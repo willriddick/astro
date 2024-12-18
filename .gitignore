@@ -1,0 +1,22 @@
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment directories
+venv/
+env/
+ENV/
+.env/
+
+# IDE files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.log
+*.sqlite3
+
+# Ignore exports
+/exports/
