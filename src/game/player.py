@@ -11,10 +11,11 @@ class Player(pygame.sprite.Sprite):
         self.rect_size = (7, 14)
         self.image = load_image('player.png')
         self.image_offset = (13, 18)
+        self.image_flip = False
 
         self.move_speed: float = 2
-        self.acc: float = 0.1
-        self.dec: float = 0.2
+        self.ground_acc = (0.2, 0.4)
+        self.air_acc = (0.1, 0.05)
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
@@ -23,8 +24,8 @@ class Player(pygame.sprite.Sprite):
         self.coyote_timer = 0
         self.coyote_buffer = 5
         self.jump_speed = 4
-        self.fall_speed = 3
-        self.gravity = 0.1
+        self.fall_speed = 4
+        self.gravity = 0.25
 
         self.collisions = {
             Direction.UP: False,
@@ -33,21 +34,59 @@ class Player(pygame.sprite.Sprite):
             Direction.LEFT: False
         }
 
-        self.debug = True
+        self.debug = False
         self.tiles_around = []
+    
+    def get_rect(self):
+        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
 
     def get_input(self):
         pressed = pygame.key.get_pressed()
         just_pressed = pygame.key.get_just_pressed()
 
         self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
+        if self.move_dir != 0:
+            self.image_flip = self.move_dir == -1
 
         self.jump_input = max(0, self.jump_input - 1)
         if just_pressed[pygame.K_SPACE]:
             self.jump_input = self.jump_buffer
     
-    def get_rect(self):
-        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
+    def update(self, tilemap):
+        self.get_input()
+
+        # Update x velocity
+        acc = self.ground_acc if self.collisions[Direction.DOWN] else self.air_acc
+        if self.move_dir == 0:
+            # Apply deceleration
+            if abs(self.velocity.x) < acc[1]:
+                self.velocity.x = 0
+            else:
+                # Copysign returns the first argument with the sign of the second argument
+                self.velocity.x -= copysign(acc[1], self.velocity.x)
+        else:
+            # Apply acceleration, clamping velocity to the move speed
+            self.velocity.x = max(
+                -self.move_speed, 
+                min(self.move_speed, self.velocity.x + (self.move_dir * acc[0])))
+        
+        # Apply gravity
+        if not self.collisions[Direction.DOWN]:
+            self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
+        
+        # Update coyote timer
+        self.coyote_timer = max(0, self.coyote_timer - 1)
+        if self.collisions[Direction.DOWN]:
+            self.coyote_timer = self.coyote_buffer
+        
+        # Apply jump
+        if self.jump_input > 0 and self.coyote_timer > 0:
+            self.velocity.y = -self.jump_speed
+            self.jump_input = 0
+            self.coyote_timer = 0
+        
+        # Move player with collisions
+        self.move(tilemap)
     
     def move(self, tilemap: Tilemap):
         # Update tile position
@@ -87,44 +126,13 @@ class Player(pygame.sprite.Sprite):
                     self.collisions[Direction.LEFT] = True
                 self.pos.x = entity_rect.x
                 self.velocity.x = 0
-              
-    def update(self, tilemap):
-        self.get_input()
-
-        if self.move_dir == 0:
-            # Apply deceleration
-            if abs(self.velocity.x) < self.dec:
-                self.velocity.x = 0
-            else:
-                # Copysign returns the first argument with the sign of the second argument
-                self.velocity.x -= copysign(self.dec, self.velocity.x)
-        else:
-            # Apply acceleration, clamping velocity to the move speed
-            self.velocity.x = max(
-                -self.move_speed, 
-                min(self.move_speed, self.velocity.x + (self.move_dir * self.acc)))
-        
-        # Apply gravity
-        if not self.collisions[Direction.DOWN]:
-            self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
-        
-        # Update coyote timer
-        self.coyote_timer = max(0, self.coyote_timer - 1)
-        if self.collisions[Direction.DOWN]:
-            self.coyote_timer = self.coyote_buffer
-        
-        # Apply jump
-        if self.jump_input > 0 and self.coyote_timer > 0:
-            self.velocity.y = -self.jump_speed
-            self.jump_input = 0
-            self.coyote_timer = 0
-        
-        self.move(tilemap)
         
     def render(self, display, offset=(0, 0)):
-        display.blit(self.image, 
+        display.blit( 
+            pygame.transform.flip(self.image, self.image_flip, False),
             (self.pos.x - self.image_offset[0] + offset[0], 
-             self.pos.y - self.image_offset[1] + offset[1]))
+             self.pos.y - self.image_offset[1] + offset[1])
+        )
         
         if self.debug:
             pygame.draw.rect(display, (255, 0, 0), self.get_rect().move(offset), 1)
