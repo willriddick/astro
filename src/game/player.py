@@ -7,21 +7,10 @@ from .util import load_image
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
         super().__init__()
+        self.pos = pygame.math.Vector2(pos)
+        self.rect_size = (7, 14)
         self.image = load_image('player.png')
         self.image_offset = (13, 18)
-        self.rect_size = (7, 14)
-        self.rect = pygame.FRect(0, 0, self.rect_size[0], self.rect_size[1])
-        self.rect.centerx, self.rect.bottom = pos
-
-        self.jump_input = 0
-        self.jump_buffer = 5
-
-        self.coyote_timer = 0
-        self.coyote_buffer = 5
-
-        self.jump_speed = 4
-        self.fall_speed = 3
-        self.gravity = 0.1
 
         self.move_speed: float = 2
         self.acc: float = 0.1
@@ -29,12 +18,23 @@ class Player(pygame.sprite.Sprite):
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
+        self.jump_input = 0
+        self.jump_buffer = 5
+        self.coyote_timer = 0
+        self.coyote_buffer = 5
+        self.jump_speed = 4
+        self.fall_speed = 3
+        self.gravity = 0.1
+
         self.collisions = {
             Direction.UP: False,
             Direction.DOWN: False,
             Direction.RIGHT: False,
             Direction.LEFT: False
         }
+
+        self.debug = True
+        self.tiles_around = []
 
     def get_input(self):
         pressed = pygame.key.get_pressed()
@@ -45,41 +45,49 @@ class Player(pygame.sprite.Sprite):
         self.jump_input = max(0, self.jump_input - 1)
         if just_pressed[pygame.K_SPACE]:
             self.jump_input = self.jump_buffer
+    
+    def get_rect(self):
+        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
+    
+    def move(self, tilemap: Tilemap):
+        # Update tile position
+        tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
+        self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])
 
-
-    def handle_collisions(self, tilemap: Tilemap):
         # Reset collisions
         for k in self.collisions.keys():
             self.collisions[k] = False
         
-        # Calculate frame movement
-        frame_movement = pygame.math.Vector2(self.velocity.x, self.velocity.y)
-        tile_pos = (self.rect.x // tilemap.tile_size, self.rect.y // tilemap.tile_size)
-        
-        # Update x position
-        self.rect.x += frame_movement.x
-        for rect in tilemap.get_rects_around(tile_pos, ['stone']):
-            if self.rect.colliderect(rect):
-                if frame_movement.x > 0:
-                    self.rect.right = rect.left
-                    self.collisions[Direction.RIGHT] = True
-                if frame_movement.x < 0:
-                    self.rect.left = rect.right
-                    self.collisions[Direction.LEFT] = True
-                self.velocity.x = 0
-        
         # Update y position
-        self.rect.y += frame_movement.y
-        for rect in tilemap.get_rects_around(tile_pos, ['stone']):
-            if self.rect.colliderect(rect):
-                if frame_movement.y > 0:
-                    self.rect.bottom = rect.top
+        self.pos.y += self.velocity.y
+        entity_rect = self.get_rect()
+        for tile in tilemap.get_tiles_around(tile_pos, ['stone']):
+            rect = tile.get_rect()
+            if entity_rect.colliderect(rect):
+                if self.velocity.y > 0:
+                    entity_rect.bottom = rect.top
                     self.collisions[Direction.DOWN] = True
-                if frame_movement.y < 0:
-                    self.rect.top = rect.bottom
+                if self.velocity.y < 0:
+                    entity_rect.top = rect.bottom
                     self.collisions[Direction.UP] = True
+                self.pos.y = entity_rect.y
                 self.velocity.y = 0
         
+        # Update x position
+        self.pos.x += self.velocity.x
+        entity_rect = self.get_rect()
+        for tile in tilemap.get_tiles_around(tile_pos, ['stone']):
+            rect = tile.get_rect()
+            if entity_rect.colliderect(rect):
+                if self.velocity.x > 0:
+                    entity_rect.right = rect.left
+                    self.collisions[Direction.RIGHT] = True
+                if self.velocity.x < 0:
+                    entity_rect.left = rect.right
+                    self.collisions[Direction.LEFT] = True
+                self.pos.x = entity_rect.x
+                self.velocity.x = 0
+              
     def update(self, tilemap):
         self.get_input()
 
@@ -99,7 +107,7 @@ class Player(pygame.sprite.Sprite):
         # Apply gravity
         if not self.collisions[Direction.DOWN]:
             self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
-
+        
         # Update coyote timer
         self.coyote_timer = max(0, self.coyote_timer - 1)
         if self.collisions[Direction.DOWN]:
@@ -111,10 +119,15 @@ class Player(pygame.sprite.Sprite):
             self.jump_input = 0
             self.coyote_timer = 0
         
-        self.handle_collisions(tilemap)
+        self.move(tilemap)
         
     def render(self, display, offset=(0, 0)):
         display.blit(self.image, 
-            (self.rect.x - self.image_offset[0] + offset[0], 
-             self.rect.y - self.image_offset[1] + offset[1]))
-        pygame.draw.rect(display, (255, 0, 0), self.rect.move(offset), 1)
+            (self.pos.x - self.image_offset[0] + offset[0], 
+             self.pos.y - self.image_offset[1] + offset[1]))
+        
+        if self.debug:
+            pygame.draw.rect(display, (255, 0, 0), self.get_rect().move(offset), 1)
+
+            for tile in self.tiles_around:
+                pygame.draw.rect(display, (0, 255, 0), tile.get_rect().move(offset), 1)
