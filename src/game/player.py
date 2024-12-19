@@ -2,14 +2,16 @@ from math import copysign
 import pygame
 from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Direction
-from .util import load_image
+from .util import load_image, load_sprite_sheet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
         super().__init__()
         self.pos = pygame.math.Vector2(pos)
         self.rect_size = (7, 14)
-        self.image = load_image('player.png')
+
+        self.images = load_sprite_sheet('run.png', (32, 32))
+        self.image_index = 0
         self.image_offset = (13, 18)
         self.image_flip = False
 
@@ -19,13 +21,14 @@ class Player(pygame.sprite.Sprite):
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.jump_input = 0
-        self.jump_buffer = 5
-        self.coyote_timer = 0
-        self.coyote_buffer = 5
         self.jump_speed = 4
         self.fall_speed = 4
         self.gravity = 0.25
+
+        self.jump_input = 0
+        self.jump_buffer = 4
+        self.coyote_timer = 0
+        self.coyote_buffer = 5
 
         self.collisions = {
             Direction.UP: False,
@@ -128,8 +131,9 @@ class Player(pygame.sprite.Sprite):
                 self.velocity.x = 0
         
     def render(self, display, offset=(0, 0)):
+        image = self.images[self.image_index]
         display.blit( 
-            pygame.transform.flip(self.image, self.image_flip, False),
+            pygame.transform.flip(image, self.image_flip, False),
             (self.pos.x - self.image_offset[0] + offset[0], 
              self.pos.y - self.image_offset[1] + offset[1])
         )

@@ -8,7 +8,7 @@ from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Asset
 
 from .player import Player
-from .util import load_images, load_image
+from .util import load_images, load_image, load_sprite_sheet
 
 FPS = 60
 
@@ -48,6 +48,8 @@ class Main:
         self.command_thread.start()
 
         self.tilemap: Tilemap = None
+
+        print(load_sprite_sheet('run.png', (32, 32)))
 
         self.handle_game()
 
