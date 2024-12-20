@@ -8,7 +8,7 @@ from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Asset
 
 from .player import Player
-from .util import load_images, load_image, load_sprite_sheet
+from ..util import load_images
 
 FPS = 60
 

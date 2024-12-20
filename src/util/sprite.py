@@ -23,7 +23,6 @@ class Sprite:
             if current_time - self.last_update_time >= time_per_frame:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
-
     
     def add_animation(self, name: str, frames: list[pygame.Surface], frame_rate: int):
         self.animations[name] = (frames, frame_rate)

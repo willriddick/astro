@@ -2,8 +2,7 @@ from math import copysign
 import pygame
 from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Direction
-from .util import load_image, load_sprite_sheet
-from .sprite import Sprite
+from ..util import Sprite, load_sprite_sheet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
