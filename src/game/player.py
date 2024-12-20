@@ -15,17 +15,17 @@ class Player(pygame.sprite.Sprite):
             (13, 18)
         )
         self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)),0)
-        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 12)
+        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 14)
         self.sprite.add_animation('air', load_sprite_sheet('player/air.png', (32, 32)),0)
         self.sprite.set_animation('idle')
 
-        self.move_speed: float = 1.5
-        self.ground_acc = (0.2, 0.3)
-        self.air_acc = (0.1, 0.05)
+        self.move_speed: float = 1.25
+        self.ground_acc = (0.15, 0.25)
+        self.air_acc = (0.05, 0.01)
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.gravity = 0.14
+        self.gravity = 0.13
         self.grounded = False
         self.fall_speed = 3
 
