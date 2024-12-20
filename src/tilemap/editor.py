@@ -4,7 +4,7 @@ import argparse
 import pygame
 from .tilemap import Tilemap
 from .tile_type import TileType
-from ..util import load_sprite_sheet, Sprite
+from ..util import load_sprite_sheet 
 
 RENDER_SCALE = 2
 WIDTH, HEIGHT = 400, 300

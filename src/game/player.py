@@ -1,9 +1,8 @@
 from math import copysign 
 from random import choice
 import pygame
-from ..tilemap.tilemap import Tilemap
-from ..tilemap.tilemap import Direction
-from ..util import Sprite, load_sprite_sheet
+from ..tilemap import Tilemap
+from ..util import Direction, Sprite, load_sprite_sheet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -25,8 +24,8 @@ class Player(pygame.sprite.Sprite):
 
         self.rotate_timer = 0
         self.rotate_duration = 8
+        self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
-        self.rotate_choice = [1] # 0: back, 1: front (more ones means more likely that the player will look front)
 
         self.move_speed: float = 1.2
         self.ground_acc = (0.1, 0.2)
@@ -36,7 +35,6 @@ class Player(pygame.sprite.Sprite):
         self.velocity = pygame.math.Vector2(0, 0)
 
         self.gravity = 0.13
-        self.grounded = False
         self.fall_speed = 3
 
         self.holding_jump = False
@@ -49,10 +47,13 @@ class Player(pygame.sprite.Sprite):
         self.coyote_timer = 0
         self.coyote_buffer = 5
 
-        self.collisions = {
+        self.on_ground = False
+        self.on_ceiling = False
+
+        self.collisions = { 
             Direction.UP: False,
             Direction.DOWN: False,
-            Direction.RIGHT: False,
+            Direction.RIGHT: False, 
             Direction.LEFT: False
         }
 
@@ -63,7 +64,7 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
 
         # Update x velocity
-        acc = self.ground_acc if self.grounded else self.air_acc
+        acc = self.ground_acc if self.on_ground else self.air_acc
         if self.move_dir == 0:
             # Apply deceleration
             if abs(self.velocity.x) < acc[1]:
@@ -82,7 +83,7 @@ class Player(pygame.sprite.Sprite):
         
         # Update coyote timer
         self.coyote_timer = max(0, self.coyote_timer - 1)
-        if self.grounded:
+        if self.on_ground:
             self.coyote_timer = self.coyote_buffer
         
         # Apply jump
@@ -115,7 +116,7 @@ class Player(pygame.sprite.Sprite):
         if self.move_dir != 0:
             self.last_move_dir = self.move_dir
 
-        if self.grounded:
+        if self.on_ground:
             if self.rotate_timer > 0:
                 if self.rotate_dir:
                     self.sprite.set_animation('front')
@@ -156,15 +157,19 @@ class Player(pygame.sprite.Sprite):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
                     self.collisions[Direction.DOWN] = True
-                    self.grounded = True
+                    self.on_ground = True
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
                     self.collisions[Direction.UP] = True
+                    self.on_ceiling = True
                 self.pos.y = entity_rect.y
                 self.velocity.y = 0
         
         if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
-            self.grounded = False
+            self.on_ground = False
+        
+        if self.velocity.y != 0 and not self.collisions[Direction.UP]:
+            self.on_ceiling = False
 
         # Update x position
         self.pos.x += self.velocity.x

@@ -1,8 +1,8 @@
 import struct
 import pygame
-from .direction import Direction
 from .tile import Tile
 from .tile_type import TileType
+from ..util import Direction
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
