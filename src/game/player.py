@@ -3,6 +3,7 @@ import pygame
 from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Direction
 from .util import load_image, load_sprite_sheet
+from .sprite import Sprite
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -10,20 +11,25 @@ class Player(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(pos)
         self.rect_size = (7, 14)
 
-        self.images = load_sprite_sheet('run.png', (32, 32))
-        self.image_index = 0
-        self.image_offset = (13, 18)
-        self.image_flip = False
+        self.sprite = Sprite(
+            self.pos, 
+            (13, 18)
+        )
+        self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)),0)
+        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 12)
+        self.sprite.add_animation('air', load_sprite_sheet('player/air.png', (32, 32)),0)
+        self.sprite.set_animation('idle')
 
-        self.move_speed: float = 2
-        self.ground_acc = (0.2, 0.4)
+        self.move_speed: float = 1.5
+        self.ground_acc = (0.2, 0.3)
         self.air_acc = (0.1, 0.05)
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.jump_speed = 4
-        self.fall_speed = 4
-        self.gravity = 0.25
+        self.jump_speed = 3
+        self.fall_speed = 3
+        self.gravity = 0.14
+        self.grounded = False
 
         self.jump_input = 0
         self.jump_buffer = 4
@@ -49,7 +55,7 @@ class Player(pygame.sprite.Sprite):
 
         self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
         if self.move_dir != 0:
-            self.image_flip = self.move_dir == -1
+            self.sprite.flip = self.move_dir == -1
 
         self.jump_input = max(0, self.jump_input - 1)
         if just_pressed[pygame.K_SPACE]:
@@ -59,7 +65,7 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
 
         # Update x velocity
-        acc = self.ground_acc if self.collisions[Direction.DOWN] else self.air_acc
+        acc = self.ground_acc if self.grounded else self.air_acc
         if self.move_dir == 0:
             # Apply deceleration
             if abs(self.velocity.x) < acc[1]:
@@ -74,12 +80,11 @@ class Player(pygame.sprite.Sprite):
                 min(self.move_speed, self.velocity.x + (self.move_dir * acc[0])))
         
         # Apply gravity
-        if not self.collisions[Direction.DOWN]:
-            self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
+        self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
         
         # Update coyote timer
         self.coyote_timer = max(0, self.coyote_timer - 1)
-        if self.collisions[Direction.DOWN]:
+        if self.grounded:
             self.coyote_timer = self.coyote_buffer
         
         # Apply jump
@@ -90,6 +95,17 @@ class Player(pygame.sprite.Sprite):
         
         # Move player with collisions
         self.move(tilemap)
+
+        # Update sprite
+        if self.grounded:
+            if self.move_dir != 0:
+                self.sprite.set_animation('run')
+            else:
+                self.sprite.set_animation('idle')
+        else:
+            self.sprite.set_animation('air')
+
+        self.sprite.update(self.pos)
     
     def move(self, tilemap: Tilemap):
         # Update tile position
@@ -109,12 +125,16 @@ class Player(pygame.sprite.Sprite):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
                     self.collisions[Direction.DOWN] = True
+                    self.grounded = True
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
                     self.collisions[Direction.UP] = True
                 self.pos.y = entity_rect.y
                 self.velocity.y = 0
         
+        if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
+            self.grounded = False
+
         # Update x position
         self.pos.x += self.velocity.x
         entity_rect = self.get_rect()
@@ -131,12 +151,7 @@ class Player(pygame.sprite.Sprite):
                 self.velocity.x = 0
         
     def render(self, display, offset=(0, 0)):
-        image = self.images[self.image_index]
-        display.blit( 
-            pygame.transform.flip(image, self.image_flip, False),
-            (self.pos.x - self.image_offset[0] + offset[0], 
-             self.pos.y - self.image_offset[1] + offset[1])
-        )
+        self.sprite.render(display, offset)
         
         if self.debug:
             pygame.draw.rect(display, (255, 0, 0), self.get_rect().move(offset), 1)

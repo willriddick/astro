@@ -31,7 +31,6 @@ class Main:
         }
 
         pygame.display.set_caption('GAME')
-        pygame.display.set_icon(load_image('player.png'))
 
         self.clock = pygame.time.Clock()
         
@@ -48,8 +47,6 @@ class Main:
         self.command_thread.start()
 
         self.tilemap: Tilemap = None
-
-        print(load_sprite_sheet('run.png', (32, 32)))
 
         self.handle_game()
 
