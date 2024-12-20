@@ -48,8 +48,6 @@ class Player(pygame.sprite.Sprite):
         self.coyote_buffer = 5
 
         self.on_ground = False
-        self.on_ceiling = False
-
         self.collisions = { 
             Direction.UP: False,
             Direction.DOWN: False,
@@ -100,7 +98,6 @@ class Player(pygame.sprite.Sprite):
         
         # Move player with collisions
         self.move(tilemap)
-
         self.handle_animation(self.pos)
 
     def handle_animation(self, pos: pygame.math.Vector2):
@@ -157,19 +154,13 @@ class Player(pygame.sprite.Sprite):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
                     self.collisions[Direction.DOWN] = True
-                    self.on_ground = True
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
                     self.collisions[Direction.UP] = True
-                    self.on_ceiling = True
                 self.pos.y = entity_rect.y
                 self.velocity.y = 0
         
-        if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
-            self.on_ground = False
-        
-        if self.velocity.y != 0 and not self.collisions[Direction.UP]:
-            self.on_ceiling = False
+        self.on_ground = self.collisions[Direction.DOWN]
 
         # Update x position
         self.pos.x += self.velocity.x
