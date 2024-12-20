@@ -1,4 +1,5 @@
-from math import copysign
+from math import copysign 
+from random import choice
 import pygame
 from ..tilemap.tilemap import Tilemap
 from ..tilemap.tilemap import Direction
@@ -14,16 +15,24 @@ class Player(pygame.sprite.Sprite):
             self.pos, 
             (13, 18)
         )
-        self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)),0)
+        self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)), 0)
         self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 11)
-        self.sprite.add_animation('air-up', load_sprite_sheet('player/air-up.png', (32, 32)),0)
-        self.sprite.add_animation('air-down', load_sprite_sheet('player/air-down.png', (32, 32)),0)
+        self.sprite.add_animation('air-up', load_sprite_sheet('player/air-up.png', (32, 32)), 0)
+        self.sprite.add_animation('air-down', load_sprite_sheet('player/air-down.png', (32, 32)), 0)
+        self.sprite.add_animation('front', load_sprite_sheet('player/front.png', (32, 32)), 0)
+        self.sprite.add_animation('back', load_sprite_sheet('player/back.png', (32, 32)), 0)
         self.sprite.set_animation('idle')
+
+        self.rotate_timer = 0
+        self.rotate_duration = 8
+        self.rotate_dir = 0
+        self.rotate_choice = [1] # 0: back, 1: front (more ones means more likely that the player will look front)
 
         self.move_speed: float = 1.2
         self.ground_acc = (0.1, 0.2)
         self.air_acc = (0.05, 0.01)
-        self.move_dir: int = 0
+        self.move_dir = 1 # starts at one because the player is facing right
+        self.last_move_dir = 1
         self.velocity = pygame.math.Vector2(0, 0)
 
         self.gravity = 0.13
@@ -67,7 +76,7 @@ class Player(pygame.sprite.Sprite):
             self.velocity.x = max(
                 -self.move_speed, 
                 min(self.move_speed, self.velocity.x + (self.move_dir * acc[0])))
-        
+            
         # Apply gravity
         self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
         
@@ -92,8 +101,24 @@ class Player(pygame.sprite.Sprite):
         self.move(tilemap)
 
         # Update sprite
+        self.rotate_timer = max(0, self.rotate_timer - 1)
+
+        # Detect direction change
+        if self.move_dir != 0 and self.move_dir != self.last_move_dir:
+            self.rotate_timer = self.rotate_duration
+            self.rotate_dir = choice(self.rotate_choice)
+
+        # Update the last move direction
+        if self.move_dir != 0:
+            self.last_move_dir = self.move_dir
+
         if self.grounded:
-            if self.move_dir != 0:
+            if self.rotate_timer > 0:
+                if self.rotate_dir:
+                    self.sprite.set_animation('front')
+                else:
+                    self.sprite.set_animation('back')
+            elif self.move_dir != 0:
                 self.sprite.set_animation('run')
             else:
                 self.sprite.set_animation('idle')
