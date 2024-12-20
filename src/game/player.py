@@ -15,12 +15,13 @@ class Player(pygame.sprite.Sprite):
             (13, 18)
         )
         self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)),0)
-        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 14)
-        self.sprite.add_animation('air', load_sprite_sheet('player/air.png', (32, 32)),0)
+        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 11)
+        self.sprite.add_animation('air-up', load_sprite_sheet('player/air-up.png', (32, 32)),0)
+        self.sprite.add_animation('air-down', load_sprite_sheet('player/air-down.png', (32, 32)),0)
         self.sprite.set_animation('idle')
 
-        self.move_speed: float = 1.25
-        self.ground_acc = (0.15, 0.25)
+        self.move_speed: float = 1.2
+        self.ground_acc = (0.1, 0.2)
         self.air_acc = (0.05, 0.01)
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
@@ -31,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 
         self.holding_jump = False
         self.jump_speed = 3
-        self.variable_jump_multiplier = 0.8
+        self.variable_jump_multiplier = 0.7
         self.variable_jump_buffer = 30
         self.variable_jump_timer = 0
         self.jump_input = 0
@@ -97,7 +98,10 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.sprite.set_animation('idle')
         else:
-            self.sprite.set_animation('air')
+            if self.velocity.y < 0:
+                self.sprite.set_animation('air-up')
+            else:
+                self.sprite.set_animation('air-down')
 
         self.sprite.update(self.pos)
     
