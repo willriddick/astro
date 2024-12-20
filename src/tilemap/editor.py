@@ -19,14 +19,14 @@ class Editor:
         self.clock = pygame.time.Clock()
         self.running = False
 
-        self.TYPES = {
-            'stone': TileType(
+        self.TYPES = [
+            TileType(
                 'stone', 
                 load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
                 autotile=True, 
                 tile_size=16
             ),
-        }
+        ]
 
         if args.load:
             self.tilemap = Tilemap.load(args.load, self.TYPES)
@@ -93,8 +93,7 @@ class Editor:
         mouse_pos = (0, 0)
         tile_pos = (0, 0)
         type_index = 0
-        type_name: str = list(self.TYPES.keys())[type_index]
-        tile_type: TileType = self.TYPES[type_name]
+        tile_type: TileType = self.TYPES[type_index]
         tile_variant = 0
 
         while self.running:
@@ -124,8 +123,7 @@ class Editor:
                     tile_variant = (tile_variant + direction) % len(tile_type.images)
                 else:
                     type_index = (type_index + direction) % len(self.TYPES)
-                    tile_name = list(self.TYPES.keys())[type_index]
-                    tile_type = self.TYPES[tile_name]
+                    tile_type = self.TYPES[type_index]
                     tile_variant = 0
 
             # Create or remove tile

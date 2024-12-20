@@ -8,7 +8,7 @@ HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class Tilemap:
-    def __init__(self, types: dict[str, TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0)):
+    def __init__(self, types: list[TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0)):
         self.types = types
         self.tile_size = tile_size
         self.size = size
@@ -20,7 +20,7 @@ class Tilemap:
     
     def clear(self):
         self.map = {}
-
+    
     def render(self, surf: pygame.Surface, offset=(0, 0)):
         x_start = offset[0] // self.tile_size
         x_stop = (offset[0] + surf.get_width()) // self.tile_size + 1
@@ -31,6 +31,12 @@ class Tilemap:
                 tile = self.get_tile((x, y))
                 if tile:
                     tile.render(surf, offset)
+    
+    def get_tile_type(self, name: str) -> TileType:
+        for type in self.types:
+            if type.name == name:
+                return type
+        return None
     
     def get_tile(self, tile_pos: tuple[int, int], direction: Direction = Direction.NONE) -> Tile | None:
         new_pos = (tile_pos[0] + direction.value[0], tile_pos[1] + direction.value[1])
@@ -142,9 +148,9 @@ class Tilemap:
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
             print(f'Save failed... file not found: {path}')
-
+    
     @staticmethod
-    def load(path: str, types: dict[str, TileType]) -> 'Tilemap':
+    def load(path: str, types: list[TileType]) -> 'Tilemap':
         try:
             with open(path, 'rb') as f:
                 content = f.read()
@@ -156,7 +162,7 @@ class Tilemap:
             step = struct.calcsize(TILE_FORMAT)
             for offset in range(header_offset, len(content), step):
                 data = struct.unpack(TILE_FORMAT, content[offset:offset + step])
-                type = types.get(data[0].decode().rstrip('\00'))
+                type = tilemap.get_tile_type(data[0].decode().rstrip('\00'))
                 tilemap.create_tile(type, data[1], (data[2], data[3]))
 
             return tilemap

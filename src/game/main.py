@@ -22,8 +22,7 @@ class Main:
         self.fullscreen = False
         
         self.TYPES = {
-            'stone': TileType(
-                'stone', 
+            TileType('stone', 
                 load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
                 autotile=True, 
                 tile_size=16
