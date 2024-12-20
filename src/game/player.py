@@ -25,11 +25,15 @@ class Player(pygame.sprite.Sprite):
         self.move_dir: int = 0
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.jump_speed = 3
-        self.fall_speed = 3
         self.gravity = 0.14
         self.grounded = False
+        self.fall_speed = 3
 
+        self.holding_jump = False
+        self.jump_speed = 3
+        self.variable_jump_multiplier = 0.8
+        self.variable_jump_buffer = 30
+        self.variable_jump_timer = 0
         self.jump_input = 0
         self.jump_buffer = 4
         self.coyote_timer = 0
@@ -44,21 +48,6 @@ class Player(pygame.sprite.Sprite):
 
         self.debug = False
         self.tiles_around = []
-    
-    def get_rect(self):
-        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
-
-    def get_input(self):
-        pressed = pygame.key.get_pressed()
-        just_pressed = pygame.key.get_just_pressed()
-
-        self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
-        if self.move_dir != 0:
-            self.sprite.flip = self.move_dir == -1
-
-        self.jump_input = max(0, self.jump_input - 1)
-        if just_pressed[pygame.K_SPACE]:
-            self.jump_input = self.jump_buffer
     
     def update(self, tilemap):
         self.get_input()
@@ -91,6 +80,12 @@ class Player(pygame.sprite.Sprite):
             self.velocity.y = -self.jump_speed
             self.jump_input = 0
             self.coyote_timer = 0
+            self.variable_jump_timer = self.variable_jump_buffer
+        
+        # Handle variable jump height
+        self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
+        if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
+            self.velocity.y *= self.variable_jump_multiplier
         
         # Move player with collisions
         self.move(tilemap)
@@ -148,7 +143,24 @@ class Player(pygame.sprite.Sprite):
                     self.collisions[Direction.LEFT] = True
                 self.pos.x = entity_rect.x
                 self.velocity.x = 0
+    
+    def get_rect(self):
+        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
+
+    def get_input(self):
+        pressed = pygame.key.get_pressed()
+        just_pressed = pygame.key.get_just_pressed()
+
+        self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
+        if self.move_dir != 0:
+            self.sprite.flip = self.move_dir == -1
+
+        self.jump_input = max(0, self.jump_input - 1)
+        if just_pressed[pygame.K_SPACE]:
+            self.jump_input = self.jump_buffer
         
+        self.holding_jump = pressed[pygame.K_SPACE]
+
     def render(self, display, offset=(0, 0)):
         self.sprite.render(display, offset)
         
