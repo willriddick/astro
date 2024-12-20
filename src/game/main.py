@@ -1,17 +1,13 @@
 import os
 import sys
 import threading
-
 import pygame
-
-from ..tilemap.tilemap import Tilemap
-from ..tilemap.tilemap import Asset
-
 from .player import Player
+from ..tilemap import Tilemap
+from ..tilemap import Asset
 from ..util import load_images
 
 FPS = 60
-
 WINDOW_SCALE = 3
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
@@ -51,7 +47,7 @@ class Main:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('test', self.ASSETS)
+        self.tilemap = Tilemap.load('maps/test2', self.ASSETS)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))

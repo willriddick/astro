@@ -20,6 +20,3 @@ ENV/
 
 # Ignore exports
 /exports/
-
-#
-tilemap/
