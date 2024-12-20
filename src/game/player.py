@@ -16,9 +16,9 @@ class Player(pygame.sprite.Sprite):
             (13, 18)
         )
         self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)), 0)
-        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 11)
-        self.sprite.add_animation('air-up', load_sprite_sheet('player/air-up.png', (32, 32)), 0)
-        self.sprite.add_animation('air-down', load_sprite_sheet('player/air-down.png', (32, 32)), 0)
+        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 10)
+        self.sprite.add_animation('air_up', load_sprite_sheet('player/air_up.png', (32, 32)), 0)
+        self.sprite.add_animation('air_down', load_sprite_sheet('player/air_down.png', (32, 32)), 0)
         self.sprite.add_animation('front', load_sprite_sheet('player/front.png', (32, 32)), 0)
         self.sprite.add_animation('back', load_sprite_sheet('player/back.png', (32, 32)), 0)
         self.sprite.set_animation('idle')
@@ -100,7 +100,10 @@ class Player(pygame.sprite.Sprite):
         # Move player with collisions
         self.move(tilemap)
 
-        # Update sprite
+        self.handle_animation(self.pos)
+
+    def handle_animation(self, pos: pygame.math.Vector2):
+        # Update rotate timer
         self.rotate_timer = max(0, self.rotate_timer - 1)
 
         # Detect direction change
@@ -123,12 +126,17 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.sprite.set_animation('idle')
         else:
-            if self.velocity.y < 0:
-                self.sprite.set_animation('air-up')
+            if self.rotate_timer > 0:
+                if self.rotate_dir:
+                    self.sprite.set_animation('front')
+                else:
+                    self.sprite.set_animation('back')
+            elif self.velocity.y < 0:
+                self.sprite.set_animation('air_up')
             else:
-                self.sprite.set_animation('air-down')
+                self.sprite.set_animation('air_down')
 
-        self.sprite.update(self.pos)
+        self.sprite.update(pos)
     
     def move(self, tilemap: Tilemap):
         # Update tile position

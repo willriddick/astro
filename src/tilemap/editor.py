@@ -3,8 +3,8 @@ import threading
 import argparse
 import pygame
 from .tilemap import Tilemap
-from .asset import Asset
-from ..util import load_images
+from .tile_type import TileType
+from ..util import load_sprite_sheet, Sprite
 
 RENDER_SCALE = 2
 WIDTH, HEIGHT = 400, 300
@@ -19,15 +19,19 @@ class Editor:
         self.clock = pygame.time.Clock()
         self.running = False
 
-        self.ASSETS = {
-            'stone': Asset('stone', load_images('test-tileset'), autotile=True),
-            'decor': Asset('decor', load_images('decor')),
+        self.TYPES = {
+            'stone': TileType(
+                'stone', 
+                load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
+                autotile=True, 
+                tile_size=16
+            ),
         }
 
         if args.load:
-            self.tilemap = Tilemap.load(args.load, self.ASSETS)
+            self.tilemap = Tilemap.load(args.load, self.TYPES)
         else:
-            self.tilemap = Tilemap(self.ASSETS)
+            self.tilemap = Tilemap(self.TYPES)
 
         if args.size:
             self.tilemap.set_size(args.size)
@@ -66,14 +70,14 @@ class Editor:
                     case ['/save', path]:
                         Tilemap.save(self.tilemap, path)
                     case ['/load', path]:
-                        self.tilemap = Tilemap.load(path, self.ASSETS)
+                        self.tilemap = Tilemap.load(path, self.TYPES)
                     case ['/clear']: 
                         self.tilemap.clear()
                         print(f'Tilemap cleared')
                     case ['/size', width, height]:
                         self.tilemap.set_size((int(width), int(height)))
                     case ['/place', path, x, y, flip]:
-                        room = Tilemap.load(path, self.ASSETS)
+                        room = Tilemap.load(path, self.TYPES)
                         self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
                     case ['/quit']:
                         self.running = False
@@ -88,9 +92,9 @@ class Editor:
     def handle_editor(self):
         mouse_pos = (0, 0)
         tile_pos = (0, 0)
-        asset_index = 0
-        asset_name: str = list(self.ASSETS.keys())[asset_index]
-        tile_asset: Asset = self.ASSETS[asset_name]
+        type_index = 0
+        type_name: str = list(self.TYPES.keys())[type_index]
+        tile_type: TileType = self.TYPES[type_name]
         tile_variant = 0
 
         while self.running:
@@ -117,16 +121,16 @@ class Editor:
                 self.e_pressed = False
 
                 if self.shift_pressed:
-                    tile_variant = (tile_variant + direction) % len(tile_asset.images)
+                    tile_variant = (tile_variant + direction) % len(tile_type.images)
                 else:
-                    asset_index = (asset_index + direction) % len(self.ASSETS)
-                    asset_name = list(self.ASSETS.keys())[asset_index]
-                    tile_asset = self.ASSETS[asset_name]
+                    type_index = (type_index + direction) % len(self.TYPES)
+                    tile_name = list(self.TYPES.keys())[type_index]
+                    tile_type = self.TYPES[tile_name]
                     tile_variant = 0
 
             # Create or remove tile
             if self.left_click:
-                self.tilemap.create_tile(tile_asset, tile_variant, tile_pos)
+                self.tilemap.create_tile(tile_type, tile_variant, tile_pos)
             
             if self.right_click:
                 self.tilemap.remove_tile(tile_pos)
@@ -135,7 +139,7 @@ class Editor:
             self.tilemap.render(self.display, self.camera_offset)
 
             # Render selected tile
-            selected_tile = tile_asset.images[tile_variant].copy()
+            selected_tile = tile_type.images[tile_variant].copy()
             selected_tile.set_alpha(100)
             self.display.blit(selected_tile, (0, 0))
 

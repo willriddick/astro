@@ -2,14 +2,14 @@ import struct
 import pygame
 from .direction import Direction
 from .tile import Tile
-from .asset import Asset
+from .tile_type import TileType
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class Tilemap:
-    def __init__(self, assets: dict[str, list[pygame.Surface]], tile_size: int = 16, size: tuple[int, int]=(0, 0), debug: bool = False):
-        self.assets = assets
+    def __init__(self, types: dict[str, TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0)):
+        self.types = types
         self.tile_size = tile_size
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
@@ -40,18 +40,18 @@ class Tilemap:
         tiles = []
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
-            if tile and tile.asset.name in filter:
+            if tile and tile.type.name in filter:
                 tiles.append(tile)
         return tiles
     
-    def create_tile(self, asset: Asset, variant: int, tile_pos: tuple[int, int]):
+    def create_tile(self, type: TileType, variant: int, tile_pos: tuple[int, int]):
         x, y = tile_pos
         if not (0 <= x < self.size[0] and 0 <= y < self.size[1]):
             return
 
         if tile_pos in self.map:
             self.remove_tile(tile_pos)
-        new_tile = Tile(self, asset, variant, tile_pos)
+        new_tile = Tile(self, type, variant, tile_pos)
         self.map[tile_pos] = new_tile
         self._update_autotiles_around(tile_pos)
                 
@@ -81,32 +81,32 @@ class Tilemap:
 
         for tile in room.map.values():
             new_pos = (x_start + tile.tile_pos[0], y_start + tile.tile_pos[1])
-            self.create_tile(tile.asset, tile.variant, new_pos)
+            self.create_tile(tile.type, tile.variant, new_pos)
 
     def _update_autotiles_around(self, tile_pos: tuple[int, int]):
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
-            if tile and tile.asset.autotile:
+            if tile and tile.type.autotile:
                 self._autotile(tile)
 
     def _autotile(self, tile: Tile):
         pos = tile.tile_pos
-        name = tile.asset.name
+        name = tile.type.name
 
         # Edge detection (No bit shifting yet)
-        u = int(self.get_tile(pos, Direction.UP) is not None and self.get_tile(pos, Direction.UP).asset.name == name)
-        r = int(self.get_tile(pos, Direction.RIGHT) is not None and self.get_tile(pos, Direction.RIGHT).asset.name == name)
-        d = int(self.get_tile(pos, Direction.DOWN) is not None and self.get_tile(pos, Direction.DOWN).asset.name == name)
-        l = int(self.get_tile(pos, Direction.LEFT) is not None and self.get_tile(pos, Direction.LEFT).asset.name == name)
+        u = int(self.get_tile(pos, Direction.UP) is not None and self.get_tile(pos, Direction.UP).type.name == name)
+        r = int(self.get_tile(pos, Direction.RIGHT) is not None and self.get_tile(pos, Direction.RIGHT).type.name == name)
+        d = int(self.get_tile(pos, Direction.DOWN) is not None and self.get_tile(pos, Direction.DOWN).type.name == name)
+        l = int(self.get_tile(pos, Direction.LEFT) is not None and self.get_tile(pos, Direction.LEFT).type.name == name)
 
         # Calculate edges bitmask (bit shifting happens here)
         edges = u | (r << 1) | (d << 2) | (l << 3)
 
         # Corner detection (must match GameMaker logic)
-        ul = int(u and l and self.get_tile(pos, Direction.UP_LEFT) is not None and self.get_tile(pos, Direction.UP_LEFT).asset.name == name)
-        ur = int(u and r and self.get_tile(pos, Direction.UP_RIGHT) is not None and self.get_tile(pos, Direction.UP_RIGHT).asset.name == name)
-        dr = int(d and r and self.get_tile(pos, Direction.DOWN_RIGHT) is not None and self.get_tile(pos, Direction.DOWN_RIGHT).asset.name == name)
-        dl = int(d and l and self.get_tile(pos, Direction.DOWN_LEFT) is not None and self.get_tile(pos, Direction.DOWN_LEFT).asset.name == name)
+        ul = int(u and l and self.get_tile(pos, Direction.UP_LEFT) is not None and self.get_tile(pos, Direction.UP_LEFT).type.name == name)
+        ur = int(u and r and self.get_tile(pos, Direction.UP_RIGHT) is not None and self.get_tile(pos, Direction.UP_RIGHT).type.name == name)
+        dr = int(d and r and self.get_tile(pos, Direction.DOWN_RIGHT) is not None and self.get_tile(pos, Direction.DOWN_RIGHT).type.name == name)
+        dl = int(d and l and self.get_tile(pos, Direction.DOWN_LEFT) is not None and self.get_tile(pos, Direction.DOWN_LEFT).type.name == name)
 
         # Calculate corners bitmask
         corners = ul | (ur << 1) | (dr << 2) | (dl << 3)
@@ -137,27 +137,27 @@ class Tilemap:
                 f.write(struct.pack(HEADER_FORMAT, tilemap.tile_size, *tilemap.size))
                 for tile in tilemap.map.values():
                     f.write(struct.pack(
-                        TILE_FORMAT, tile.asset.name.encode(), tile.variant, *tile.tile_pos
+                        TILE_FORMAT, tile.type.name.encode(), tile.variant, *tile.tile_pos
                     ))
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
             print(f'Save failed... file not found: {path}')
 
     @staticmethod
-    def load(path: str, assets: dict[str, list[pygame.Surface]]) -> 'Tilemap':
+    def load(path: str, types: dict[str, TileType]) -> 'Tilemap':
         try:
             with open(path, 'rb') as f:
                 content = f.read()
 
             header_offset = struct.calcsize(HEADER_FORMAT)
             tile_size, *size = struct.unpack(HEADER_FORMAT, content[:header_offset])
-            tilemap = Tilemap(assets, tile_size, tuple(size))
+            tilemap = Tilemap(types, tile_size, tuple(size))
 
             step = struct.calcsize(TILE_FORMAT)
             for offset in range(header_offset, len(content), step):
                 data = struct.unpack(TILE_FORMAT, content[offset:offset + step])
-                asset = assets.get(data[0].decode().rstrip('\00'))
-                tilemap.create_tile(asset, data[1], (data[2], data[3]))
+                type = types.get(data[0].decode().rstrip('\00'))
+                tilemap.create_tile(type, data[1], (data[2], data[3]))
 
             return tilemap
         except FileNotFoundError:

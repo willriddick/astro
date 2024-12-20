@@ -1,11 +1,10 @@
-import os
 import sys
 import threading
 import pygame
 from .player import Player
 from ..tilemap import Tilemap
-from ..tilemap import Asset
-from ..util import load_images
+from ..tilemap import TileType
+from ..util import load_sprite_sheet
 
 FPS = 60
 WINDOW_SCALE = 3
@@ -22,9 +21,15 @@ class Main:
             pygame.RESIZABLE)
         self.fullscreen = False
         
-        self.ASSETS = {
-            'stone': Asset('stone', load_images('test-tileset'), True),
+        self.TYPES = {
+            'stone': TileType(
+                'stone', 
+                load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
+                autotile=True, 
+                tile_size=16
+            ),
         }
+        self.tilemap: Tilemap = None
 
         pygame.display.set_caption('GAME')
 
@@ -42,12 +47,10 @@ class Main:
         self.command_thread.daemon = True
         self.command_thread.start()
 
-        self.tilemap: Tilemap = None
-
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test2', self.ASSETS)
+        self.tilemap = Tilemap.load('maps/test2', self.TYPES)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))
