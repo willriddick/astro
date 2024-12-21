@@ -47,6 +47,10 @@ class Player(pygame.sprite.Sprite):
         self.coyote_timer = 0
         self.coyote_buffer = 5
 
+        self.wall_jump_speed = (4, 2)
+        self.slide_left = False
+        self.slide_right = False
+
         self.on_ground = False
         self.collisions = { 
             Direction.UP: False,
@@ -84,6 +88,19 @@ class Player(pygame.sprite.Sprite):
         if self.on_ground:
             self.coyote_timer = self.coyote_buffer
         
+        # Wall jump
+        self.slide_left = self.collisions[Direction.RIGHT] and self.move_dir == 1
+        self.slide_right = self.collisions[Direction.LEFT] and self.move_dir == -1
+        if (self.slide_left or self.slide_right) and self.velocity.y > 0: 
+            self.velocity.y = min(0.5, self.velocity.y + (self.gravity * 0.2))
+
+            if self.jump_input > 0:
+                self.velocity.x = self.move_dir * -self.wall_jump_speed[0]
+                self.velocity.y = -self.wall_jump_speed[1]
+                self.jump_input = 0
+                self.variable_jump_timer = self.variable_jump_buffer
+
+
         # Apply jump
         if self.jump_input > 0 and self.coyote_timer > 0:
             self.velocity.y = -self.jump_speed
@@ -108,6 +125,12 @@ class Player(pygame.sprite.Sprite):
         if self.move_dir != 0 and self.move_dir != self.last_move_dir:
             self.rotate_timer = self.rotate_duration
             self.rotate_dir = choice(self.rotate_choice)
+        
+        # Handle flip
+        if self.slide_left or self.slide_right:
+            self.sprite.flip = self.slide_left
+        elif self.move_dir != 0:
+            self.sprite.flip = self.move_dir == -1
 
         # Update the last move direction
         if self.move_dir != 0:
@@ -185,8 +208,6 @@ class Player(pygame.sprite.Sprite):
         just_pressed = pygame.key.get_just_pressed()
 
         self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
-        if self.move_dir != 0:
-            self.sprite.flip = self.move_dir == -1
 
         self.jump_input = max(0, self.jump_input - 1)
         if just_pressed[pygame.K_SPACE]:
