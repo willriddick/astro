@@ -1,9 +1,42 @@
 from math import copysign 
 from random import choice
+from enum import Enum
 import pygame
 from .sprite import Sprite
 from ..tilemap import Tilemap
-from ..util import Direction, load_sprite_sheet
+from ..util import Direction, load_sprite_sheet, State, StateMachine
+
+class PlayerState(Enum):
+    IDLE = 0
+    RUN = 1
+
+class StateIdle(State):
+    def __init__(self):
+        super().__init__('idle', PlayerState.IDLE)
+    
+    def on_enter(self):
+        print('IDLE ENTER')
+    
+    def update(self):
+        if self.owner.move_dir != 0:
+            self.owner.state_machine.switch(PlayerState.RUN)
+    
+    def on_exit(self):
+        print('IDLE EXIT')
+
+class StateRun(State):
+    def __init__(self):
+        super().__init__('run', PlayerState.RUN)
+    
+    def on_enter(self):
+        print('RUN ENTER')
+    
+    def update(self):
+        if self.owner.move_dir == 0:
+            self.owner.state_machine.switch(PlayerState.IDLE)
+    
+    def on_exit(self):
+        print('RUN EXIT')
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -24,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         self.sprite.set_animation('idle')
 
         self.rotate_timer = 0
-        self.rotate_duration = 9
+        self.rotate_duration = 10
         self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
 
@@ -62,6 +95,9 @@ class Player(pygame.sprite.Sprite):
 
         self.debug = False
         self.tiles_around = []
+
+        self.state_machine = StateMachine(self, StateIdle())
+        self.state_machine.add_states([StateRun()])
     
     def update(self, tilemap):
         self.get_input()
@@ -117,6 +153,8 @@ class Player(pygame.sprite.Sprite):
         # Move player with collisions
         self.move(tilemap)
         self.handle_animation(self.pos)
+
+        self.state_machine.update()
 
     def handle_animation(self, pos: pygame.math.Vector2):
         # Update rotate timer
