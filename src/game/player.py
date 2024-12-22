@@ -1,8 +1,9 @@
 from math import copysign 
 from random import choice
 import pygame
+from .sprite import Sprite
 from ..tilemap import Tilemap
-from ..util import Direction, Sprite, load_sprite_sheet
+from ..util import Direction, load_sprite_sheet
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -23,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.sprite.set_animation('idle')
 
         self.rotate_timer = 0
-        self.rotate_duration = 8
+        self.rotate_duration = 9
         self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
 
