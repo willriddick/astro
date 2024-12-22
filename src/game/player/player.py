@@ -1,42 +1,10 @@
 from math import copysign 
 from random import choice
-from enum import Enum
 import pygame
-from .sprite import Sprite
-from ..tilemap import Tilemap
-from ..util import Direction, load_sprite_sheet, State, StateMachine
-
-class PlayerState(Enum):
-    IDLE = 0
-    RUN = 1
-
-class StateIdle(State):
-    def __init__(self):
-        super().__init__('idle', PlayerState.IDLE)
-    
-    def on_enter(self):
-        print('IDLE ENTER')
-    
-    def update(self):
-        if self.owner.move_dir != 0:
-            self.owner.state_machine.switch(PlayerState.RUN)
-    
-    def on_exit(self):
-        print('IDLE EXIT')
-
-class StateRun(State):
-    def __init__(self):
-        super().__init__('run', PlayerState.RUN)
-    
-    def on_enter(self):
-        print('RUN ENTER')
-    
-    def update(self):
-        if self.owner.move_dir == 0:
-            self.owner.state_machine.switch(PlayerState.IDLE)
-    
-    def on_exit(self):
-        print('RUN EXIT')
+from .states import StateIdle, StateRun
+from ..sprite import Sprite
+from ...tilemap import Tilemap
+from ...util import Direction, load_sprite_sheet, StateMachine
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -96,8 +64,10 @@ class Player(pygame.sprite.Sprite):
         self.debug = False
         self.tiles_around = []
 
-        self.state_machine = StateMachine(self, StateIdle())
-        self.state_machine.add_states([StateRun()])
+        self.state_machine = StateMachine(self, [
+            StateIdle(),
+            StateRun(),
+        ])
     
     def update(self, tilemap):
         self.get_input()

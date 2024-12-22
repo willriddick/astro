@@ -25,14 +25,12 @@ class State:
         pass
     
 class StateMachine:
-    def __init__(self, owner: object, initial_state: State):
+    def __init__(self, owner: object, states: list[State]):
         self.owner = owner
-        self.initial_state = initial_state
-
         self.states: dict[int, State] = {}
-        self.previous_state: State = initial_state
-        self.current_state: State = initial_state
-        self.add_state(initial_state)
+        self.add_states(states)
+        self.current_state: State = states[0]
+        self.previous_state: State = self.current_state
    
     def update(self):
         if self.current_state is not None:
