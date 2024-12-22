@@ -2,9 +2,9 @@ import sys
 import threading
 import argparse
 import pygame
+from src.util import load_sprite_sheet 
 from .tilemap import Tilemap
 from .tile_type import TileType
-from ..util import load_sprite_sheet 
 
 RENDER_SCALE = 2
 WIDTH, HEIGHT = 400, 300

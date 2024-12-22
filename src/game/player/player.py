@@ -1,10 +1,8 @@
-from math import copysign 
-from random import choice
 import pygame
+from src.tilemap import Tilemap
+from src.util import Direction, load_sprite_sheet, StateMachine
+from src.game.sprite import Sprite
 from .states import StateIdle, StateRun
-from ..sprite import Sprite
-from ...tilemap import Tilemap
-from ...util import Direction, load_sprite_sheet, StateMachine
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos: tuple[int, int]):
@@ -71,21 +69,9 @@ class Player(pygame.sprite.Sprite):
     
     def update(self, tilemap):
         self.get_input()
-
-        # Update x velocity
-        acc = self.ground_acc if self.on_ground else self.air_acc
-        if self.move_dir == 0:
-            # Apply deceleration
-            if abs(self.velocity.x) < acc[1]:
-                self.velocity.x = 0
-            else:
-                # Copysign returns the first argument with the sign of the second argument
-                self.velocity.x -= copysign(acc[1], self.velocity.x)
-        else:
-            # Apply acceleration, clamping velocity to the move speed
-            self.velocity.x = max(
-                -self.move_speed, 
-                min(self.move_speed, self.velocity.x + (self.move_dir * acc[0])))
+        self.state_machine.update()
+        self.move(tilemap)
+        self.sprite.update(self.pos)
             
         # Apply gravity
         self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
@@ -107,7 +93,6 @@ class Player(pygame.sprite.Sprite):
                 self.jump_input = 0
                 self.variable_jump_timer = self.variable_jump_buffer
 
-
         # Apply jump
         if self.jump_input > 0 and self.coyote_timer > 0:
             self.velocity.y = -self.jump_speed
@@ -120,54 +105,6 @@ class Player(pygame.sprite.Sprite):
         if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
             self.velocity.y *= self.variable_jump_multiplier
         
-        # Move player with collisions
-        self.move(tilemap)
-        self.handle_animation(self.pos)
-
-        self.state_machine.update()
-
-    def handle_animation(self, pos: pygame.math.Vector2):
-        # Update rotate timer
-        self.rotate_timer = max(0, self.rotate_timer - 1)
-
-        # Detect direction change
-        if self.move_dir != 0 and self.move_dir != self.last_move_dir:
-            self.rotate_timer = self.rotate_duration
-            self.rotate_dir = choice(self.rotate_choice)
-        
-        # Handle flip
-        if self.slide_left or self.slide_right:
-            self.sprite.flip = self.slide_left
-        elif self.move_dir != 0:
-            self.sprite.flip = self.move_dir == -1
-
-        # Update the last move direction
-        if self.move_dir != 0:
-            self.last_move_dir = self.move_dir
-
-        if self.on_ground:
-            if self.rotate_timer > 0:
-                if self.rotate_dir:
-                    self.sprite.set_animation('front')
-                else:
-                    self.sprite.set_animation('back')
-            elif self.move_dir != 0:
-                self.sprite.set_animation('run')
-            else:
-                self.sprite.set_animation('idle')
-        else:
-            if self.rotate_timer > 0:
-                if self.rotate_dir:
-                    self.sprite.set_animation('front')
-                else:
-                    self.sprite.set_animation('back')
-            elif self.velocity.y < 0:
-                self.sprite.set_animation('air_up')
-            else:
-                self.sprite.set_animation('air_down')
-
-        self.sprite.update(pos)
-    
     def move(self, tilemap: Tilemap):
         # Update tile position
         tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
@@ -217,6 +154,9 @@ class Player(pygame.sprite.Sprite):
         just_pressed = pygame.key.get_just_pressed()
 
         self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
+        
+        if self.move_dir != 0:
+            self.last_move_dir = self.move_dir
 
         self.jump_input = max(0, self.jump_input - 1)
         if just_pressed[pygame.K_SPACE]:

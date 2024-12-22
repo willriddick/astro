@@ -1,10 +1,9 @@
 import sys
 import threading
 import pygame
+from src.tilemap import Tilemap, TileType
+from src.util import load_sprite_sheet
 from .player import Player
-from ..tilemap import Tilemap
-from ..tilemap import TileType
-from ..util import load_sprite_sheet
 
 FPS = 60
 WINDOW_SCALE = 3
