@@ -10,7 +10,7 @@ WINDOW_SCALE = 3
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
-class Main:
+class Game:
     def __init__(self):
         pygame.init()
 
@@ -39,12 +39,13 @@ class Main:
         self.players = pygame.sprite.Group()
         self.players.add(self.p1)
 
-        self.running = True
-
+        self.running = False
         self.command_thread = threading.Thread(target=self.handle_commands)
         self.command_thread.daemon = True
+    
+    def run(self):
+        self.running = True
         self.command_thread.start()
-
         self.handle_game()
 
     def handle_game(self):
@@ -114,5 +115,3 @@ class Main:
                 (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE), 
                 pygame.RESIZABLE)
     
-if __name__ == "__main__":
-    main = Main()
