@@ -31,6 +31,7 @@ class StateMachine:
         self.add_states(states)
         self.current_state: State = states[0]
         self.previous_state: State = self.current_state
+        self.debug = True
    
     def update(self):
         if self.current_state is not None:
@@ -47,6 +48,9 @@ class StateMachine:
         
         self.current_state = self.states[_id]
         self.current_state.on_enter()
+
+        if self.debug:
+            print(f'state: {self.current_state.name}')
     
     def add_states(self, states: list[State]):
         for state in states:

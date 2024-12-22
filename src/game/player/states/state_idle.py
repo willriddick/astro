@@ -6,11 +6,14 @@ class StateIdle(State):
         super().__init__('idle', PlayerState.IDLE)
     
     def on_enter(self):
-        print('IDLE ENTER')
+        self.owner.sprite.set_animation('idle')
     
     def update(self):
+        self.owner.handle_jump()
+
         if self.owner.move_dir != 0:
-            self.owner.state_machine.switch(PlayerState.RUN)
+            self.switch(PlayerState.RUN)
+        
+        if not self.owner.on_ground:
+            self.switch(PlayerState.AIR)
     
-    def on_exit(self):
-        print('IDLE EXIT')
