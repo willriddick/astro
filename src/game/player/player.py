@@ -32,6 +32,7 @@ class Player(pygame.sprite.Sprite):
             StateIdle(),
             StateRun(),
             StateAir(),
+            StateWall(),
         ])
 
         self.ground_move_speed: float = 1.15  
@@ -57,9 +58,12 @@ class Player(pygame.sprite.Sprite):
         self.coyote_buffer = 5
 
         self.wall_jump_speed = (4, 2)
+        self.wall_slide_speed = 0.5
+        self.wall_slide_gravity = 0.05
         self.slide_left = False
         self.slide_right = False
 
+        self.falling = False
         self.on_ground = False
         self.collisions = { 
             Direction.UP: False,
@@ -104,6 +108,17 @@ class Player(pygame.sprite.Sprite):
             self.jump_input = 0
             self.coyote_timer = 0
             self.variable_jump_timer = self.variable_jump_buffer
+    
+    def handle_wall_jump(self):
+        self.slide_left = self.collisions[Direction.RIGHT] and self.move_dir == 1
+        self.slide_right = self.collisions[Direction.LEFT] and self.move_dir == -1
+        if (self.slide_left or self.slide_right) and self.velocity.y > 0: 
+            self.velocity.y = min(0.5, self.velocity.y + (self.gravity * 0.2))
+            if self.jump_input > 0:
+                self.velocity.x = self.move_dir * -self.wall_jump_speed[0]
+                self.velocity.y = -self.wall_jump_speed[1]
+                self.jump_input = 0
+                self.variable_jump_timer = self.variable_jump_buffer
 
     def handle_gravity(self):
         # Apply gravity
@@ -153,9 +168,6 @@ class Player(pygame.sprite.Sprite):
                     self.collisions[Direction.UP] = True
                 self.pos.y = entity_rect.y
                 self.velocity.y = 0
-        
-        if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
-            self.on_ground = False
 
         # Update x position
         self.pos.x += self.velocity.x
@@ -171,6 +183,12 @@ class Player(pygame.sprite.Sprite):
                     self.collisions[Direction.LEFT] = True
                 self.pos.x = entity_rect.x
                 self.velocity.x = 0
+        
+        # Update helper variables
+        if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
+            self.on_ground = False
+        
+        self.falling = (self.velocity.y > 0 and not self.collisions[Direction.DOWN])
 
     def render(self, display, offset=(0, 0)):
         self.sprite.render(display, offset)

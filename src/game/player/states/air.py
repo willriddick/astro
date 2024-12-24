@@ -1,5 +1,6 @@
 from random import choice
 from src.util import State
+from src.util import Direction
 from .states import PlayerState
 
 class StateAir(State):
@@ -10,7 +11,11 @@ class StateAir(State):
         self.owner.handle_movement(self.owner.air_move_speed, self.owner.air_acc)
         self.owner.handle_gravity()
         self.handle_animation()
-        
+        self.owner.handle_wall_jump()
+
+        if self.owner.falling and (self.owner.slide_left or self.owner.slide_right):
+            self.switch(PlayerState.WALL)
+
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
                 self.switch(PlayerState.IDLE)
@@ -35,7 +40,7 @@ class StateAir(State):
             else:
                 animation = 'back'
         else:
-            if self.owner.velocity.y > 0:
+            if self.owner.falling:
                 animation = 'air_down'
             else:
                 animation = 'air_up'
