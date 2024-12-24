@@ -19,6 +19,8 @@ class Game:
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE)
         self.fullscreen = False
+
+        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
         self.TYPES = {
             TileType('stone', 
@@ -49,7 +51,7 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test2', self.TYPES)
+        self.tilemap = Tilemap.load('maps/test3', self.TYPES)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))
@@ -60,7 +62,11 @@ class Game:
             for player in self.players:
                 player.update(self.tilemap)
                 player.render(self.display, self.camera_offset)
+            
+            text = '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
 
+            text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+            self.display.blit(text_surf, (0, 0))
             try:
                 self.window.blit(pygame.transform.scale(self.display, self.window.get_size()))
                 pygame.display.update()

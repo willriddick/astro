@@ -149,45 +149,54 @@ class Player(pygame.sprite.Sprite):
         tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
         self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])
 
-        # Reset collisions
-        for k in self.collisions.keys():
-            self.collisions[k] = False
-        
         # Update y position
         self.pos.y += self.velocity.y
         entity_rect = self.get_rect()
-        for tile in tilemap.get_tiles_around(tile_pos, ['stone']):
+        for tile in self.tiles_around:
             rect = tile.get_rect()
             if entity_rect.colliderect(rect):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
-                    self.collisions[Direction.DOWN] = True
-                    self.on_ground = True
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
-                    self.collisions[Direction.UP] = True
                 self.pos.y = entity_rect.y
                 self.velocity.y = 0
 
         # Update x position
         self.pos.x += self.velocity.x
         entity_rect = self.get_rect()
-        for tile in tilemap.get_tiles_around(tile_pos, ['stone']):
+        for tile in self.tiles_around:
             rect = tile.get_rect()
             if entity_rect.colliderect(rect):
                 if self.velocity.x > 0:
                     entity_rect.right = rect.left
-                    self.collisions[Direction.RIGHT] = True
                 if self.velocity.x < 0:
                     entity_rect.left = rect.right
-                    self.collisions[Direction.LEFT] = True
                 self.pos.x = entity_rect.x
                 self.velocity.x = 0
         
-        # Update helper variables
-        if self.velocity.y != 0 and not self.collisions[Direction.DOWN]:
-            self.on_ground = False
+        # Update collisions
+        points = {
+            Direction.DOWN:  [(entity_rect.left + 1,  entity_rect.bottom + 1),
+                              (entity_rect.right - 1, entity_rect.bottom + 1)],
+            Direction.UP:    [(entity_rect.left + 1,  entity_rect.top - 1),
+                              (entity_rect.right - 1, entity_rect.top - 1)],
+            Direction.LEFT:  [(entity_rect.left - 1,  entity_rect.top + 1),
+                              (entity_rect.left - 1,  entity_rect.bottom - 1)],
+            Direction.RIGHT: [(entity_rect.right + 1, entity_rect.top + 1),
+                              (entity_rect.right + 1, entity_rect.bottom - 1)],
+        }
+        for direction, points in points.items():
+            for tile in self.tiles_around:
+                tile_rect = tile.get_rect()
+                if any(tile_rect.collidepoint(point) for point in points):
+                    self.collisions[direction] = True
+                    break # No need to check further tiles for this direction
+                else:
+                    self.collisions[direction] = False
         
+        # Update helper variables
+        self.on_ground = self.collisions[Direction.DOWN]
         self.falling = (self.velocity.y > 0 and not self.collisions[Direction.DOWN])
 
     def render(self, display, offset=(0, 0)):

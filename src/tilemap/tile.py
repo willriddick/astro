@@ -2,7 +2,7 @@ import pygame
 from .tile_type import TileType
 
 pygame.font.init()
-FONT = pygame.font.Font('assets/DePixelIllegible.ttf', 8)
+FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
 
 class Tile:
     def __init__(self, tilemap, type: TileType, variant: int, tile_pos: tuple[int, int]):
