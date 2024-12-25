@@ -1,4 +1,4 @@
-from src.util import State
+from src.util import State, Direction
 from .states import PlayerState
 
 class StateWallSlide(State):
@@ -6,15 +6,18 @@ class StateWallSlide(State):
         super().__init__(PlayerState.WALL_SLIDE)
 
     def on_enter(self):
-        self.owner.sprite.flip = (self.owner.move_dir == 1)
+        self.owner.sprite.flip = (self.owner.slide_dir == 1)
         self.owner.sprite.set_animation('idle')
     
+    def on_exit(self):
+        self.owner.last_move_dir = -self.owner.slide_dir
+    
     def update(self):
-        self.owner.velocity.y = min(
-            self.owner.velocity.y + self.owner.wall_slide_gravity,
-            self.owner.wall_slide_speed
-        )
-
+        if self.owner.velocity.y < 0:
+            self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        else:
+            self.owner.apply_gravity(self.owner.wall_slide_gravity, self.owner.wall_slide_speed)
+        
         self.owner.handle_wall_jump()
 
         if self.owner.on_ground:
@@ -23,6 +26,12 @@ class StateWallSlide(State):
             else:
                 self.switch(PlayerState.RUN)
         
-        if self.owner.move_dir == 0:
+        if (self.owner.move_dir != self.owner.slide_dir) or (
+            not self.owner.collisions[Direction.LEFT] and not self.owner.collisions[Direction.RIGHT]
+        ):
             self.switch(PlayerState.AIR)
-   
+            self.owner.slide_left_timer = 0
+            self.owner.slide_right_timer = 0
+            self.owner.pressed_left_timer = 0
+            self.owner.pressed_right_timer = 0
+        

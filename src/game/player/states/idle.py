@@ -9,6 +9,7 @@ class StateIdle(State):
         self.owner.sprite.set_animation('idle')
     
     def update(self):
+        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
 
         if self.owner.move_dir != 0:

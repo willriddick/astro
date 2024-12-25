@@ -8,7 +8,7 @@ class StateRun(State):
     
     def update(self):
         self.owner.handle_movement(self.owner.ground_move_speed, self.owner.ground_acc)
-        self.owner.handle_gravity()
+        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
         self.handle_animation()
         

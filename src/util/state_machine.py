@@ -23,10 +23,9 @@ class StateMachine:
             self.current_state.on_exit()
         
         self.current_state = self.states[_id]
-        self.current_state.on_enter()
-
         if self.debug:
             print(f'state: {self.current_state.name}')
+        self.current_state.on_enter()
     
     def add_states(self, states: list[State]):
         for state in states:

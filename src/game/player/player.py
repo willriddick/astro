@@ -45,26 +45,34 @@ class Player(pygame.sprite.Sprite):
         self.last_move_dir = 1
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.gravity = 0.15
-        self.fall_speed = 3
+        self.gravity_multiplier = 1
+        self.gravity = 0.10
+        self.fall_speed = 2
 
         self.holding_jump = False
-        self.jump_speed = 3.5
-        self.variable_jump_multiplier = 0.7
-        self.variable_jump_buffer = 30
+        self.jump_speed = 3
+        self.variable_jump_multiplier = 0.8
+        self.variable_jump_buffer = 15
         self.variable_jump_timer = 0
-        self.jump_input = 0
+        self.jump_input_timer = 0
         self.jump_buffer = 4
         self.coyote_timer = 0
         self.coyote_buffer = 5
 
-        self.wall_jump_speed = (2, 2.5)
+        self.wall_jump_duration = 12
+        self.wall_jump_speed = (2.5, 2.5)
+        self.wall_jump_dec = 0.15
         self.wall_slide_speed = 0.5
         self.wall_slide_gravity = 0.05
+        self.slide_dir = 0
         self.slide_buffer = 10
         self.slide_left_timer = 0
         self.slide_right_timer = 0
-        self.wall_dir = 0
+
+        self.pressed_left_timer = 0
+        self.pressed_left_buffer = 5
+        self.pressed_right_timer = 0
+        self.pressed_right_buffer = 5
 
         self.falling = False
         self.on_ground = False
@@ -106,17 +114,19 @@ class Player(pygame.sprite.Sprite):
             self.coyote_timer = self.coyote_buffer
 
         # Apply jump
-        if self.jump_input > 0 and self.coyote_timer > 0:
+        if self.jump_input_timer > 0 and self.coyote_timer > 0:
             self.velocity.y = -self.jump_speed
-            self.jump_input = 0
+            self.jump_input_timer = 0
             self.coyote_timer = 0
             self.variable_jump_timer = self.variable_jump_buffer
     
     def handle_wall_jump(self):
-        if self.collisions[Direction.RIGHT] and self.move_dir == 1 and self.falling:
+        if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
             self.slide_left_timer = self.slide_buffer
-        elif self.collisions[Direction.LEFT] and self.move_dir == -1 and self.falling:
+            self.slide_dir = 1
+        elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
             self.slide_right_timer = self.slide_buffer
+            self.slide_dir = -1
         
         self.slide_left_timer = max(0, self.slide_left_timer - 1)
         self.slide_right_timer = max(0, self.slide_right_timer - 1)
@@ -125,24 +135,19 @@ class Player(pygame.sprite.Sprite):
             self.slide_left_timer = 0
             self.slide_right_timer = 0
 
-        if self.jump_input > 0 and (self.slide_left_timer or self.slide_right_timer): 
-            self.wall_dir = -1 if self.slide_left_timer else 1
-            self.velocity.x = self.wall_jump_speed[0] * self.wall_dir
+        if self.jump_input_timer > 0 and (self.slide_left_timer or self.slide_right_timer): 
+            self.velocity.x = self.wall_jump_speed[0] * -self.slide_dir
             self.velocity.y = -self.wall_jump_speed[1]
-            self.jump_input = 0
+            self.jump_input_timer = 0
             self.slide_left_timer = 0
             self.slide_right_timer = 0
             self.state_machine.switch(PlayerState.WALL_JUMP)
 
-
-    def handle_gravity(self):
-        # Apply gravity
-        self.velocity.y = min(self.fall_speed, self.velocity.y + self.gravity)
-
-        # Handle variable jump height
-        self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
-        if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
-            self.velocity.y *= self.variable_jump_multiplier
+    def apply_gravity(self, gravity: float, max_speed: float, ):
+        self.velocity.y = min(
+            max_speed * self.gravity_multiplier,
+            self.velocity.y + gravity * self.gravity_multiplier
+        )
     
     def handle_input(self):
         pressed = pygame.key.get_pressed()
@@ -150,11 +155,19 @@ class Player(pygame.sprite.Sprite):
 
         self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
         
-        self.jump_input = max(0, self.jump_input - 1)
+        self.jump_input_timer = max(0, self.jump_input_timer - 1)
         if just_pressed[pygame.K_SPACE]:
-            self.jump_input = self.jump_buffer
+            self.jump_input_timer = self.jump_buffer
         
         self.holding_jump = pressed[pygame.K_SPACE]
+
+        if pressed[pygame.K_a]:
+            self.pressed_left_timer = self.pressed_left_buffer
+        if pressed[pygame.K_d]:
+            self.pressed_right_timer = self.pressed_right_buffer
+        
+        self.pressed_left_timer = max(0, self.pressed_left_timer - 1)
+        self.pressed_right_timer = max(0, self.pressed_right_timer - 1)
     
     def get_rect(self):
         return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
