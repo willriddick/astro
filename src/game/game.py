@@ -51,7 +51,7 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test3', self.TYPES)
+        self.tilemap = Tilemap.load('maps/test1', self.TYPES)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))
@@ -63,10 +63,12 @@ class Game:
                 player.update(self.tilemap)
                 player.render(self.display, self.camera_offset)
             
-            text = '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
-
+            text = f'{self.p1.state_machine.current_state.name}\n'
+            text += f'{self.p1.velocity}\n'
+            text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
             self.display.blit(text_surf, (0, 0))
+
             try:
                 self.window.blit(pygame.transform.scale(self.display, self.window.get_size()))
                 pygame.display.update()
@@ -85,7 +87,10 @@ class Game:
                     case ['/help']:
                         print('Available commands:')
                         print('/help - Show this help message')
+                        print('/load - Load new tilemap')
                         print('/quit - Quit the game')
+                    case ['/load', path]:
+                        self.tilemap = Tilemap.load(path, self.TYPES)
                     case ['/quit']:
                         self.running = False
                     case _:

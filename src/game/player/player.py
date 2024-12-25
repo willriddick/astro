@@ -46,12 +46,12 @@ class Player(pygame.sprite.Sprite):
         self.velocity = pygame.math.Vector2(0, 0)
 
         self.gravity_multiplier = 1
-        self.gravity = 0.15
+        self.gravity = 0.14
         self.fall_speed = 3
 
         self.holding_jump = False
         self.jump_speed = 3
-        self.variable_jump_multiplier = 0.8
+        self.variable_jump_multiplier = 0.7
         self.variable_jump_buffer = 15
         self.variable_jump_timer = 0
         self.jump_input_timer = 0
