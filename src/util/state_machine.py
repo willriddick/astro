@@ -1,29 +1,5 @@
-class State:
-    def __init__(self, name: str, _id: int):
-        self.name = name
-        self.id = _id
-        self.state_machine = None
-    
-    def switch(self, _id: int):
-        if self.state_machine is None:
-            raise ValueError('State machine is not set.')
-        self.state_machine.switch(_id)
- 
-    @property
-    def owner(self):
-        if self.state_machine is None:
-            raise ValueError('State machine is not set.')
-        return self.state_machine.owner
+from .state import State
 
-    def on_enter(self):
-        pass
-    
-    def update(self):
-        pass
-
-    def on_exit(self):
-        pass
-    
 class StateMachine:
     def __init__(self, owner: object, states: list[State]):
         self.owner = owner

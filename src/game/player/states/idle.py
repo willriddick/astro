@@ -3,7 +3,7 @@ from .states import PlayerState
 
 class StateIdle(State):
     def __init__(self):
-        super().__init__('idle', PlayerState.IDLE)
+        super().__init__(PlayerState.IDLE)
     
     def on_enter(self):
         self.owner.sprite.set_animation('idle')

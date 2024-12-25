@@ -1,11 +1,10 @@
 from random import choice
 from src.util import State
-from src.util import Direction
 from .states import PlayerState
 
 class StateAir(State):
     def __init__(self):
-        super().__init__('air', PlayerState.AIR)
+        super().__init__(PlayerState.AIR)
     
     def update(self):
         self.owner.handle_movement(self.owner.air_move_speed, self.owner.air_acc)
@@ -13,8 +12,8 @@ class StateAir(State):
         self.handle_animation()
         self.owner.handle_wall_jump()
 
-        if self.owner.falling and (self.owner.slide_left or self.owner.slide_right):
-            self.switch(PlayerState.WALL)
+        if self.owner.slide_left_timer or self.owner.slide_right_timer:
+            self.switch(PlayerState.WALL_SLIDE)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:

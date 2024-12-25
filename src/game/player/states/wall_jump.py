@@ -1,23 +1,33 @@
 from random import choice
 from src.util import State
+from src.util import approach
 from .states import PlayerState
 
-class StateRun(State):
+class StateWallJump(State):
     def __init__(self):
-        super().__init__(PlayerState.RUN)
+        super().__init__(PlayerState.WALL_JUMP)
+        self.timer = 0
+    
+    def on_enter(self):
+        self.timer = 20
     
     def update(self):
-        self.owner.handle_movement(self.owner.ground_move_speed, self.owner.ground_acc)
-        self.owner.handle_gravity()
-        self.owner.handle_jump()
+        self.timer = max(0, self.timer - 1)
+
+        self.owner.velocity.x = approach(self.owner.velocity.x, self.owner.air_move_speed * -self.owner.wall_dir, 0.)
+        self.owner.handle_gravity() 
+
         self.handle_animation()
-        
-        if self.owner.velocity.x == 0:
-            self.switch(PlayerState.IDLE)
-        
-        if not self.owner.on_ground:
+        self.owner.handle_wall_jump()
+
+        if self.owner.on_ground:
+            if self.owner.velocity.x == 0:
+                self.switch(PlayerState.IDLE)
+            else:
+                self.switch(PlayerState.RUN)
+        elif self.timer == 0:
             self.switch(PlayerState.AIR)
-        
+         
     def handle_animation(self):
         if self.owner.move_dir != 0 and self.owner.move_dir != self.owner.last_move_dir:
             self.owner.rotate_timer = self.owner.rotate_duration
@@ -35,7 +45,11 @@ class StateRun(State):
                 animation = 'front'
             else:
                 animation = 'back'
-        elif self.owner.move_dir != 0:
-            animation = 'run'
+        else:
+            if self.owner.falling:
+                animation = 'air_down'
+            else:
+                animation = 'air_up'
         
         self.owner.sprite.set_animation(animation)
+    
