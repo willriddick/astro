@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         self.coyote_timer = 0
         self.coyote_buffer = 5
 
-        self.wall_jump_speed = (3, 2.5)
+        self.wall_jump_speed = (2, 2.5)
         self.wall_slide_speed = 0.5
         self.wall_slide_gravity = 0.05
         self.slide_buffer = 10
@@ -121,6 +121,10 @@ class Player(pygame.sprite.Sprite):
         self.slide_left_timer = max(0, self.slide_left_timer - 1)
         self.slide_right_timer = max(0, self.slide_right_timer - 1)
 
+        if self.on_ground:
+            self.slide_left_timer = 0
+            self.slide_right_timer = 0
+
         if self.jump_input > 0 and (self.slide_left_timer or self.slide_right_timer): 
             self.wall_dir = -1 if self.slide_left_timer else 1
             self.velocity.x = self.wall_jump_speed[0] * self.wall_dir
@@ -129,6 +133,7 @@ class Player(pygame.sprite.Sprite):
             self.slide_left_timer = 0
             self.slide_right_timer = 0
             self.state_machine.switch(PlayerState.WALL_JUMP)
+
 
     def handle_gravity(self):
         # Apply gravity

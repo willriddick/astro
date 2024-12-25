@@ -1,5 +1,4 @@
 from src.util import State
-from src.util import approach
 from .states import PlayerState
 
 class StateWallSlide(State):
@@ -16,7 +15,6 @@ class StateWallSlide(State):
             self.owner.wall_slide_speed
         )
 
-
         self.owner.handle_wall_jump()
 
         if self.owner.on_ground:
@@ -25,7 +23,6 @@ class StateWallSlide(State):
             else:
                 self.switch(PlayerState.RUN)
         
-        if self.owner.slide_left_timer == 0 and self.owner.slide_right_timer == 0:
+        if self.owner.move_dir == 0:
             self.switch(PlayerState.AIR)
-    
    
