@@ -18,6 +18,7 @@ class Editor:
         self.screen = pygame.display.set_mode((WIDTH * RENDER_SCALE, HEIGHT * RENDER_SCALE))
         self.clock = pygame.time.Clock()
         self.running = False
+        self.last_path = ''
 
         self.TYPES = [
             TileType(
@@ -29,6 +30,7 @@ class Editor:
         ]
 
         if args.load:
+            self.last_path = args.load
             self.tilemap = Tilemap.load(args.load, self.TYPES)
         else:
             self.tilemap = Tilemap(self.TYPES)
@@ -67,9 +69,13 @@ class Editor:
                         print('/load <path> - Load the tilemap from the specified path')
                         print('/clear - Clear the tilemap')
                         print('/quit - Quit the editor\n')
+                    case ['/save']:
+                        if self.last_path:
+                            Tilemap.save(self.tilemap, self.last_path)
                     case ['/save', path]:
                         Tilemap.save(self.tilemap, path)
                     case ['/load', path]:
+                        self.last_path = path
                         self.tilemap = Tilemap.load(path, self.TYPES)
                     case ['/clear']: 
                         self.tilemap.clear()
