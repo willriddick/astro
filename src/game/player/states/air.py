@@ -7,8 +7,7 @@ class StateAir(State):
         super().__init__(PlayerState.AIR)
     
     def update(self):
-        self.owner.handle_movement(self.owner.air_move_speed, self.owner.air_acc)
-
+        self.owner.apply_movement(self.owner.air_move_speed, self.owner.air_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
 
         self.owner.variable_jump_timer = max(0, self.owner.variable_jump_timer - 1)
@@ -18,7 +17,7 @@ class StateAir(State):
         self.owner.handle_wall_jump()
         self.handle_animation()
 
-        if self.owner.slide_left_timer or self.owner.slide_right_timer:
+        if self.owner.slide_timer:
             self.switch(PlayerState.WALL_SLIDE)
 
         if self.owner.on_ground:

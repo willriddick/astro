@@ -13,7 +13,9 @@ class StateWallSlide(State):
         self.owner.last_move_dir = -self.owner.slide_dir
     
     def update(self):
-        if self.owner.velocity.y < 0:
+        self.owner.apply_movement(self.owner.air_move_speed, self.owner.air_acc)
+
+        if self.owner.velocity.y < 0 or self.owner.move_dir != self.owner.slide_dir:
             self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         else:
             self.owner.apply_gravity(self.owner.wall_slide_gravity, self.owner.wall_slide_speed)
@@ -26,12 +28,8 @@ class StateWallSlide(State):
             else:
                 self.switch(PlayerState.RUN)
         
-        if (self.owner.move_dir != self.owner.slide_dir) or (
-            not self.owner.collisions[Direction.LEFT] and not self.owner.collisions[Direction.RIGHT]
-        ):
-            self.switch(PlayerState.AIR)
-            self.owner.slide_left_timer = 0
-            self.owner.slide_right_timer = 0
+        if not self.owner.collisions[Direction.LEFT] and not self.owner.collisions[Direction.RIGHT]:
             self.owner.pressed_left_timer = 0
             self.owner.pressed_right_timer = 0
+            self.switch(PlayerState.AIR)
         

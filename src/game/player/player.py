@@ -46,8 +46,8 @@ class Player(pygame.sprite.Sprite):
         self.velocity = pygame.math.Vector2(0, 0)
 
         self.gravity_multiplier = 1
-        self.gravity = 0.10
-        self.fall_speed = 2
+        self.gravity = 0.15
+        self.fall_speed = 3
 
         self.holding_jump = False
         self.jump_speed = 3
@@ -60,14 +60,13 @@ class Player(pygame.sprite.Sprite):
         self.coyote_buffer = 5
 
         self.wall_jump_duration = 12
-        self.wall_jump_speed = (2.5, 2.5)
-        self.wall_jump_dec = 0.15
+        self.wall_jump_speed = (2.5, 2.7)
+        self.wall_jump_dec = 0.13
         self.wall_slide_speed = 0.5
         self.wall_slide_gravity = 0.05
         self.slide_dir = 0
         self.slide_buffer = 10
-        self.slide_left_timer = 0
-        self.slide_right_timer = 0
+        self.slide_timer = 0
 
         self.pressed_left_timer = 0
         self.pressed_left_buffer = 5
@@ -92,7 +91,7 @@ class Player(pygame.sprite.Sprite):
         self.handle_collision(tilemap)
         self.sprite.update(self.pos)
 
-    def handle_movement(self, max_speed: float, acc: tuple[float, float]):
+    def apply_movement(self, max_speed: float, acc: tuple[float, float]):
         if self.move_dir == 0:
             # Apply deceleration
             if abs(self.velocity.x) < acc[1]:
@@ -122,25 +121,19 @@ class Player(pygame.sprite.Sprite):
     
     def handle_wall_jump(self):
         if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
-            self.slide_left_timer = self.slide_buffer
+            self.slide_timer = self.slide_buffer
             self.slide_dir = 1
         elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
-            self.slide_right_timer = self.slide_buffer
+            self.slide_timer = self.slide_buffer
             self.slide_dir = -1
         
-        self.slide_left_timer = max(0, self.slide_left_timer - 1)
-        self.slide_right_timer = max(0, self.slide_right_timer - 1)
+        self.slide_timer = max(0, self.slide_timer - 1)
 
-        if self.on_ground:
-            self.slide_left_timer = 0
-            self.slide_right_timer = 0
-
-        if self.jump_input_timer > 0 and (self.slide_left_timer or self.slide_right_timer): 
+        if self.jump_input_timer > 0 and self.slide_timer:
             self.velocity.x = self.wall_jump_speed[0] * -self.slide_dir
             self.velocity.y = -self.wall_jump_speed[1]
             self.jump_input_timer = 0
-            self.slide_left_timer = 0
-            self.slide_right_timer = 0
+            self.slide_timer = 0
             self.state_machine.switch(PlayerState.WALL_JUMP)
 
     def apply_gravity(self, gravity: float, max_speed: float, ):
