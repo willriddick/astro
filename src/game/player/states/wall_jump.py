@@ -11,6 +11,10 @@ class WallJump(State):
         self.timer = self.owner.wall_jump_duration
         self.owner.set_animation(Animation.AIR_UP)
         self.owner.sprite.flip = (self.owner.slide_dir == 1)
+        self.owner.velocity.x = self.owner.wall_jump_speed[0] * -self.owner.slide_dir * self.owner.movement_multiplier
+        self.owner.velocity.y = -self.owner.wall_jump_speed[1]
+        self.owner.jump_input_timer = 0
+        self.owner.slide_timer = 0
     
     def on_exit(self):
         self.owner.last_move_dir = -self.owner.slide_dir

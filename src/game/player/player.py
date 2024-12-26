@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.rect_size = (7, 14)
 
         # Velocity and acceleration
-        self.movement_multiplier = 1.25
+        self.movement_multiplier = 1
         self.velocity = pygame.math.Vector2(0, 0)
         self.move_dir = 1 # starts at one because the player is facing right
         self.ground_move_speed: float = 1.15  
@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.air_acc = (0.05, 0.01)   
 
         # Gravity
-        self.gravity_multiplier = 0.75
+        self.gravity_multiplier = 1
         self.gravity = 0.14
         self.fall_speed = 3
 
@@ -139,10 +139,6 @@ class Player(pygame.sprite.Sprite):
         
         # Apply jump
         if self.jump_input_timer > 0 and self.slide_timer:
-            self.velocity.x = self.wall_jump_speed[0] * -self.slide_dir
-            self.velocity.y = -self.wall_jump_speed[1]
-            self.jump_input_timer = 0
-            self.slide_timer = 0
             self.state_machine.switch(States.WALL_JUMP)
 
     def handle_input(self):
