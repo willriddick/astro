@@ -1,6 +1,7 @@
 from random import choice
 from src.util import State
 from .states import PlayerState
+from ..animation import Animation
 
 class StateRun(State):
     def __init__(self):
@@ -29,13 +30,10 @@ class StateRun(State):
         
         self.owner.rotate_timer = max(0, self.owner.rotate_timer - 1)
         
-        animation = 'idle'
+        animation = Animation.IDLE
         if self.owner.rotate_timer > 0:
-            if self.owner.rotate_dir:
-                animation = 'front'
-            else:
-                animation = 'back'
+            animation = Animation.FRONT if self.owner.rotate_dir else Animation.BACK
         elif self.owner.move_dir != 0:
-            animation = 'run'
+            animation = Animation.RUN
         
-        self.owner.sprite.set_animation(animation)
+        self.owner.set_animation(animation)

@@ -5,7 +5,7 @@ class Sprite:
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
 
-        self.animations: dict[str, tuple[list[pygame.Surface, int]]] = {} # name: (frames, frame_rate)
+        self.animations: dict[str, tuple[list[pygame.Surface, int]]] = {} # id: (frames, frame_rate)
         self.current = ''
         self.frame = 0
         self.subindex = 0
@@ -24,14 +24,19 @@ class Sprite:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
     
-    def add_animation(self, name: str, frames: list[pygame.Surface], frame_rate: int):
-        self.animations[name] = (frames, frame_rate)
+    def add_animation(self, id_: int, frames: list[pygame.Surface], frame_rate: int, range_: tuple[int, int]=None):
+        if range_:
+            start = range_[0]
+            stop = range_[1]
+            self.animations[id_] = (frames[start:stop], frame_rate)
+        else:
+            self.animations[id_] = (frames, frame_rate)
     
-    def set_animation(self, name: str, frame: int = 0):
-        assert name in self.animations, f'Animation {name} not found'
-        if self.current != name:
+    def set_animation(self, id_: str, frame: int = 0):
+        assert id_ in self.animations, f'Animation {id_} not found'
+        if self.current != id_:
             self.frame = frame
-            self.current = name
+            self.current = id_
     
     def get_animation(self) -> tuple[list[pygame.Surface], int]:
         return self.animations.get(self.current)

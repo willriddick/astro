@@ -1,12 +1,13 @@
 from src.util import State
 from .states import PlayerState
+from ..animation import Animation
 
 class StateIdle(State):
     def __init__(self):
         super().__init__(PlayerState.IDLE)
     
     def on_enter(self):
-        self.owner.sprite.set_animation('idle')
+        self.owner.set_animation(Animation.IDLE)
     
     def update(self):
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)

@@ -1,6 +1,7 @@
 from random import choice
 from src.util import State
 from .states import PlayerState
+from ..animation import Animation
 
 class StateAir(State):
     def __init__(self):
@@ -37,17 +38,11 @@ class StateAir(State):
         
         self.owner.rotate_timer = max(0, self.owner.rotate_timer - 1)
         
-        animation = 'idle'
+        animation = Animation.IDLE
         if self.owner.rotate_timer > 0:
-            if self.owner.rotate_dir:
-                animation = 'front'
-            else:
-                animation = 'back'
+            animation = Animation.FRONT if self.owner.rotate_dir else Animation.BACK
         else:
-            if self.owner.falling:
-                animation = 'air_down'
-            else:
-                animation = 'air_up'
+            animation = Animation.AIR_DOWN if self.owner.falling else Animation.AIR_UP
         
-        self.owner.sprite.set_animation(animation)
+        self.owner.set_animation(animation)
     

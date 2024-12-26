@@ -4,29 +4,22 @@ from src.tilemap import Tilemap
 from src.util import Direction, load_sprite_sheet, StateMachine, approach
 from src.game.sprite import Sprite
 from .states import *
+from .animation import Animation, add_animations
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple[int, int]):
+    def __init__(self, pos: tuple[float, float]):
         super().__init__()
         self.pos = pygame.math.Vector2(pos)
         self.rect_size = (7, 14)
-
-        self.sprite = Sprite(
-            self.pos, 
-            (13, 18)
-        )
-        self.sprite.add_animation('idle', load_sprite_sheet('player/idle.png', (32, 32)), 0)
-        self.sprite.add_animation('run', load_sprite_sheet('player/run.png', (32, 32)), 10)
-        self.sprite.add_animation('air_up', load_sprite_sheet('player/air_up.png', (32, 32)), 0)
-        self.sprite.add_animation('air_down', load_sprite_sheet('player/air_down.png', (32, 32)), 0)
-        self.sprite.add_animation('front', load_sprite_sheet('player/front.png', (32, 32)), 0)
-        self.sprite.add_animation('back', load_sprite_sheet('player/back.png', (32, 32)), 0)
-        self.sprite.set_animation('idle')
 
         self.rotate_timer = 0
         self.rotate_duration = 10
         self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
+
+        self.sprite = Sprite(pos, (13, 18))
+        add_animations(self.sprite)
+        self.sprite.set_animation(Animation.IDLE)
 
         self.state_machine = StateMachine(self, [
             StateIdle(),
@@ -90,6 +83,9 @@ class Player(pygame.sprite.Sprite):
         self.state_machine.update()
         self.handle_collision(tilemap)
         self.sprite.update(self.pos)
+    
+    def set_animation(self, animation: Animation):
+        self.sprite.set_animation(animation)
 
     def apply_movement(self, max_speed: float, acc: tuple[float, float]):
         if self.move_dir == 0:

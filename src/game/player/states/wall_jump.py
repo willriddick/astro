@@ -1,5 +1,6 @@
 from src.util import State, approach
 from .states import PlayerState
+from ..animation import Animation
 
 class StateWallJump(State):
     def __init__(self):
@@ -8,7 +9,7 @@ class StateWallJump(State):
     
     def on_enter(self):
         self.timer = self.owner.wall_jump_duration
-        self.owner.sprite.set_animation('air_up')
+        self.owner.set_animation(Animation.AIR_UP)
         self.owner.sprite.flip = (self.owner.slide_dir == 1)
     
     def on_exit(self):

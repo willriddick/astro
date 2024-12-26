@@ -1,5 +1,6 @@
 from src.util import State, Direction
 from .states import PlayerState
+from ..animation import Animation
 
 class StateWallSlide(State):
     def __init__(self):
@@ -7,7 +8,7 @@ class StateWallSlide(State):
 
     def on_enter(self):
         self.owner.sprite.flip = (self.owner.slide_dir == 1)
-        self.owner.sprite.set_animation('idle')
+        self.owner.set_animation(Animation.IDLE)
     
     def on_exit(self):
         self.owner.last_move_dir = -self.owner.slide_dir
