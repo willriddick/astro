@@ -1,11 +1,11 @@
 from random import choice
 from src.util import State
-from .states import PlayerState
+from .states import States
 from ..animation import Animation
 
-class StateAir(State):
+class Air(State):
     def __init__(self):
-        super().__init__(PlayerState.AIR)
+        super().__init__(States.AIR)
     
     def update(self):
         self.owner.apply_movement(self.owner.air_move_speed, self.owner.air_acc)
@@ -19,13 +19,13 @@ class StateAir(State):
         self.handle_animation()
 
         if self.owner.slide_timer:
-            self.switch(PlayerState.WALL_SLIDE)
+            self.switch(States.WALL_SLIDE)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
-                self.switch(PlayerState.IDLE)
+                self.switch(States.IDLE)
             else:
-                self.switch(PlayerState.RUN)
+                self.switch(States.RUN)
          
     def handle_animation(self):
         if self.owner.move_dir != 0 and self.owner.move_dir != self.owner.last_move_dir:

@@ -1,10 +1,10 @@
 from src.util import State
-from .states import PlayerState
+from .states import States
 from ..animation import Animation
 
-class StateIdle(State):
+class Idle(State):
     def __init__(self):
-        super().__init__(PlayerState.IDLE)
+        super().__init__(States.IDLE)
     
     def on_enter(self):
         self.owner.set_animation(Animation.IDLE)
@@ -14,8 +14,8 @@ class StateIdle(State):
         self.owner.handle_jump()
 
         if self.owner.move_dir != 0:
-            self.switch(PlayerState.RUN)
+            self.switch(States.RUN)
         
         if not self.owner.on_ground:
-            self.switch(PlayerState.AIR)
+            self.switch(States.AIR)
     

@@ -1,9 +1,8 @@
 import pygame
-from math import copysign 
 from src.tilemap import Tilemap
-from src.util import Direction, load_sprite_sheet, StateMachine, approach
+from src.util import Direction, StateMachine, approach
 from src.game.sprite import Sprite
-from .states import *
+from .states import States, Idle, Run, Air, WallSlide, WallJump
 from .animation import Animation, add_animations
 
 class Player(pygame.sprite.Sprite):
@@ -21,13 +20,7 @@ class Player(pygame.sprite.Sprite):
         add_animations(self.sprite)
         self.sprite.set_animation(Animation.IDLE)
 
-        self.state_machine = StateMachine(self, [
-            StateIdle(),
-            StateRun(),
-            StateAir(),
-            StateWallSlide(),
-            StateWallJump(),
-        ])
+        self.state_machine = StateMachine(self, [Idle(), Run(), Air(), WallSlide(), WallJump()])
 
         self.ground_move_speed: float = 1.15  
         self.ground_acc = (0.1, 0.2) # (acceleration, deceleration)
@@ -121,7 +114,7 @@ class Player(pygame.sprite.Sprite):
             self.velocity.y = -self.wall_jump_speed[1]
             self.jump_input_timer = 0
             self.slide_timer = 0
-            self.state_machine.switch(PlayerState.WALL_JUMP)
+            self.state_machine.switch(States.WALL_JUMP)
 
     def apply_gravity(self, gravity: float, max_speed: float, ):
         self.velocity.y = min(

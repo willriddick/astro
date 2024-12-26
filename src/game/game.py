@@ -64,7 +64,7 @@ class Game:
                 player.render(self.display, self.camera_offset)
             
             text = f'{self.p1.state_machine.current_state.name}\n'
-            text += f'{self.p1.velocity}\n'
+            text += f'{self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
             self.display.blit(text_surf, (0, 0))

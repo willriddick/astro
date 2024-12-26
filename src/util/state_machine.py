@@ -7,7 +7,7 @@ class StateMachine:
         self.add_states(states)
         self.current_state: State = states[0]
         self.previous_state: State = self.current_state
-        self.debug = True
+        self.debug = False
    
     def update(self):
         if self.current_state is not None:
