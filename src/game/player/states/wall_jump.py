@@ -18,10 +18,10 @@ class WallJump(State):
     def update(self):
         self.timer = max(0, self.timer - 1)
 
-        self.owner.velocity.x = approach(
-            self.owner.velocity.x,
-            self.owner.air_move_speed * -self.owner.slide_dir,
-            self.owner.wall_jump_dec
+        self.owner.apply_movement(
+            dir_ = -self.owner.slide_dir, 
+            max_speed = self.owner.air_move_speed,
+            acc = self.owner.wall_jump_acc
         )
 
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)

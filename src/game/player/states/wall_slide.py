@@ -14,7 +14,7 @@ class WallSlide(State):
         self.owner.last_move_dir = -self.owner.slide_dir
     
     def update(self):
-        self.owner.apply_movement(self.owner.air_move_speed, self.owner.air_acc)
+        self.owner.apply_movement(self.owner.move_dir, self.owner.air_move_speed, self.owner.air_acc)
 
         if self.owner.velocity.y < 0 or self.owner.move_dir != self.owner.slide_dir:
             self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
