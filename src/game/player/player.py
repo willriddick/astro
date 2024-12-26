@@ -1,7 +1,7 @@
 import pygame
 from math import copysign 
 from src.tilemap import Tilemap
-from src.util import Direction, load_sprite_sheet, StateMachine
+from src.util import Direction, load_sprite_sheet, StateMachine, approach
 from src.game.sprite import Sprite
 from .states import *
 
@@ -39,10 +39,10 @@ class Player(pygame.sprite.Sprite):
         self.ground_move_speed: float = 1.15  
         self.ground_acc = (0.1, 0.2) # (acceleration, deceleration)
 
-        self.air_move_speed: float = 1.15  
-        self.air_acc = (0.05, 0.01)   
         self.move_dir = 1 # starts at one because the player is facing right
         self.last_move_dir = 1
+        self.air_move_speed: float = 1.15  
+        self.air_acc = (0.05, 0.01)   
         self.velocity = pygame.math.Vector2(0, 0)
 
         self.gravity_multiplier = 1
@@ -93,22 +93,13 @@ class Player(pygame.sprite.Sprite):
 
     def apply_movement(self, max_speed: float, acc: tuple[float, float]):
         if self.move_dir == 0:
-            # Apply deceleration
-            if abs(self.velocity.x) < acc[1]:
-                self.velocity.x = 0
-            else:
-                # Copysign returns the first argument with the sign of the second argument
-                self.velocity.x -= copysign(acc[1], self.velocity.x)
+            self.velocity.x = approach(self.velocity.x, 0, acc[1])
         else:
-            # Apply acceleration, clamping velocity to the move speed
-            self.velocity.x = max(
-                -max_speed, 
-                min(max_speed, self.velocity.x + (self.move_dir * acc[0]))
-            )
+            self.velocity.x = approach(self.velocity.x, self.move_dir * max_speed, acc[0])
     
     def handle_jump(self):
-        # Handle coyote timer
         self.coyote_timer = max(0, self.coyote_timer - 1)
+
         if self.on_ground:
             self.coyote_timer = self.coyote_buffer
 
@@ -120,6 +111,8 @@ class Player(pygame.sprite.Sprite):
             self.variable_jump_timer = self.variable_jump_buffer
     
     def handle_wall_jump(self):
+        self.slide_timer = max(0, self.slide_timer - 1)
+
         if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
             self.slide_timer = self.slide_buffer
             self.slide_dir = 1
@@ -127,8 +120,6 @@ class Player(pygame.sprite.Sprite):
             self.slide_timer = self.slide_buffer
             self.slide_dir = -1
         
-        self.slide_timer = max(0, self.slide_timer - 1)
-
         if self.jump_input_timer > 0 and self.slide_timer:
             self.velocity.x = self.wall_jump_speed[0] * -self.slide_dir
             self.velocity.y = -self.wall_jump_speed[1]
