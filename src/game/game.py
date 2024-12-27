@@ -51,7 +51,7 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test1', self.TYPES)
+        self.tilemap = Tilemap.load('maps/test2', self.TYPES)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))

@@ -1,13 +1,13 @@
 from .state import State
 
 class StateMachine:
-    def __init__(self, owner: object, states: list[State]):
+    def __init__(self, owner: object, states: list[State], debug: bool=False):
         self.owner = owner
         self.states: dict[int, State] = {}
         self.add_states(states)
+        self.debug = debug
         self.current_state: State = states[0]
         self.previous_state: State = self.current_state
-        self.debug = False
    
     def update(self):
         if self.current_state is not None:

@@ -3,6 +3,7 @@ from enum import Enum
 class States(Enum):
     IDLE = 0
     RUN = 1
-    AIR = 2
-    WALL_SLIDE = 3
-    WALL_JUMP = 4
+    JUMP = 2
+    AIR = 3
+    WALL_SLIDE = 4
+    WALL_JUMP = 5

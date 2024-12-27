@@ -2,7 +2,7 @@ import pygame
 from src.tilemap import Tilemap
 from src.util import Direction, StateMachine, approach, load_sprite_sheet
 from src.game.sprite import Sprite
-from .states import States, Idle, Run, Air, WallSlide, WallJump
+from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
 
 class Player(pygame.sprite.Sprite):
@@ -83,10 +83,11 @@ class Player(pygame.sprite.Sprite):
         self.state_machine = StateMachine(self, [
             Idle(),
             Run(),
+            Jump(),
             Air(),
             WallSlide(),
             WallJump()
-        ])
+        ], debug=True)
 
     def update(self, tilemap):
         self.handle_input()
@@ -120,12 +121,8 @@ class Player(pygame.sprite.Sprite):
         if self.on_ground:
             self.coyote_timer = self.coyote_buffer
 
-        # Apply jump
         if self.jump_input_timer > 0 and self.coyote_timer > 0:
-            self.velocity.y = -self.jump_speed
-            self.jump_input_timer = 0
-            self.coyote_timer = 0
-            self.variable_jump_timer = self.variable_jump_buffer
+            self.state_machine.switch(States.JUMP)
     
     def handle_wall_jump(self):
         self.slide_timer = max(0, self.slide_timer - 1)
@@ -137,7 +134,6 @@ class Player(pygame.sprite.Sprite):
             self.slide_timer = self.slide_buffer
             self.slide_dir = -1
         
-        # Apply jump
         if self.jump_input_timer > 0 and self.slide_timer:
             self.state_machine.switch(States.WALL_JUMP)
 
