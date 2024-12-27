@@ -19,7 +19,7 @@ class WallSlide(State):
         if self.owner.velocity.y < 0 or self.owner.move_dir != self.owner.slide_dir:
             self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         else:
-            self.owner.apply_gravity(self.owner.wall_slide_gravity, self.owner.wall_slide_speed)
+            self.owner.apply_gravity(self.owner.slide_gravity, self.owner.slide_speed)
         
         self.owner.handle_wall_jump()
 

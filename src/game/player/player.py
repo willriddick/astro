@@ -26,27 +26,29 @@ class Player(pygame.sprite.Sprite):
         self.fall_speed = 3
 
         # Jumping
-        self.holding_jump = False
+        self.max_jumps = 2
+        self.jumps_remaining = 0
         self.jump_speed = 3
+        self.coyote_timer = 0
+        self.coyote_buffer = 7
         self.variable_jump_multiplier = 0.7
         self.variable_jump_buffer = 15
         self.variable_jump_timer = 0
-        self.jump_input_timer = 0
-        self.jump_buffer = 4
-        self.coyote_timer = 0
-        self.coyote_buffer = 5
 
         # Wall jump and sliding
         self.wall_jump_duration = 12
         self.wall_jump_speed = (2.5, 2.7)
         self.wall_jump_acc = (0.13, 0.13)
-        self.wall_slide_speed = 0.5
-        self.wall_slide_gravity = 0.05
+        self.slide_speed = 0.5
+        self.slide_gravity = 0.05
         self.slide_dir = 0
-        self.slide_buffer = 10
         self.slide_timer = 0
+        self.slide_buffer = 10
 
-        # Input timers
+        # Inputs
+        self.holding_jump = False
+        self.jump_input_timer = 0
+        self.jump_input_buffer = 4
         self.pressed_left_timer = 0
         self.pressed_left_buffer = 5
         self.pressed_right_timer = 0
@@ -87,7 +89,7 @@ class Player(pygame.sprite.Sprite):
             Air(),
             WallSlide(),
             WallJump()
-        ], debug=True)
+        ], debug=False)
 
     def update(self, tilemap):
         self.handle_input()
@@ -120,10 +122,12 @@ class Player(pygame.sprite.Sprite):
 
         if self.on_ground:
             self.coyote_timer = self.coyote_buffer
-
-        if self.jump_input_timer > 0 and self.coyote_timer > 0:
+            self.jumps_remaining = self.max_jumps
+        
+       
+        if self.jump_input_timer > 0 and self.jumps_remaining:
             self.state_machine.switch(States.JUMP)
-    
+   
     def handle_wall_jump(self):
         self.slide_timer = max(0, self.slide_timer - 1)
 
@@ -145,7 +149,7 @@ class Player(pygame.sprite.Sprite):
         
         self.jump_input_timer = max(0, self.jump_input_timer - 1)
         if just_pressed[pygame.K_SPACE]:
-            self.jump_input_timer = self.jump_buffer
+            self.jump_input_timer = self.jump_input_buffer
         
         self.holding_jump = pressed[pygame.K_SPACE]
 

@@ -51,7 +51,7 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test2', self.TYPES)
+        self.tilemap = Tilemap.load('maps/test1', self.TYPES)
 
         while self.running:
             self.display.fill((0, 0, 0, 0))
@@ -63,8 +63,9 @@ class Game:
                 player.update(self.tilemap)
                 player.render(self.display, self.camera_offset)
             
-            text = f'{self.p1.state_machine.current_state.name}\n'
-            text += f'{self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
+            text = f'State: {self.p1.state_machine.current_state.name}\n'
+            text += f'Jumps: {self.p1.jumps_remaining}\n'
+            text += f'Velocity: {self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
             self.display.blit(text_surf, (0, 0))

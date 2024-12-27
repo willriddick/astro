@@ -10,6 +10,7 @@ class Air(State):
     def update(self):
         self.owner.apply_movement(self.owner.move_dir, self.owner.air_move_speed, self.owner.air_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        self.owner.handle_jump()
 
         self.owner.variable_jump_timer = max(0, self.owner.variable_jump_timer - 1)
         if not self.owner.holding_jump and self.owner.variable_jump_timer > 0 and self.owner.velocity.y < 0:
