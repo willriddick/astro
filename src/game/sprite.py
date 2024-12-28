@@ -26,8 +26,9 @@ class Sprite:
     
     def add_animation(self, id_: int, frames: list[pygame.Surface], frame_rate: int, range_: tuple[int, int]=None):
         if range_:
-            start = range_[0]
-            stop = range_[1]
+            start, stop = range_
+            if not (0 <= start < len(frames) and 0 < stop <= len(frames) and start < stop):
+                raise ValueError(f"Invalid range_: {range_} for frames length {len(frames)}")
             self.animations[id_] = (frames[start:stop], frame_rate)
         else:
             self.animations[id_] = (frames, frame_rate)

@@ -67,12 +67,13 @@ class Player(pygame.sprite.Sprite):
 
         # Setup sprite
         self.sprite = Sprite(pos, image_offset=(13, 18))
-        self.sprite.add_animation(Animation.IDLE, load_sprite_sheet('player/idle.png', (32, 32)), 0)
-        self.sprite.add_animation(Animation.RUN, load_sprite_sheet('player/run.png', (32, 32)), 10)
-        self.sprite.add_animation(Animation.AIR_UP, load_sprite_sheet('player/air_up.png', (32, 32)), 0)
-        self.sprite.add_animation(Animation.AIR_DOWN, load_sprite_sheet('player/air_down.png', (32, 32)), 0)
-        self.sprite.add_animation(Animation.FRONT, load_sprite_sheet('player/front.png', (32, 32)), 0)
-        self.sprite.add_animation(Animation.BACK, load_sprite_sheet('player/back.png', (32, 32)), 0)
+        sheet = load_sprite_sheet('player/player.png', (32, 32))
+        self.sprite.add_animation(Animation.IDLE, sheet, 0, range_=(0,4))
+        self.sprite.add_animation(Animation.RUN, sheet, 10, range_=(4,10))
+        self.sprite.add_animation(Animation.AIR_UP, sheet, 0, range_=(10,11))
+        self.sprite.add_animation(Animation.AIR_DOWN, sheet, 0, range_=(11,12))
+        self.sprite.add_animation(Animation.FRONT, sheet, 0, range_=(12,13))
+        self.sprite.add_animation(Animation.BACK, sheet, 0, range_=(13,14))
         self.sprite.set_animation(Animation.IDLE)
 
         self.rotate_timer = 0
