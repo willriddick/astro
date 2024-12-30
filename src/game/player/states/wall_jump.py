@@ -22,7 +22,7 @@ class WallJump(State):
     def update(self):
         self.timer = max(0, self.timer - 1)
 
-        self.owner.apply_movement(
+        self.owner.accelerate_x(
             dir_ = -self.owner.slide_dir, 
             max_speed = self.owner.air_move_speed,
             acc = self.owner.wall_jump_acc

@@ -8,7 +8,7 @@ class Air(State):
         super().__init__(States.AIR)
     
     def update(self):
-        self.owner.apply_movement(self.owner.move_dir, self.owner.air_move_speed, self.owner.air_acc)
+        self.owner.accelerate_x(self.owner.move_dir, self.owner.air_move_speed, self.owner.air_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
 

@@ -2,14 +2,13 @@ import pygame
 from src.tilemap import Tilemap
 from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_palette, load_image, load_palette
 from src.game.sprite import Sprite
+from src.game.physics_entity import PhysicsEntity
 from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
 
-class Player(pygame.sprite.Sprite):
+class Player(PhysicsEntity):
     def __init__(self, pos: tuple[float, float]):
-        super().__init__()
-        self.pos = pygame.math.Vector2(pos)
-        self.rect_size = (7, 14)
+        super().__init__(pos, (7, 14))
 
         # Velocity and acceleration
         self.movement_multiplier = 1
@@ -69,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         sheet = swap_palette(
             load_image('player/player.png', False),
             load_palette('player/palette.png'), 
-            load_palette('player/palette3.png')
+            load_palette('player/palette2.png')
         )
         image_list = load_sprite_sheet(sheet, (32, 32))
 
@@ -83,7 +82,7 @@ class Player(pygame.sprite.Sprite):
         self.sprite.set_animation(Animation.IDLE)
 
         self.rotate_timer = 0
-        self.rotate_duration = 10
+        self.rotate_duration = 11
         self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
         self.last_move_dir = 1
@@ -103,20 +102,6 @@ class Player(pygame.sprite.Sprite):
         self.state_machine.update()
         self.handle_collision(tilemap)
         self.sprite.update(self.pos)
-    
-    def apply_movement(self, dir_: int, max_speed: float, acc: tuple[float, float]):
-        if dir_ == 0:
-            self.velocity.x = approach(
-                value=self.velocity.x,
-                target=0,
-                step=acc[1] * self.movement_multiplier
-            )
-        else:
-            self.velocity.x = approach(
-                value=self.velocity.x,
-                target=dir_ * max_speed * self.movement_multiplier,
-                step=acc[0] * self.movement_multiplier
-            )
     
     def apply_gravity(self, gravity: float, max_speed: float, ):
         self.velocity.y = min(
