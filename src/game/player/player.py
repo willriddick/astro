@@ -1,6 +1,6 @@
 import pygame
 from src.tilemap import Tilemap
-from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_color, load_image
+from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_palette, load_image
 from src.game.sprite import Sprite
 from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
@@ -66,7 +66,36 @@ class Player(pygame.sprite.Sprite):
         }
 
         # Setup sprite
-        sheet = swap_color(load_image('player/player.png', False), (235, 184, 91), (255, 241, 169))
+        palette = [
+            (235, 184, 91),
+            (255, 241, 169),
+            (199, 133, 57),
+            (230, 113, 70),
+            (194, 55, 63),
+            (183, 65, 50),
+            (42, 125, 117),
+            (36, 80, 95),
+            (36, 80, 95),
+            (122, 40, 73),
+            (42, 41, 66),
+            (58, 27, 64),
+        ]
+        new_palette = [
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+            (255, 0, 0),
+        ]
+        sheet = load_image('player/player.png', False)
+        sheet = swap_palette(sheet, palette, new_palette)
         image_list = load_sprite_sheet(sheet, (32, 32))
 
         self.sprite = Sprite(pos, image_offset=(13, 18))

@@ -36,10 +36,23 @@ def load_sprite_sheet(image: pygame.surface, size: tuple[int, int]) -> list[pyga
             images.append(image.subsurface(x * size[0], y * size[1], size[0], size[1]).convert_alpha())
     return images
 
-def swap_color(image: pygame.Surface, old_color: tuple[int, int, int], new_color: tuple[int, int, int]) -> pygame.Surface:
+def swap_color(image: pygame.Surface, old_color: pygame.color.Color, new_color: pygame.color.Color) -> pygame.Surface:
     image_copy = pygame.Surface(image.get_size())
     image_copy.fill(new_color)
     image.set_colorkey(old_color)
     image_copy.blit(image, (0, 0))
     image_copy.set_colorkey((0, 0, 0))
     return image_copy
+
+def swap_palette(image: pygame.Surface, old_palette: list[pygame.color.Color], new_palette: list[pygame.color.Color]) -> pygame.Surface:
+    assert len(old_palette) == len(new_palette), f'Old ({len(old_palette)}) and new ({len(new_palette)}) palette must have the same size'
+    for index, old_color in enumerate(old_palette):
+        new_color = new_palette[index]
+        image = swap_color(image, old_color, new_color)
+    return image
+
+def load_palette(path: str) -> list[pygame.color.Color]:
+    image = load_image(path, False)
+    size = image.get_size()
+    assert size[0] == 1, f'Palette image must have a width of 1 pixel, got {size[0]}'
+    return [image.get_at((0, y)) for y in range(size[1])]
