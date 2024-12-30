@@ -54,5 +54,5 @@ def swap_palette(image: pygame.Surface, old_palette: list[pygame.color.Color], n
 def load_palette(path: str) -> list[pygame.color.Color]:
     image = load_image(path, False)
     size = image.get_size()
-    assert size[0] == 1, f'Palette image must have a width of 1 pixel, got {size[0]}'
-    return [image.get_at((0, y)) for y in range(size[1])]
+    assert size[1] == 1, f'Palette image must have a heigth of 1 pixel, got {size[0]}'
+    return [image.get_at((x, 0)) for x in range(size[0])]

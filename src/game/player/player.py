@@ -1,6 +1,6 @@
 import pygame
 from src.tilemap import Tilemap
-from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_palette, load_image
+from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_palette, load_image, load_palette
 from src.game.sprite import Sprite
 from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
@@ -26,7 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.fall_speed = 3
 
         # Jumping
-        self.max_jumps = 2
+        self.max_jumps = 1
         self.jumps_remaining = 0
         self.jump_speed = 3
         self.coyote_timer = 0
@@ -66,36 +66,11 @@ class Player(pygame.sprite.Sprite):
         }
 
         # Setup sprite
-        palette = [
-            (235, 184, 91),
-            (255, 241, 169),
-            (199, 133, 57),
-            (230, 113, 70),
-            (194, 55, 63),
-            (183, 65, 50),
-            (42, 125, 117),
-            (36, 80, 95),
-            (36, 80, 95),
-            (122, 40, 73),
-            (42, 41, 66),
-            (58, 27, 64),
-        ]
-        new_palette = [
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-            (255, 0, 0),
-        ]
-        sheet = load_image('player/player.png', False)
-        sheet = swap_palette(sheet, palette, new_palette)
+        sheet = swap_palette(
+            load_image('player/player.png', False),
+            load_palette('player/palette.png'), 
+            load_palette('player/palette3.png')
+        )
         image_list = load_sprite_sheet(sheet, (32, 32))
 
         self.sprite = Sprite(pos, image_offset=(13, 18))
