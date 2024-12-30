@@ -2,7 +2,7 @@ import sys
 import threading
 import pygame
 from src.tilemap import Tilemap, TileType
-from src.util import load_sprite_sheet
+from src.util import load_sprite_sheet, load_image
 from .player import Player
 
 FPS = 60
@@ -24,7 +24,7 @@ class Game:
         
         self.TYPES = {
             TileType('stone', 
-                load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
+                load_sprite_sheet(load_image('stone_tileset/stone_tileset.png'), (16,16)), 
                 autotile=True, 
                 tile_size=16
             ),

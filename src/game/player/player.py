@@ -1,6 +1,6 @@
 import pygame
 from src.tilemap import Tilemap
-from src.util import Direction, StateMachine, approach, load_sprite_sheet
+from src.util import Direction, StateMachine, approach, load_sprite_sheet, swap_color, load_image
 from src.game.sprite import Sprite
 from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
@@ -66,14 +66,16 @@ class Player(pygame.sprite.Sprite):
         }
 
         # Setup sprite
+        sheet = swap_color(load_image('player/player.png', False), (235, 184, 91), (255, 241, 169))
+        image_list = load_sprite_sheet(sheet, (32, 32))
+
         self.sprite = Sprite(pos, image_offset=(13, 18))
-        sheet = load_sprite_sheet('player/player.png', (32, 32))
-        self.sprite.add_animation(Animation.IDLE, sheet, 0, range_=(0,4))
-        self.sprite.add_animation(Animation.RUN, sheet, 10, range_=(4,10))
-        self.sprite.add_animation(Animation.AIR_UP, sheet, 0, range_=(10,11))
-        self.sprite.add_animation(Animation.AIR_DOWN, sheet, 0, range_=(11,12))
-        self.sprite.add_animation(Animation.FRONT, sheet, 0, range_=(12,13))
-        self.sprite.add_animation(Animation.BACK, sheet, 0, range_=(13,14))
+        self.sprite.add_animation(Animation.IDLE, image_list, 0, range_=(0,4))
+        self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
+        self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
+        self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
+        self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
+        self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
         self.sprite.set_animation(Animation.IDLE)
 
         self.rotate_timer = 0
