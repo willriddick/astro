@@ -54,12 +54,13 @@ class Player(PhysicsEntity):
         image_list = load_sprite_sheet(sheet, (32, 32))
 
         self.sprite = Sprite(pos, image_offset=(13, 18))
-        self.sprite.add_animation(Animation.IDLE, image_list, 0, range_=(0,4))
+        self.sprite.add_animation(Animation.IDLE, image_list, 5, range_=(0,4))
         self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
         self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
         self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
         self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
         self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
+        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(14,15))
         self.sprite.set_animation(Animation.IDLE)
 
         self.rotate_timer = 0

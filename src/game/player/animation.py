@@ -7,3 +7,4 @@ class Animation(Enum):
     AIR_DOWN = 3
     FRONT = 4
     BACK = 5
+    SLIDE = 6

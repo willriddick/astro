@@ -8,7 +8,7 @@ class WallSlide(State):
 
     def on_enter(self):
         self.owner.sprite.flip = (self.owner.slide_dir == 1)
-        self.owner.set_animation(Animation.IDLE)
+        self.owner.set_animation(Animation.SLIDE)
     
     def on_exit(self):
         self.owner.last_move_dir = -self.owner.slide_dir
