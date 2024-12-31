@@ -1,8 +1,8 @@
 import struct
 import pygame
+from src.util import Direction
 from .tile import Tile
 from .tile_type import TileType
-from ..util import Direction
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
@@ -22,10 +22,10 @@ class Tilemap:
         self.map = {}
     
     def render(self, surf: pygame.Surface, offset=(0, 0)):
-        x_start = offset[0] // self.tile_size
-        x_stop = (offset[0] + surf.get_width()) // self.tile_size + 1
-        y_start = offset[1] // self.tile_size
-        y_stop = (offset[1] + surf.get_height()) // self.tile_size + 1
+        x_start = int(offset[0] // self.tile_size)
+        x_stop = int((offset[0] + surf.get_width()) // self.tile_size + 1)
+        y_start = int(offset[1] // self.tile_size)
+        y_stop = int((offset[1] + surf.get_height()) // self.tile_size + 1)
         for x in range(x_start, x_stop):
             for y in range(y_start, y_stop):
                 tile = self.get_tile((x, y))

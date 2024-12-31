@@ -1,68 +1,72 @@
 import sys
 import threading
 import pygame
+from src.tilemap import Tilemap, TileType
+from src.util import load_sprite_sheet, load_image
 from .player import Player
-from ..tilemap import Tilemap
-from ..tilemap import TileType
-from ..util import load_sprite_sheet
+from .camera import Camera
 
 FPS = 60
 WINDOW_SCALE = 3
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
-class Main:
+class Game:
     def __init__(self):
         pygame.init()
 
-        self.display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE)
         self.fullscreen = False
+        pygame.display.set_caption('GAME')
+
+        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
         self.TYPES = {
             TileType('stone', 
-                load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
+                load_sprite_sheet(load_image('stone_tileset/stone_tileset.png'), (16,16)), 
                 autotile=True, 
                 tile_size=16
             ),
         }
         self.tilemap: Tilemap = None
 
-        pygame.display.set_caption('GAME')
+        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
+        self.players = list[Player]
+        self.camera.set_target(self.p1)
 
         self.clock = pygame.time.Clock()
-        
-        self.camera_offset = (0, 0)
-
-        self.p1 = Player((self.display.get_width() // 2, self.display.get_height() // 2))
-        self.players = pygame.sprite.Group()
-        self.players.add(self.p1)
-
-        self.running = True
-
+        self.running = False
         self.command_thread = threading.Thread(target=self.handle_commands)
         self.command_thread.daemon = True
+    
+    def run(self):
+        self.running = True
         self.command_thread.start()
-
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test2', self.TYPES)
+        self.tilemap = Tilemap.load('maps/test1', self.TYPES)
 
         while self.running:
-            self.display.fill((0, 0, 0, 0))
             for event in pygame.event.get():
                 self.handle_event(event)
             
-            self.tilemap.render(self.display, self.camera_offset)
-            for player in self.players:
-                player.update(self.tilemap)
-                player.render(self.display, self.camera_offset)
+            self.camera.update()
+            self.tilemap.render(self.camera.display, self.camera.offset)
+            self.p1.update(self.tilemap)
+            
+            text = f'State: {self.p1.state_machine.current_state.name}\n'
+            text += f'Jumps: {self.p1.jumps_remaining}\n'
+            text += f'Velocity: {self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
+            text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
+            text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+            self.camera.display.blit(text_surf, (0, 0))
 
             try:
-                self.window.blit(pygame.transform.scale(self.display, self.window.get_size()))
+                self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
                 pygame.display.update()
                 self.clock.tick(FPS) 
             except:
@@ -79,7 +83,10 @@ class Main:
                     case ['/help']:
                         print('Available commands:')
                         print('/help - Show this help message')
+                        print('/load - Load new tilemap')
                         print('/quit - Quit the game')
+                    case ['/load', path]:
+                        self.tilemap = Tilemap.load(path, self.TYPES)
                     case ['/quit']:
                         self.running = False
                     case _:
@@ -115,5 +122,3 @@ class Main:
                 (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE), 
                 pygame.RESIZABLE)
     
-if __name__ == "__main__":
-    main = Main()
