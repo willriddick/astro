@@ -1,12 +1,11 @@
 import pygame
 from src.tilemap import Tilemap
 from src.util import approach, Direction
+from .entity import Entity
 
-class PhysicsEntity(pygame.sprite.Sprite):
+class PhysicsEntity(Entity):
     def __init__(self, pos: tuple[int, int], rect_size: tuple[int, int]):
-        super().__init__()
-        self.pos = pygame.Vector2(pos)
-        self.rect_size = rect_size
+        super().__init__(pos, rect_size)
 
         # Velocity
         self.velocity = pygame.Vector2(0, 0)
@@ -27,18 +26,7 @@ class PhysicsEntity(pygame.sprite.Sprite):
             Direction.RIGHT: False, 
             Direction.LEFT: False
         }
-
-        # Sprite
-        self.sprite = None
     
-    def render(self, display, offset=(0, 0)):
-        if self.sprite:
-            self.sprite.render(display, offset)
-    
-    def set_animation(self, animation: int):
-        if self.sprite:
-            self.sprite.set_animation(animation)
-   
     def accelerate_x(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.x = self.accelerate_decelerate(self.velocity.x, max_speed, dir_, acc, self.velocity_multiplier.x)
     
@@ -64,10 +52,7 @@ class PhysicsEntity(pygame.sprite.Sprite):
                 target=dir_ * target * multiplier,
                 step=acc[0] * multiplier
             )
-    
-    def get_rect(self):
-        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size[0], self.rect_size[1])
-    
+   
     def handle_collision(self, tilemap: Tilemap):
         # Update tile position
         tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
@@ -122,6 +107,3 @@ class PhysicsEntity(pygame.sprite.Sprite):
         # Update helper variables
         self.on_ground = self.collisions[Direction.DOWN]
         self.falling = (self.velocity.y > 0 and not self.collisions[Direction.DOWN])
-
-
-   
