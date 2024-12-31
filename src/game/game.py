@@ -4,6 +4,7 @@ import pygame
 from src.tilemap import Tilemap, TileType
 from src.util import load_sprite_sheet, load_image
 from .player import Player
+from .camera import Camera
 
 FPS = 60
 WINDOW_SCALE = 3
@@ -14,7 +15,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        self.display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE)
@@ -35,9 +36,8 @@ class Game:
 
         self.clock = pygame.time.Clock()
         
-        self.camera_offset = (0, 0)
 
-        self.p1 = Player((self.display.get_width() // 2, self.display.get_height() // 2))
+        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
         self.players = pygame.sprite.Group()
         self.players.add(self.p1)
 
@@ -54,24 +54,26 @@ class Game:
         self.tilemap = Tilemap.load('maps/test1', self.TYPES)
 
         while self.running:
-            self.display.fill((0, 0, 0, 0))
+            self.camera.update()
+            self.camera.move_to(pygame.math.Vector2(self.p1.get_rect().center))
+
             for event in pygame.event.get():
                 self.handle_event(event)
             
-            self.tilemap.render(self.display, self.camera_offset)
+            self.tilemap.render(self.camera.display, self.camera.offset)
             for player in self.players:
                 player.update(self.tilemap)
-                player.render(self.display, self.camera_offset)
+                player.render(self.camera.display, -self.camera.offset)
             
             text = f'State: {self.p1.state_machine.current_state.name}\n'
             text += f'Jumps: {self.p1.jumps_remaining}\n'
             text += f'Velocity: {self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
-            self.display.blit(text_surf, (0, 0))
+            self.camera.display.blit(text_surf, (0, 0))
 
             try:
-                self.window.blit(pygame.transform.scale(self.display, self.window.get_size()))
+                self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
                 pygame.display.update()
                 self.clock.tick(FPS) 
             except:
