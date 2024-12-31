@@ -2,7 +2,7 @@ import sys
 import threading
 import argparse
 import pygame
-from src.util import load_sprite_sheet 
+from src.util import load_image, load_sprite_sheet 
 from .tilemap import Tilemap
 from .tile_type import TileType
 
@@ -23,7 +23,7 @@ class Editor:
         self.TYPES = [
             TileType(
                 'stone', 
-                load_sprite_sheet('stone_tileset/stone_tileset.png', (16,16)), 
+                load_sprite_sheet(load_image('stone_tileset/stone_tileset.png'), (16,16)), 
                 autotile=True, 
                 tile_size=16
             ),

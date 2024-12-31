@@ -7,34 +7,77 @@ class Camera:
         self.width = width
         self.height = height
         self.display = pygame.Surface((width, height))
-        self.offset = pygame.Vector2(0, 0)
 
-        self.target: Entity = None
+        # In-game positions
+        self.position = pygame.Vector2(0, 0)
+        self.target_position = pygame.Vector2(0, 0)
+        self.offset = pygame.Vector2(0, 0)
+        self.boundary: tuple[int, int, int, int] = None
+
+        # Entity management
         self.entities: list[Entity] = []
     
     def update(self):
+        """Update the camera and render the display surface."""
+        # Clear display surface
         self.display.fill((0, 0, 0))
 
-        if self.target:
-            self.move_to(self.target.get_center())
+        # Calculate the offset from the in-game position
+        self.offset = pygame.Vector2(
+            self.position.x - self.width // 2,
+            self.position.y - self.height // 2
+        )
 
+        # Render all entities relative to the offset
         for entity in self.entities:
             entity.render(self.display, -self.offset)
+
+        self.draw_markers()
+        
+    def get_rect(self):
+        """Get the camera's current rectangle in the game world."""
+        return pygame.Rect(
+            self.position.x - self.width // 2,
+            self.position.y - self.height // 2,
+            self.width, self.height
+        )
+
+    def move_to(self, target: pygame.Vector2, smoothing: float = 0.2):
+        """Move the camera smoothly towards a target position."""
+        self.target_position = target
+        cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
+        self.position = self.position * (1 - cos_smoothing) + self.target_position * cos_smoothing
+
+        # Clamp the camera's position to the boundary if defined
+        if self.boundary:
+            clamped_x = max(
+                self.boundary.left + self.width // 2,
+                min(self.position.x, self.boundary.right - self.width // 2)
+            )
+            clamped_y = max(
+                self.boundary.top + self.height // 2,
+                min(self.position.y, self.boundary.bottom - self.height // 2)
+            )
+            self.position = pygame.Vector2(clamped_x, clamped_y)
     
-    def set_target(self, target: Entity):
-        if target not in self.entities:
-            self.add(target)
-        self.target = target
-    
+    def set_boundary(self, boundary: pygame.Rect):
+        """Set a boundary for the camera to stay within."""
+        self.boundary = boundary
+
     def add(self, entity: Entity):
+        """Add an entity to be managed by the camera."""
         self.entities.append(entity)
    
     def remove(self, entity: Entity):
-        if self.target == entity:
-            self.target = None
+        """Remove an entity from the camera."""
         self.entities.remove(entity)
-   
-    def move_to(self, target: pygame.Vector2, smoothing: float = 0.2):
-        target_offset = pygame.Vector2(target.x - self.width // 2, target.y - self.height // 2)
-        cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
-        self.offset = self.offset * (1 - cos_smoothing) + target_offset * cos_smoothing
+
+    def draw_markers(self):
+        camera_marker = pygame.Rect(self.width // 2 - 2, self.height // 2 - 2, 4, 4)
+        target_marker = pygame.Rect(
+            self.width // 2 + (self.target_position.x - self.position.x) - 2,
+            self.height // 2 + (self.target_position.y - self.position.y) - 2,
+            4, 4
+        )
+        pygame.draw.rect(self.display, (255, 255, 255), camera_marker, 1)
+        pygame.draw.rect(self.display, (255, 0, 0), target_marker, 1)

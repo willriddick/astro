@@ -14,6 +14,9 @@ class Tilemap:
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
         self.debug = False
+    
+    def get_rect(self) -> pygame.Rect:
+        return pygame.Rect(0, 0, self.size[0] * self.tile_size, self.size[1] * self.tile_size)
 
     def set_size(self, size: tuple[int, int]):
         self.size = size

@@ -91,7 +91,6 @@ class Player(PhysicsEntity):
         if self.on_ground:
             self.coyote_timer = self.coyote_buffer
             self.jumps_remaining = self.max_jumps
-        
        
         if self.jump_input_timer > 0 and self.jumps_remaining:
             self.state_machine.switch(States.JUMP)
