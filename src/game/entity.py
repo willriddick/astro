@@ -8,6 +8,10 @@ class Entity(pygame.sprite.Sprite):
         self.rect_size = rect_size
         self.sprite: Sprite = None
     
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        assert self.sprite, 'Sprite not set {self}'
+        self.sprite.render(display, offset)
+    
     def set_animation(self, animation: int):
         assert self.sprite, 'Sprite not set {self}'
         self.sprite.set_animation(animation)

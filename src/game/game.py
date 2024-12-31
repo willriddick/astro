@@ -20,6 +20,7 @@ class Game:
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE)
         self.fullscreen = False
+        pygame.display.set_caption('GAME')
 
         self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
@@ -32,15 +33,11 @@ class Game:
         }
         self.tilemap: Tilemap = None
 
-        pygame.display.set_caption('GAME')
+        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
+        self.players = list[Player]
+        self.camera.set_target(self.p1)
 
         self.clock = pygame.time.Clock()
-        
-
-        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
-        self.players = pygame.sprite.Group()
-        self.players.add(self.p1)
-
         self.running = False
         self.command_thread = threading.Thread(target=self.handle_commands)
         self.command_thread.daemon = True
@@ -54,16 +51,12 @@ class Game:
         self.tilemap = Tilemap.load('maps/test1', self.TYPES)
 
         while self.running:
-            self.camera.update()
-            self.camera.move_to(pygame.math.Vector2(self.p1.get_rect().center))
-
             for event in pygame.event.get():
                 self.handle_event(event)
             
+            self.camera.update()
             self.tilemap.render(self.camera.display, self.camera.offset)
-            for player in self.players:
-                player.update(self.tilemap)
-                player.render(self.camera.display, -self.camera.offset)
+            self.p1.update(self.tilemap)
             
             text = f'State: {self.p1.state_machine.current_state.name}\n'
             text += f'Jumps: {self.p1.jumps_remaining}\n'
