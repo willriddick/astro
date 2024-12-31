@@ -49,17 +49,17 @@ class Game:
     def handle_game(self):
         self.tilemap = Tilemap.load('maps/test4', self.TYPES)
 
-        self.camera.add(self.p1)
+        self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
+        self.camera.add(self.p1)
 
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
             
-            self.camera.update()
-            self.tilemap.render(self.camera.display, self.camera.offset)
             self.p1.update(self.tilemap)
             self.camera.move_to(self.p1.get_center())
+            self.camera.update()
             
             text = f'{self.p1.state_machine.current_state.name}\n'
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
