@@ -1,9 +1,10 @@
 import sys
 import threading
 import pygame
+import random
 from src.tilemap import Tilemap, TileType
 from src.util import load_sprite_sheet, load_image
-from src.level_gen import LevelBuilder, Level
+from src.level_gen import LevelBuilder, Level, Display
 from .player import Player
 from .camera import Camera
 
@@ -32,11 +33,16 @@ class Game:
                 tile_size=16
             ),
         }
-        self.tilemap: Tilemap = None
+        self.tilemap = Tilemap(self.TYPES, tile_size=16)
 
-        self.level: Level = LevelBuilder.generate_level('src/level_gen/configs/test2.json', 1)
+        config = 'src/level_gen/configs/test2.json'
+        self.level: Level = LevelBuilder.generate_level(config, 1)
+        print(Display(self.level))
+
         for room in self.level.map.values():
-            print(room)
+            new_map = Tilemap.load('maps/test1', self.TYPES)
+            #print(f'{room} {room.position}')
+            self.tilemap.place(new_map, room.position, random.choice([0, 1]))
 
         self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
         self.players = list[Player]
@@ -52,8 +58,6 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test4', self.TYPES)
-
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
         self.camera.add(self.p1)
