@@ -1,4 +1,5 @@
 import sys
+import os
 import threading
 import pygame
 import random
@@ -35,14 +36,23 @@ class Game:
         }
         self.tilemap = Tilemap(self.TYPES, tile_size=16)
 
-        config = 'src/level_gen/configs/test2.json'
+        config = 'src/level_gen/configs/test1.json'
         self.level: Level = LevelBuilder.generate_level(config, 1)
         print(Display(self.level))
 
         for room in self.level.map.values():
-            new_map = Tilemap.load('maps/test1', self.TYPES)
-            #print(f'{room} {room.position}')
-            self.tilemap.place(new_map, room.position, random.choice([0, 1]))
+            #print(f'{room} {room.position} {room.index}')
+            
+            map_folder = f'maps/{room.index}' 
+            map_paths: list[str] = []
+            for name in os.listdir(map_folder):
+                map_paths.append(map_folder + '/' + name)
+            map_path = random.choice(map_paths)
+            #print(map_path) 
+
+            new_map = Tilemap.load(map_path, self.TYPES)
+            flip = random.choice([0, 1])
+            self.tilemap.place(new_map, room.position, flip)
 
         self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
         self.players = list[Player]
