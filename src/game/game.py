@@ -3,6 +3,7 @@ import threading
 import pygame
 from src.tilemap import Tilemap, TileType
 from src.util import load_sprite_sheet, load_image
+from src.level_gen import LevelBuilder, Level
 from .player import Player
 from .camera import Camera
 
@@ -32,6 +33,10 @@ class Game:
             ),
         }
         self.tilemap: Tilemap = None
+
+        self.level: Level = LevelBuilder.generate_level('src/level_gen/configs/test2.json', 1)
+        for room in self.level.map.values():
+            print(room)
 
         self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
         self.players = list[Player]
