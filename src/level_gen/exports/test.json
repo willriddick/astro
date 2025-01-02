@@ -1,0 +1,175 @@
+{
+    "rooms": [
+        {
+            "index": 0,
+            "key": 10,
+            "x": 5,
+            "y": 7,
+            "attributes": [
+                "ENTRANCE",
+                "BRANCH"
+            ]
+        },
+        {
+            "index": 1,
+            "key": 13,
+            "x": 5,
+            "y": 6,
+            "attributes": [
+                "BRANCH",
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 2,
+            "key": 7,
+            "x": 5,
+            "y": 5,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 3,
+            "key": 9,
+            "x": 4,
+            "y": 5,
+            "attributes": []
+        },
+        {
+            "index": 4,
+            "key": 6,
+            "x": 4,
+            "y": 4,
+            "attributes": []
+        },
+        {
+            "index": 5,
+            "key": 11,
+            "x": 3,
+            "y": 4,
+            "attributes": [
+                "BRIDGE"
+            ]
+        },
+        {
+            "index": 6,
+            "key": 14,
+            "x": 3,
+            "y": 3,
+            "attributes": [
+                "BRANCH"
+            ]
+        },
+        {
+            "index": 7,
+            "key": 5,
+            "x": 3,
+            "y": 2,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 8,
+            "key": 2,
+            "x": 4,
+            "y": 2,
+            "attributes": [
+                "EXIT"
+            ]
+        },
+        {
+            "index": 9,
+            "key": 11,
+            "x": 6,
+            "y": 6,
+            "attributes": []
+        },
+        {
+            "index": 10,
+            "key": 7,
+            "x": 6,
+            "y": 5,
+            "attributes": [
+                "BRIDGE"
+            ]
+        },
+        {
+            "index": 11,
+            "key": 14,
+            "x": 7,
+            "y": 5,
+            "attributes": [
+                "BRANCH",
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 12,
+            "key": 4,
+            "x": 7,
+            "y": 4,
+            "attributes": []
+        },
+        {
+            "index": 13,
+            "key": 5,
+            "x": 2,
+            "y": 3,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 14,
+            "key": 9,
+            "x": 2,
+            "y": 4,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 15,
+            "key": 14,
+            "x": 7,
+            "y": 6,
+            "attributes": [
+                "BRIDGE"
+            ]
+        },
+        {
+            "index": 16,
+            "key": 8,
+            "x": 7,
+            "y": 7,
+            "attributes": []
+        },
+        {
+            "index": 17,
+            "key": 3,
+            "x": 4,
+            "y": 7,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 18,
+            "key": 3,
+            "x": 3,
+            "y": 7,
+            "attributes": [
+                "ITEM_ONE"
+            ]
+        },
+        {
+            "index": 19,
+            "key": 1,
+            "x": 2,
+            "y": 7,
+            "attributes": []
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "rows": [4, 5],
+    "cols": [4, 5],
+    "main_length": [5, 6],
+    "room_count": [11, 13],
+    "bridge_count": 3,
+    "item_count": [3, 4],
+    "branch_length_range": [1, 4],
+    "weights": {
+        "UP": 10,
+        "DOWN": 0,
+        "LEFT": 5,
+        "RIGHT": 5
+    },
+    "branch_weights": {
+        "UP": 5,
+        "DOWN": 5,
+        "LEFT": 5,
+        "RIGHT": 5
+    }
+}
