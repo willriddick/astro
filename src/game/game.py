@@ -29,7 +29,7 @@ class Game:
         
         self.TYPES = {
             TileType('stone', 
-                load_sprite_sheet(load_image('stone_tileset/stone_tileset.png'), (16,16)), 
+                load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), 
                 autotile=True, 
                 tile_size=16
             ),

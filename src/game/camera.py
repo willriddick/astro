@@ -36,7 +36,7 @@ class Camera:
         for entity in self.entities:
             entity.render(self.display, -self.offset)
 
-        self.draw_markers()
+        #self.draw_debug()
     
     def render_tilemap(self, tilemap):
         if not tilemap:
@@ -91,7 +91,7 @@ class Camera:
         """Remove an entity from the camera."""
         self.entities.remove(entity)
 
-    def draw_markers(self):
+    def draw_debug(self):
         camera_marker = pygame.Rect(self.width // 2 - 2, self.height // 2 - 2, 4, 4)
         target_marker = pygame.Rect(
             self.width // 2 + (self.target_position.x - self.position.x) - 2,
