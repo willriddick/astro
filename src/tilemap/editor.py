@@ -69,10 +69,10 @@ class Editor:
                         print('/load <path> - Load the tilemap from the specified path')
                         print('/clear - Clear the tilemap')
                         print('/quit - Quit the editor\n')
-                    case ['/save']:
+                    case ['/save' | '/s']:
                         if self.last_path:
                             Tilemap.save(self.tilemap, self.last_path)
-                    case ['/save', path]:
+                    case ['/save' | '/s', path]:
                         Tilemap.save(self.tilemap, path)
                     case ['/load', path]:
                         self.last_path = path

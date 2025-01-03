@@ -5,7 +5,7 @@ import pygame
 import random
 from src.tilemap import Tilemap, TileType
 from src.util import load_sprite_sheet, load_image
-from src.level_gen import LevelBuilder, Level, Display
+from src.level_gen import LevelBuilder, Level, Display, Attribute
 from .player import Player
 from .camera import Camera
 
@@ -37,24 +37,23 @@ class Game:
         self.tilemap = Tilemap(self.TYPES, tile_size=16)
 
         config = 'src/level_gen/configs/test1.json'
-        self.level: Level = LevelBuilder.generate_level(config, 1)
+        self.level: Level = LevelBuilder.generate_level(config)
         print(Display(self.level))
 
+        spawn_pos = (0, 0)
+
         for room in self.level.map.values():
-            #print(f'{room} {room.position} {room.index}')
-            
-            map_folder = f'maps/{room.index}' 
+            map_folder = f'maps/{room.key}' 
             map_paths: list[str] = []
             for name in os.listdir(map_folder):
                 map_paths.append(map_folder + '/' + name)
             map_path = random.choice(map_paths)
-            #print(map_path) 
-
             new_map = Tilemap.load(map_path, self.TYPES)
-            flip = random.choice([0, 1])
-            self.tilemap.place(new_map, room.position, flip)
+            self.tilemap.place(new_map, room.position, False)
+            if room.has_attribute(Attribute.ENTRANCE):
+                spawn_pos = (room.position.x * 10 * self.tilemap.tile_size, room.position.y * 8 * self.tilemap.tile_size)
 
-        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
+        self.p1 = Player(spawn_pos)
         self.players = list[Player]
 
         self.clock = pygame.time.Clock()
@@ -81,6 +80,7 @@ class Game:
             self.camera.update()
             
             text = f'{self.p1.state_machine.current_state.name}\n'
+            text += f'{int(self.p1.pos.x):04},{int(self.p1.pos.y):04} \n'
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
             self.camera.display.blit(text_surf, (0, 0))

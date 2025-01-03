@@ -17,7 +17,7 @@ class Player(PhysicsEntity):
         self.air_acc = (0.05, 0.01)   
 
         # Jumping
-        self.max_jumps = 10
+        self.max_jumps = 1
         self.jumps_remaining = 0
         self.jump_speed = 3
         self.coyote_timer = 0
