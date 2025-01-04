@@ -27,6 +27,12 @@ class Editor:
                 autotile=True, 
                 tile_size=16
             ),
+            TileType(
+                'door',
+                [load_sprite_sheet(load_image('items.png'), (16,16))[0]],
+                autotile=False,
+                tile_size=16
+            ),
         ]
 
         if args.load:
@@ -62,7 +68,7 @@ class Editor:
             try:
                 command = input()
                 match command.split():
-                    case ['/help']:
+                    case ['/help' | '/h']:
                         print('Available commands:')
                         print('/help - Show this help message')
                         print('/save <path> - Save the tilemap to the specified path')
@@ -74,18 +80,18 @@ class Editor:
                             Tilemap.save(self.tilemap, self.last_path)
                     case ['/save' | '/s', path]:
                         Tilemap.save(self.tilemap, path)
-                    case ['/load', path]:
+                    case ['/load' | '/l', path]:
                         self.last_path = path
                         self.tilemap = Tilemap.load(path, self.TYPES)
-                    case ['/clear']: 
+                    case ['/clear' | '/c']: 
                         self.tilemap.clear()
                         print(f'Tilemap cleared')
-                    case ['/size', width, height]:
+                    case ['/size' | '/z', width, height]:
                         self.tilemap.set_size((int(width), int(height)))
                     case ['/place', path, x, y, flip]:
                         room = Tilemap.load(path, self.TYPES)
                         self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
-                    case ['/quit']:
+                    case ['/quit' | '/q']:
                         self.running = False
                     case _:
                         print(f'Unknown command: {command}')

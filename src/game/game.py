@@ -3,7 +3,7 @@ import os
 import threading
 import pygame
 import random
-from src.tilemap import Tilemap, TileType
+from src.tilemap import Tilemap, TileType, Tile
 from src.util import load_sprite_sheet, load_image
 from src.level_gen import LevelBuilder, Level, Display, Attribute
 from .player import Player
@@ -33,14 +33,18 @@ class Game:
                 autotile=True, 
                 tile_size=16
             ),
+            TileType(
+                'door',
+                [load_sprite_sheet(load_image('items.png'), (16,16))[0]],
+                autotile=False,
+                tile_size=16
+            ),
         }
-        self.tilemap = Tilemap(self.TYPES, tile_size=16)
+        self.tilemap = Tilemap(self.TYPES, tile_size=16, size=(0, 0), debug=False)
 
         config = 'src/level_gen/configs/test1.json'
         self.level: Level = LevelBuilder.generate_level(config)
         print(Display(self.level))
-
-        spawn_pos = (0, 0)
 
         for room in self.level.map.values():
             map_folder = f'maps/{room.key}' 
@@ -50,9 +54,14 @@ class Game:
             map_path = random.choice(map_paths)
             new_map = Tilemap.load(map_path, self.TYPES)
             self.tilemap.place(new_map, room.position, False)
-            if room.has_attribute(Attribute.ENTRANCE):
-                spawn_pos = (room.position.x * 10 * self.tilemap.tile_size, room.position.y * 8 * self.tilemap.tile_size)
-
+        
+        spawn_pos = (0, 0)
+        doors = self.tilemap.get_tiles_with_type('door') 
+        if doors:
+            door: Tile = random.choice(doors)
+            spawn_pos = door.pixel_pos
+            print('spawn_pos:', spawn_pos)
+        
         self.p1 = Player(spawn_pos)
         self.players = list[Player]
 
@@ -109,6 +118,11 @@ class Game:
                         self.tilemap = Tilemap.load(path, self.TYPES)
                     case ['/quit']:
                         self.running = False
+                    case ['/collision']:
+                        self.p1.collision_enabled = not self.p1.collision_enabled 
+                    case ['/jumps', amount]:
+                        self.p1.max_jumps = amount
+                        self.p1.jumps_remaining = amount
                     case _:
                         print(f'Unknown command: {command}')
                         print('Type /help for a list of commands')

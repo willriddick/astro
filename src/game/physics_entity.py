@@ -20,6 +20,7 @@ class PhysicsEntity(Entity):
         self.tiles_around = []
         self.falling = False
         self.on_ground = False
+        self.collision_enabled = True
         self.collisions = { 
             Direction.UP: False,
             Direction.DOWN: False,
@@ -54,6 +55,10 @@ class PhysicsEntity(Entity):
             )
    
     def handle_collision(self, tilemap: Tilemap):
+        if not self.collision_enabled:
+            self.pos += self.velocity
+            return
+
         # Update tile position
         tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
         self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])

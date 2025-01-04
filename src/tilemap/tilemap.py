@@ -8,12 +8,12 @@ HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class Tilemap:
-    def __init__(self, types: list[TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0)):
+    def __init__(self, types: list[TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0), debug: bool = False):
         self.types = types
         self.tile_size = tile_size
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
-        self.debug = False
+        self.debug = debug
     
     def get_rect(self) -> pygame.Rect:
         return pygame.Rect(0, 0, self.size[0] * self.tile_size, self.size[1] * self.tile_size)
@@ -37,6 +37,13 @@ class Tilemap:
     def get_tile(self, tile_pos: tuple[int, int], direction: Direction = Direction.NONE) -> Tile | None:
         new_pos = (tile_pos[0] + direction.value[0], tile_pos[1] + direction.value[1])
         return self.map.get(new_pos)
+    
+    def get_tiles_with_type(self, type: str) -> list[Tile]:
+        output = []
+        for tile in self.map.values():
+            if tile.type.name == type:
+                output.append(tile)
+        return output
     
     def get_tiles_around(self, tile_pos: tuple[int, int], filter: list[str]) -> list[Tile]:
         tiles = []
