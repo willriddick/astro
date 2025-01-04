@@ -1,5 +1,5 @@
 import pygame
-from src.tilemap import Tilemap
+from src.tilemap import TileMap
 from src.util import approach, Direction
 from .entity import Entity
 
@@ -54,7 +54,7 @@ class PhysicsEntity(Entity):
                 step=acc[0] * multiplier
             )
    
-    def handle_collision(self, tilemap: Tilemap):
+    def handle_collision(self, tilemap: TileMap):
         if not self.collision_enabled:
             self.pos += self.velocity
             return

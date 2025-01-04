@@ -3,9 +3,9 @@ import os
 import threading
 import pygame
 import random
-from src.tilemap import Tilemap, Tile, Tileset
+from src.tilemap import TileMap, Tile, TileSet
 from src.level_gen import LevelBuilder, Level, Display, Attribute
-from src.util import load_image, load_sprite_sheet
+from src.util import load_image, load_sprite_sheet, draw_transparent_rect
 from .player import Player
 from .camera import Camera
 
@@ -25,13 +25,16 @@ class Game:
         self.fullscreen = False
         pygame.display.set_caption('GAME')
 
+        self.command_active = False
+        self.command_input = ''
+
         self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
-        self.tileset = Tileset(16)
+        self.tileset = TileSet(16)
         self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
         self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
 
-        self.tilemap = Tilemap(self.tileset, size=(0, 0), debug=False)
+        self.tilemap = TileMap(self.tileset, size=(0, 0), debug=False)
 
         self.level: Level = LevelBuilder.generate_level('configs/test1.json')
         print(Display(self.level))
@@ -42,7 +45,7 @@ class Game:
             for name in os.listdir(map_folder):
                 map_paths.append(map_folder + '/' + name)
             map_path = random.choice(map_paths)
-            new_map = Tilemap.load(map_path, self.tileset)
+            new_map = TileMap.load(map_path, self.tileset)
             self.tilemap.place(new_map, room.position, False)
         
         spawn_pos = (0, 0)
@@ -70,8 +73,6 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-      
-
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -85,6 +86,14 @@ class Game:
             text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
             text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
             self.camera.display.blit(text_surf, (0, 0))
+
+            if self.command_active:
+                draw_transparent_rect(
+                    self.camera.display, 
+                    rect=pygame.Rect(0, self.camera.height - 16, self.camera.width, 16),
+                    color=(0, 0, 0), 
+                    alpha=128
+                )
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -107,7 +116,7 @@ class Game:
                         print('/load - Load new tilemap')
                         print('/quit - Quit the game')
                     case ['/load', path]:
-                        self.tilemap = Tilemap.load(path, self.TYPES)
+                        self.tilemap = TileMap.load(path, self.TYPES)
                     case ['/quit']:
                         self.running = False
                     case ['/collision']:
@@ -130,6 +139,9 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SLASH:
+                self.command_active = not self.command_active
     
     def handle_resize(self, width, height):
         new_width = width

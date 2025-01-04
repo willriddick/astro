@@ -1,7 +1,7 @@
 import pygame
 from .tile_type import TileType
 
-class Tileset:
+class TileSet:
     def __init__(self, tile_size: int):
         self.tileset: list[TileType] = []
         self.tile_size = tile_size

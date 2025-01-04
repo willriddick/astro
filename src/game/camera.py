@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+from src.tilemap import TileMap
 from .entity import Entity
 
 class Camera:
@@ -16,7 +17,7 @@ class Camera:
 
         # Entity management
         self.entities: list[Entity] = []
-        self.tilemap = None
+        self.tilemap: TileMap = None
     
     def update(self):
         """Update the camera and render the display surface."""

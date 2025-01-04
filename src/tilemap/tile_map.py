@@ -1,15 +1,15 @@
 import struct
 import pygame
 from src.util import Direction
-from .tileset import Tileset
+from .tile_set import TileSet
 from .tile import Tile
 from .tile_type import TileType
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
-class Tilemap:
-    def __init__(self, tileset: Tileset, size: tuple[int, int]=(0, 0), debug: bool = False):
+class TileMap:
+    def __init__(self, tileset: TileSet, size: tuple[int, int]=(0, 0), debug: bool = False):
         self.tileset = tileset
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
@@ -151,14 +151,14 @@ class Tilemap:
             print(f'Save failed... file not found: {path}')
 
     @staticmethod
-    def load(path: str, tileset: Tileset) -> 'Tilemap':
+    def load(path: str, tileset: TileSet) -> 'TileMap':
         try:
             with open(path, 'rb') as f:
                 content = f.read()
 
             header_offset = struct.calcsize(HEADER_FORMAT)
             tile_size, *size = struct.unpack(HEADER_FORMAT, content[:header_offset])
-            tilemap = Tilemap(tileset, size)
+            tilemap = TileMap(tileset, size)
 
             step = struct.calcsize(TILE_FORMAT)
             for offset in range(header_offset, len(content), step):

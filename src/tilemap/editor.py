@@ -3,9 +3,9 @@ import threading
 import argparse
 import pygame
 from src.util import load_image, load_sprite_sheet 
-from .tilemap import Tilemap
+from .tile_map import TileMap
 from .tile_type import TileType
-from .tileset import Tileset
+from .tile_set import TileSet
 
 RENDER_SCALE = 2
 WIDTH, HEIGHT = 400, 300
@@ -21,15 +21,15 @@ class Editor:
         self.running = False
         self.last_path = ''
 
-        self.tileset = Tileset(16)
+        self.tileset = TileSet(16)
         self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
         self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
 
         if args.load:
             self.last_path = args.load
-            self.tilemap = Tilemap.load(args.load, self.tileset)
+            self.tilemap = TileMap.load(args.load, self.tileset)
         else:
-            self.tilemap = Tilemap(self.tileset)
+            self.tilemap = TileMap(self.tileset)
 
         if args.size:
             self.tilemap.set_size(args.size)
@@ -67,19 +67,19 @@ class Editor:
                         print('/quit - Quit the editor\n')
                     case ['/save' | '/s']:
                         if self.last_path:
-                            Tilemap.save(self.tilemap, self.last_path)
+                            TileMap.save(self.tilemap, self.last_path)
                     case ['/save' | '/s', path]:
-                        Tilemap.save(self.tilemap, path)
+                        TileMap.save(self.tilemap, path)
                     case ['/load' | '/l', path]:
                         self.last_path = path
-                        self.tilemap = Tilemap.load(path, self.TYPES)
+                        self.tilemap = TileMap.load(path, self.TYPES)
                     case ['/clear' | '/c']: 
                         self.tilemap.clear()
                         print(f'Tilemap cleared')
                     case ['/size' | '/z', width, height]:
                         self.tilemap.set_size((int(width), int(height)))
                     case ['/place', path, x, y, flip]:
-                        room = Tilemap.load(path, self.TYPES)
+                        room = TileMap.load(path, self.TYPES)
                         self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
                     case ['/quit' | '/q']:
                         self.running = False
