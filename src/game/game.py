@@ -64,29 +64,17 @@ class Game:
         self.camera.move_to(self.p1.get_center(), instant=True)
 
         self.running = False
-        self.command_thread = threading.Thread(target=self.handle_commands)
-        self.command_thread.daemon = True
     
     def run(self):
         self.running = True
-        self.command_thread.start()
-        self.handle_game()
 
-    def handle_game(self):
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
             
-            self.p1.update(self.tilemap)
-            self.camera.move_to(self.p1.get_center())
             self.camera.update()
+            self.debug_display()
             
-            text = f'{self.p1.state_machine.current_state.name}\n'
-            text += f'{int(self.p1.pos.x):04},{int(self.p1.pos.y):04} \n'
-            text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
-            text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
-            self.camera.display.blit(text_surf, (0, 0))
-
             if self.command_active:
                 draw_transparent_rect(
                     self.camera.display, 
@@ -94,10 +82,12 @@ class Game:
                     color=(0, 0, 0), 
                     alpha=128
                 )
-                text = f'{self.command_input}'
+                text = f'/{self.command_input}'
                 text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
                 self.camera.display.blit(text_surf, (4, self.camera.height - 8))
-
+            else:
+                self.p1.update(self.tilemap)
+                self.camera.move_to(self.p1.get_center())
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -108,33 +98,29 @@ class Game:
 
         pygame.quit()
         sys.exit()
+    
+    def debug_display(self):
+        text = f'{self.p1.state_machine.current_state.name}\n'
+        text += f'{int(self.p1.pos.x):04},{int(self.p1.pos.y):04} \n'
+        text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
+        text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+        self.camera.display.blit(text_surf, (0, 0))
 
-    def handle_commands(self):
-        while self.running:
-            try:
-                command = input()
-                match command.split():
-                    case ['/help']:
-                        print('Available commands:')
-                        print('/help - Show this help message')
-                        print('/load - Load new tilemap')
-                        print('/quit - Quit the game')
-                    case ['/load', path]:
-                        self.tilemap = TileMap.load(path, self.TYPES)
-                    case ['/quit']:
-                        self.running = False
-                    case ['/collision']:
-                        self.p1.collision_enabled = not self.p1.collision_enabled 
-                    case ['/jumps', amount]:
-                        self.p1.max_jumps = amount
-                        self.p1.jumps_remaining = amount
-                    case _:
-                        print(f'Unknown command: {command}')
-                        print('Type /help for a list of commands')
-            except EOFError:
+    def handle_command(self, command: str):
+        match command.split():
+            case ['load', path]:
+                self.tilemap = TileMap.load(path, self.TYPES)
+            case ['quit']:
                 self.running = False
-            except KeyboardInterrupt:
-                self.running = False
+            case ['collision' | 'col']:
+                self.p1.collision_enabled = not self.p1.collision_enabled 
+            case ['jumps', amount]:
+                self.p1.max_jumps = int(amount)
+                self.p1.jumps_remaining = self.p1.max_jumps
+            case ['tp', x, y]:
+                self.p1.pos = pygame.Vector2(int(x), int(y))
+            case _:
+                print(f'Unknown command: {command}')
     
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:
@@ -144,18 +130,24 @@ class Game:
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SLASH:
-                self.command_active = not self.command_active
-                self.command_input = ''
-
-            if self.command_active:
-                if event.key == pygame.K_RETURN:
-                    self.command_active = False
+            if not self.command_active:
+                if event.key == pygame.K_SLASH:
+                    self.command_active = True
                     self.command_input = ''
-                elif event.key == pygame.K_BACKSPACE:
-                    self.command_input = self.command_input[:-1]
-                else:
-                    self.command_input += event.unicode
+            else:
+                match event.key:
+                    case pygame.K_RETURN:
+                        if self.command_input:
+                            self.handle_command(self.command_input)
+                        self.command_active = False
+                        self.command_input = ''
+                    case pygame.K_ESCAPE | pygame.K_SLASH:
+                        self.command_active = False
+                        self.command_input = ''
+                    case pygame.K_BACKSPACE:
+                        self.command_input = self.command_input[:-1]
+                    case _:
+                        self.command_input += event.unicode
     
     def handle_resize(self, width, height):
         new_width = width

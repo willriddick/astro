@@ -72,14 +72,14 @@ class Editor:
                         TileMap.save(self.tilemap, path)
                     case ['/load' | '/l', path]:
                         self.last_path = path
-                        self.tilemap = TileMap.load(path, self.TYPES)
+                        self.tilemap = TileMap.load(path, self.tileset)
                     case ['/clear' | '/c']: 
                         self.tilemap.clear()
                         print(f'Tilemap cleared')
                     case ['/size' | '/z', width, height]:
                         self.tilemap.set_size((int(width), int(height)))
                     case ['/place', path, x, y, flip]:
-                        room = TileMap.load(path, self.TYPES)
+                        room = TileMap.load(path, self.tileset)
                         self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
                     case ['/quit' | '/q']:
                         self.running = False
