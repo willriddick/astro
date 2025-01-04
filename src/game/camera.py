@@ -61,11 +61,15 @@ class Camera:
             self.width, self.height
         )
 
-    def move_to(self, target: pygame.Vector2, smoothing: float = 0.2):
+    def move_to(self, target: pygame.Vector2, smoothing: float = 0.2, instant: bool = False):
         """Move the camera smoothly towards a target position."""
         self.target_position = target
-        cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
-        self.position = self.position * (1 - cos_smoothing) + self.target_position * cos_smoothing
+
+        if instant:
+            self.position = self.target_position
+        else:
+            cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
+            self.position = self.position * (1 - cos_smoothing) + self.target_position * cos_smoothing
 
         # Clamp the camera's position to the boundary if defined
         if self.boundary:

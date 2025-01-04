@@ -18,7 +18,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.clock = pygame.time.Clock()
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE)
@@ -52,10 +52,16 @@ class Game:
             door: Tile = random.choice(doors)
             spawn_pos = door.pixel_pos
         
+       
         self.p1 = Player(spawn_pos)
         self.players = list[Player]
 
-        self.clock = pygame.time.Clock()
+        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.camera.tilemap = self.tilemap
+        self.camera.set_boundary(self.tilemap.get_rect())
+        self.camera.add(self.p1)
+        self.camera.move_to(self.p1.get_center(), instant=True)
+
         self.running = False
         self.command_thread = threading.Thread(target=self.handle_commands)
         self.command_thread.daemon = True
@@ -66,9 +72,7 @@ class Game:
         self.handle_game()
 
     def handle_game(self):
-        self.camera.tilemap = self.tilemap
-        self.camera.set_boundary(self.tilemap.get_rect())
-        self.camera.add(self.p1)
+      
 
         while self.running:
             for event in pygame.event.get():
