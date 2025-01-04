@@ -33,8 +33,7 @@ class Game:
 
         self.tilemap = Tilemap(self.tileset, size=(0, 0), debug=False)
 
-        config = 'src/level_gen/configs/test1.json'
-        self.level: Level = LevelBuilder.generate_level(config)
+        self.level: Level = LevelBuilder.generate_level('configs/test1.json')
         print(Display(self.level))
 
         for room in self.level.map.values():
@@ -51,7 +50,6 @@ class Game:
         if doors:
             door: Tile = random.choice(doors)
             spawn_pos = door.pixel_pos
-        
        
         self.p1 = Player(spawn_pos)
         self.players = list[Player]

@@ -88,7 +88,7 @@ class Display:
         
         # Place room information
         attributes = ' '.join(f'{attr}' for attr in room.attributes)
-        info_str = f'{room.index} {room.key} {attributes}'.ljust(self.room_cols - 2)
+        info_str = f'{room.index} {attributes}'.ljust(self.room_cols - 2)
         position_str = f'{room.position}'.ljust(self.room_cols - 2)
         room_display[1, 1:-1] = list(info_str)
         room_display[2, 1:-1] = list(position_str)
