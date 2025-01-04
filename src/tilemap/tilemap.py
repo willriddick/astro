@@ -1,6 +1,7 @@
 import struct
 import pygame
 from src.util import Direction
+from .tileset import Tileset
 from .tile import Tile
 from .tile_type import TileType
 
@@ -8,12 +9,15 @@ HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class Tilemap:
-    def __init__(self, types: list[TileType], tile_size: int = 16, size: tuple[int, int]=(0, 0), debug: bool = False):
-        self.types = types
-        self.tile_size = tile_size
+    def __init__(self, tileset: Tileset, size: tuple[int, int]=(0, 0), debug: bool = False):
+        self.tileset = tileset
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
         self.debug = debug
+    
+    @property
+    def tile_size(self) -> int:
+        return self.tileset.tile_size
     
     def get_rect(self) -> pygame.Rect:
         return pygame.Rect(0, 0, self.size[0] * self.tile_size, self.size[1] * self.tile_size)
@@ -27,12 +31,6 @@ class Tilemap:
     def render(self, surf: pygame.Surface, offset=(0, 0)):
         for tile in self.map.values():
             tile.render(surf, offset)
-    
-    def get_tile_type(self, name: str) -> TileType:
-        for type in self.types:
-            if type.name == name:
-                return type
-        return None
     
     def get_tile(self, tile_pos: tuple[int, int], direction: Direction = Direction.NONE) -> Tile | None:
         new_pos = (tile_pos[0] + direction.value[0], tile_pos[1] + direction.value[1])
@@ -138,7 +136,7 @@ class Tilemap:
 
         # Update variant
         tile.variant = variant
-    
+   
     @staticmethod
     def save(tilemap, path: str):
         try:
@@ -151,21 +149,21 @@ class Tilemap:
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
             print(f'Save failed... file not found: {path}')
-    
+
     @staticmethod
-    def load(path: str, types: list[TileType]) -> 'Tilemap':
+    def load(path: str, tileset: Tileset) -> 'Tilemap':
         try:
             with open(path, 'rb') as f:
                 content = f.read()
 
             header_offset = struct.calcsize(HEADER_FORMAT)
             tile_size, *size = struct.unpack(HEADER_FORMAT, content[:header_offset])
-            tilemap = Tilemap(types, tile_size, tuple(size))
+            tilemap = Tilemap(tileset, size)
 
             step = struct.calcsize(TILE_FORMAT)
             for offset in range(header_offset, len(content), step):
                 data = struct.unpack(TILE_FORMAT, content[offset:offset + step])
-                type = tilemap.get_tile_type(data[0].decode().rstrip('\00'))
+                type = tileset.get_by_name(data[0].decode().rstrip('\00'))
                 tilemap.create_tile(type, data[1], (data[2], data[3]))
 
             return tilemap

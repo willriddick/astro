@@ -10,14 +10,16 @@ class Tile:
         self.type = type
         self.variant = variant
         self.tile_pos = tile_pos
-        self.size = self.tilemap.tile_size
-        self.pixel_pos = (tile_pos[0] * self.size, tile_pos[1] * self.size)
     
     def __str__(self):
         return f'{self.type}:{self.variant} ({self.tile_pos[0]}, {self.tile_pos[1]})'
     
+    @property
+    def pixel_pos(self) -> tuple[int, int]:
+        return (self.tile_pos[0] * self.tilemap.tileset.tile_size, self.tile_pos[1] * self.tilemap.tileset.tile_size) 
+    
     def get_rect(self) -> pygame.Rect:
-        return pygame.Rect(self.pixel_pos[0], self.pixel_pos[1], self.size, self.size)
+        return pygame.Rect(self.pixel_pos[0], self.pixel_pos[1], self.tilemap.tileset.tile_size, self.tilemap.tileset.tile_size)
     
     def render(self, display: pygame.Surface, offset=(0, 0)):
         pos = (self.pixel_pos[0] - offset[0], self.pixel_pos[1] - offset[1])

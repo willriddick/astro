@@ -3,9 +3,9 @@ import os
 import threading
 import pygame
 import random
-from src.tilemap import Tilemap, TileType, Tile
-from src.util import load_sprite_sheet, load_image
+from src.tilemap import Tilemap, Tile, Tileset
 from src.level_gen import LevelBuilder, Level, Display, Attribute
+from src.util import load_image, load_sprite_sheet
 from .player import Player
 from .camera import Camera
 
@@ -27,20 +27,11 @@ class Game:
 
         self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
-        self.TYPES = {
-            TileType('stone', 
-                load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), 
-                autotile=True, 
-                tile_size=16
-            ),
-            TileType(
-                'door',
-                [load_sprite_sheet(load_image('items.png'), (16,16))[0]],
-                autotile=False,
-                tile_size=16
-            ),
-        }
-        self.tilemap = Tilemap(self.TYPES, tile_size=16, size=(0, 0), debug=False)
+        self.tileset = Tileset(16)
+        self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
+        self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
+
+        self.tilemap = Tilemap(self.tileset, size=(0, 0), debug=False)
 
         config = 'src/level_gen/configs/test1.json'
         self.level: Level = LevelBuilder.generate_level(config)
@@ -52,7 +43,7 @@ class Game:
             for name in os.listdir(map_folder):
                 map_paths.append(map_folder + '/' + name)
             map_path = random.choice(map_paths)
-            new_map = Tilemap.load(map_path, self.TYPES)
+            new_map = Tilemap.load(map_path, self.tileset)
             self.tilemap.place(new_map, room.position, False)
         
         spawn_pos = (0, 0)
@@ -60,7 +51,6 @@ class Game:
         if doors:
             door: Tile = random.choice(doors)
             spawn_pos = door.pixel_pos
-            print('spawn_pos:', spawn_pos)
         
         self.p1 = Player(spawn_pos)
         self.players = list[Player]
