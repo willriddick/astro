@@ -90,10 +90,14 @@ class Game:
             if self.command_active:
                 draw_transparent_rect(
                     self.camera.display, 
-                    rect=pygame.Rect(0, self.camera.height - 16, self.camera.width, 16),
+                    rect=pygame.Rect(0, self.camera.height - 12, self.camera.width, 12),
                     color=(0, 0, 0), 
                     alpha=128
                 )
+                text = f'{self.command_input}'
+                text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+                self.camera.display.blit(text_surf, (4, self.camera.height - 8))
+
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -142,6 +146,16 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SLASH:
                 self.command_active = not self.command_active
+                self.command_input = ''
+
+            if self.command_active:
+                if event.key == pygame.K_RETURN:
+                    self.command_active = False
+                    self.command_input = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.command_input = self.command_input[:-1]
+                else:
+                    self.command_input += event.unicode
     
     def handle_resize(self, width, height):
         new_width = width
