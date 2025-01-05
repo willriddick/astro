@@ -1,24 +1,29 @@
 import sys
-import threading
 import argparse
 import pygame
-from src.util import Assets
+from src.util import Assets, draw_transparent_rect
 from .tile_map import TileMap
 from .tile_type import TileType
 
-RENDER_SCALE = 2
-WIDTH, HEIGHT = 400, 300
+RENDER_SCALE = 3
+DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 
 class Editor:
     
     def __init__(self, args):
         pygame.init()
         pygame.display.set_caption('Editor')
-        self.display = pygame.Surface((WIDTH, HEIGHT))
-        self.screen = pygame.display.set_mode((WIDTH * RENDER_SCALE, HEIGHT * RENDER_SCALE))
-        self.clock = pygame.time.Clock()
+        
         self.running = False
+        self.clock = pygame.time.Clock()
         self.last_path = ''
+
+        self.display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        self.screen = pygame.display.set_mode((DISPLAY_WIDTH * RENDER_SCALE, DISPLAY_HEIGHT * RENDER_SCALE))
+        Assets.load_assets()
+
+        self.command_active = False
+        self.command_input = ''
 
         if args.load:
             self.last_path = args.load
@@ -38,97 +43,63 @@ class Editor:
         self.shift_pressed = False
         self.q_pressed = False
         self.e_pressed = False
-
-        self.command_thread = threading.Thread(target=self.handle_commands)
-        self.command_thread.daemon = True
-
+    
     def run(self):
-        print('Running Editor...')
-        self.running = True
-        self.command_thread.start()
-        self.handle_editor()
-    
-    def handle_commands(self):
-        while self.running:
-            try:
-                command = input()
-                match command.split():
-                    case ['/help' | '/h']:
-                        print('Available commands:')
-                        print('/help - Show this help message')
-                        print('/save <path> - Save the tilemap to the specified path')
-                        print('/load <path> - Load the tilemap from the specified path')
-                        print('/clear - Clear the tilemap')
-                        print('/quit - Quit the editor\n')
-                    case ['/save' | '/s']:
-                        if self.last_path:
-                            TileMap.save(self.tilemap, self.last_path)
-                    case ['/save' | '/s', path]:
-                        TileMap.save(self.tilemap, path)
-                    case ['/load' | '/l', path]:
-                        self.last_path = path
-                        self.tilemap = TileMap.load(path, Assets.TILESET)
-                    case ['/clear' | '/c']: 
-                        self.tilemap.clear()
-                        print(f'Tilemap cleared')
-                    case ['/size' | '/z', width, height]:
-                        self.tilemap.set_size((int(width), int(height)))
-                    case ['/place', path, x, y, flip]:
-                        room = TileMap.load(path, Assets.TILESET)
-                        self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
-                    case ['/quit' | '/q']:
-                        self.running = False
-                    case _:
-                        print(f'Unknown command: {command}')
-                        print('Type /help for a list of commands')
-            except EOFError:
-                self.running = False
-            except KeyboardInterrupt:
-                self.running = False
-    
-    def handle_editor(self):
         mouse_pos = (0, 0)
         tile_pos = (0, 0)
         type_index = 0
         tile_type: TileType = Assets.TILESET.get_by_index(type_index)
         tile_variant = 0
+        self.running = True
 
         while self.running:
             self.display.fill((0, 0, 0, 0))
+
             for event in pygame.event.get():
                 self.handle_event(event)
-            
-            # Calculate mouse position
-            mouse_pos = (
-                pygame.mouse.get_pos()[0] / RENDER_SCALE, 
-                pygame.mouse.get_pos()[1] / RENDER_SCALE
-            )
 
-            # Calculate selected tile position
-            tile_pos = (
-                int((mouse_pos[0] + self.camera_offset[0]) // Assets.TILESET.tile_size), 
-                int((mouse_pos[1] + self.camera_offset[1]) // Assets.TILESET.tile_size)
-            )
+            if self.command_active:
+                draw_transparent_rect(
+                    self.display, 
+                    rect=pygame.Rect(0, DISPLAY_HEIGHT - 12, DISPLAY_WIDTH, 12),
+                    color=(0, 0, 0), 
+                    alpha=128
+                )
+                text = f'/{self.command_input}'
+                text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
+                self.display.blit(text_surf, (4, DISPLAY_HEIGHT - 8))            
+            else:
+                # Calculate mouse position
+                mouse_pos = (
+                    pygame.mouse.get_pos()[0] / RENDER_SCALE, 
+                    pygame.mouse.get_pos()[1] / RENDER_SCALE
+                )
 
-            # Change tile type and variant
-            if self.q_pressed or self.e_pressed:
-                direction = -1 if self.q_pressed else 1
-                self.q_pressed = False
-                self.e_pressed = False
+                # Calculate selected tile position
+                tile_pos = (
+                    int((mouse_pos[0] + self.camera_offset[0]) // Assets.TILESET.tile_size), 
+                    int((mouse_pos[1] + self.camera_offset[1]) // Assets.TILESET.tile_size)
+                )
 
-                if self.shift_pressed:
-                    tile_variant = (tile_variant + direction) % len(tile_type.images)
-                else:
-                    type_index = Assets.TILESET.get_by_index(type_index + direction)
-                    tile_type = self.TYPES[type_index]
-                    tile_variant = 0
+                # Change tile type and variant
+                if self.q_pressed or self.e_pressed:
+                    direction = -1 if self.q_pressed else 1
+                    self.q_pressed = False
+                    self.e_pressed = False
 
-            # Create or remove tile
-            if self.left_click:
-                self.tilemap.create_tile(tile_type, tile_variant, tile_pos)
-            
-            if self.right_click:
-                self.tilemap.remove_tile(tile_pos)
+                    if self.shift_pressed:
+                        tile_variant = (tile_variant + direction) % len(tile_type.images)
+                    else:
+                        type_index = type_index + direction
+                        tile_type = Assets.TILESET.get_by_index(type_index)
+                        tile_variant = 0
+
+                # Create or remove tile
+                if self.left_click:
+                    self.tilemap.create_tile(tile_type, tile_variant, tile_pos)
+                
+                if self.right_click:
+                    self.tilemap.remove_tile(tile_pos)
 
             # Render tilemap
             self.tilemap.render(self.display, self.camera_offset)
@@ -146,6 +117,7 @@ class Editor:
 
             # Update display
             self.move_camera() 
+
             try:
                 self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()))
                 pygame.display.update()
@@ -153,10 +125,39 @@ class Editor:
             except:
                 self.running = False
         
-        print('Exiting...')
         pygame.quit()
         sys.exit()
     
+    def handle_command(self, command: str):
+        match command.split():
+            case ['help' | 'h']:
+                print('Available commands:')
+                print('/help - Show this help message')
+                print('/save <path> - Save the tilemap to the specified path')
+                print('/load <path> - Load the tilemap from the specified path')
+                print('/clear - Clear the tilemap')
+                print('/quit - Quit the editor\n')
+            case ['save' | 's']:
+                if self.last_path:
+                    TileMap.save(self.tilemap, self.last_path)
+            case ['save' | 's', path]:
+                TileMap.save(self.tilemap, path)
+            case ['load' | 'l', path]:
+                self.last_path = path
+                self.tilemap = TileMap.load(path, Assets.TILESET)
+            case ['clear' | 'c']: 
+                self.tilemap.clear()
+                print(f'Tilemap cleared')
+            case ['size' | 'z', width, height]:
+                self.tilemap.set_size((int(width), int(height)))
+            case ['place', path, x, y, flip]:
+                room = TileMap.load(path, Assets.TILESET)
+                self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
+            case ['quit' | 'q']:
+                self.running = False
+            case _:
+                print(f'Unknown command: {command}')
+
     def move_camera(self):
         keys = pygame.key.get_pressed()
         self.camera_direction = (
@@ -222,6 +223,26 @@ class Editor:
                 self.left_click = False
             if event.button == 3:
                 self.right_click = False
+
+        if event.type == pygame.KEYDOWN:
+            if not self.command_active:
+                if event.key == pygame.K_SLASH:
+                    self.command_active = True
+                    self.command_input = ''
+            else:
+                match event.key:
+                    case pygame.K_RETURN:
+                        if self.command_input:
+                            self.handle_command(self.command_input)
+                        self.command_active = False
+                        self.command_input = ''
+                    case pygame.K_ESCAPE:
+                        self.command_active = False
+                        self.command_input = ''
+                    case pygame.K_BACKSPACE:
+                        self.command_input = self.command_input[:-1]
+                    case _:
+                        self.command_input += event.unicode
 
 def parse_tuple(s):
     try:

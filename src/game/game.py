@@ -14,6 +14,8 @@ ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption('GAME')
+
         self.running = False
         self.clock = pygame.time.Clock()
 
@@ -22,7 +24,6 @@ class Game:
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE
         )
-        pygame.display.set_caption('GAME')
         Assets.load_assets()
 
         self.command_active = False
@@ -116,7 +117,7 @@ class Game:
                             self.handle_command(self.command_input)
                         self.command_active = False
                         self.command_input = ''
-                    case pygame.K_ESCAPE | pygame.K_SLASH:
+                    case pygame.K_ESCAPE:
                         self.command_active = False
                         self.command_input = ''
                     case pygame.K_BACKSPACE:
