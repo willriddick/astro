@@ -1,7 +1,7 @@
 import sys
 import pygame
-from src.tilemap import TileMap, TileSet
-from src.util import draw_transparent_rect, load_image, load_sprite_sheet 
+from src.tilemap import TileMap 
+from src.util import Assets, draw_transparent_rect
 from .player import Player
 from .camera import Camera
 from .map_builder import MapBuilder
@@ -23,16 +23,12 @@ class Game:
             pygame.RESIZABLE
         )
         pygame.display.set_caption('GAME')
+        Assets.load_assets()
 
         self.command_active = False
         self.command_input = ''
 
-        self.tileset = TileSet(16)
-        self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
-        self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
-        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
-        
-        self.tilemap = MapBuilder.generate(self.tileset, 'configs/test1.json', 0)
+        self.tilemap = MapBuilder.generate('configs/test1.json')
 
         self.p1 = Player()
         self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
@@ -62,7 +58,7 @@ class Game:
                     alpha=128
                 )
                 text = f'/{self.command_input}'
-                text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+                text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
                 self.camera.display.blit(text_surf, (4, self.camera.height - 8))
             else:
                 self.p1.update(self.tilemap)
@@ -82,7 +78,7 @@ class Game:
         text = f'{self.p1.state_machine.current_state.name}\n'
         text += f'x: {int(self.p1.pos.x):04}, y:{int(self.p1.pos.y):04} \n'
         text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.p1.collisions.items())
-        text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
+        text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         self.camera.display.blit(text_surf, (0, 0))
 
     def handle_command(self, command: str):

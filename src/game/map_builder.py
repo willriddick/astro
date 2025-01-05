@@ -3,13 +3,14 @@ import pygame
 import random
 import os
 from src.level_gen import LevelBuilder, Level
-from src.tilemap import TileMap, TileSet, Tile
+from src.tilemap import TileMap, Tile
+from src.util import Assets
 
 class MapBuilder:
     @staticmethod
-    def generate(tileset: TileSet, config: str, seed: int | float | str) -> Level:
+    def generate(config: str, seed: int | float | str = None) -> Level:
         level = LevelBuilder.generate_level(config, seed)
-        tilemap = TileMap(tileset, size=(0, 0), debug=False)
+        tilemap = TileMap(Assets.TILESET, size=(0, 0), debug=False)
 
         for room in level.map.values():
             map_folder = f'maps/{room.key}' 
@@ -17,7 +18,7 @@ class MapBuilder:
             for name in os.listdir(map_folder):
                 map_paths.append(map_folder + '/' + name)
             map_path = random.choice(map_paths)
-            new_map = TileMap.load(map_path, tileset)
+            new_map = TileMap.load(map_path, Assets.TILESET)
             tilemap.place(new_map, room.position, False)
         
         return tilemap

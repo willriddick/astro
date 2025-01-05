@@ -2,10 +2,9 @@ import sys
 import threading
 import argparse
 import pygame
-from src.util import load_image, load_sprite_sheet 
+from src.util import Assets
 from .tile_map import TileMap
 from .tile_type import TileType
-from .tile_set import TileSet
 
 RENDER_SCALE = 2
 WIDTH, HEIGHT = 400, 300
@@ -21,15 +20,11 @@ class Editor:
         self.running = False
         self.last_path = ''
 
-        self.tileset = TileSet(16)
-        self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
-        self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
-
         if args.load:
             self.last_path = args.load
-            self.tilemap = TileMap.load(args.load, self.tileset)
+            self.tilemap = TileMap.load(args.load, Assets.TILESET)
         else:
-            self.tilemap = TileMap(self.tileset)
+            self.tilemap = TileMap(Assets.TILESET)
 
         if args.size:
             self.tilemap.set_size(args.size)
@@ -72,14 +67,14 @@ class Editor:
                         TileMap.save(self.tilemap, path)
                     case ['/load' | '/l', path]:
                         self.last_path = path
-                        self.tilemap = TileMap.load(path, self.tileset)
+                        self.tilemap = TileMap.load(path, Assets.TILESET)
                     case ['/clear' | '/c']: 
                         self.tilemap.clear()
                         print(f'Tilemap cleared')
                     case ['/size' | '/z', width, height]:
                         self.tilemap.set_size((int(width), int(height)))
                     case ['/place', path, x, y, flip]:
-                        room = TileMap.load(path, self.tileset)
+                        room = TileMap.load(path, Assets.TILESET)
                         self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
                     case ['/quit' | '/q']:
                         self.running = False
@@ -95,7 +90,7 @@ class Editor:
         mouse_pos = (0, 0)
         tile_pos = (0, 0)
         type_index = 0
-        tile_type: TileType = self.tileset.get_by_index(type_index)
+        tile_type: TileType = Assets.TILESET.get_by_index(type_index)
         tile_variant = 0
 
         while self.running:
@@ -111,8 +106,8 @@ class Editor:
 
             # Calculate selected tile position
             tile_pos = (
-                int((mouse_pos[0] + self.camera_offset[0]) // self.tileset.tile_size), 
-                int((mouse_pos[1] + self.camera_offset[1]) // self.tileset.tile_size)
+                int((mouse_pos[0] + self.camera_offset[0]) // Assets.TILESET.tile_size), 
+                int((mouse_pos[1] + self.camera_offset[1]) // Assets.TILESET.tile_size)
             )
 
             # Change tile type and variant
@@ -124,7 +119,7 @@ class Editor:
                 if self.shift_pressed:
                     tile_variant = (tile_variant + direction) % len(tile_type.images)
                 else:
-                    type_index = self.tileset.get_by_index(type_index + direction)
+                    type_index = Assets.TILESET.get_by_index(type_index + direction)
                     tile_type = self.TYPES[type_index]
                     tile_variant = 0
 
@@ -174,7 +169,7 @@ class Editor:
         )
     
     def draw_tile_square(self, tile_pos):
-        tile_size = self.tileset.tile_size
+        tile_size = Assets.TILESET.tile_size
         current_tile = pygame.Surface((tile_size, tile_size), pygame.SRCALPHA)
         current_tile.set_alpha(100)
         pygame.draw.rect(
@@ -188,7 +183,7 @@ class Editor:
         )
     
     def draw_border(self):
-        tile_size = self.tileset.tile_size
+        tile_size = Assets.TILESET.tile_size
         size = self.tilemap.size
         border = pygame.Surface((size[0] * tile_size, size[1] * tile_size), pygame.SRCALPHA)
         border.set_alpha(100)
