@@ -6,7 +6,7 @@ from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
 from .animation import Animation
 
 class Player(PhysicsEntity):
-    def __init__(self, pos: tuple[float, float]):
+    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0)):
         super().__init__(pos, (7, 14))
 
         # Velocity and acceleration

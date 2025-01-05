@@ -1,0 +1,27 @@
+{
+    "width": 10,
+    "height": 8,
+    "tile_size": 32,
+    "tiles": [
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 },
+        { "name": "stone", "x": 0, "y": 0 } 
+    ]
+}

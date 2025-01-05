@@ -1,73 +1,52 @@
 import sys
-import os
-import threading
 import pygame
-import random
-from src.tilemap import TileMap, Tile, TileSet
-from src.level_gen import LevelBuilder, Level, Display, Attribute
-from src.util import load_image, load_sprite_sheet, draw_transparent_rect
+from src.tilemap import TileMap, TileSet
+from src.util import draw_transparent_rect, load_image, load_sprite_sheet 
 from .player import Player
 from .camera import Camera
+from .map_builder import MapBuilder
 
 FPS = 60
-WINDOW_SCALE = 3
+WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
 class Game:
     def __init__(self):
         pygame.init()
-
+        self.running = False
         self.clock = pygame.time.Clock()
+
+        self.fullscreen = False
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
-            pygame.RESIZABLE)
-        self.fullscreen = False
+            pygame.RESIZABLE
+        )
         pygame.display.set_caption('GAME')
 
         self.command_active = False
         self.command_input = ''
 
-        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
-        
         self.tileset = TileSet(16)
         self.tileset.add('stone', load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), True)
         self.tileset.add('door', [load_sprite_sheet(load_image('items.png'), (16,16))[0]], False)
-
-        self.tilemap = TileMap(self.tileset, size=(0, 0), debug=False)
-
-        self.level: Level = LevelBuilder.generate_level('configs/test1.json')
-        print(Display(self.level))
-
-        for room in self.level.map.values():
-            map_folder = f'maps/{room.key}' 
-            map_paths: list[str] = []
-            for name in os.listdir(map_folder):
-                map_paths.append(map_folder + '/' + name)
-            map_path = random.choice(map_paths)
-            new_map = TileMap.load(map_path, self.tileset)
-            self.tilemap.place(new_map, room.position, False)
+        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
         
-        spawn_pos = (0, 0)
-        doors = self.tilemap.get_tiles_with_type('door') 
-        if doors:
-            door: Tile = random.choice(doors)
-            spawn_pos = door.pixel_pos
-       
-        self.p1 = Player(spawn_pos)
+        self.tilemap = MapBuilder.generate(self.tileset, 'configs/test1.json', 0)
+
+        self.p1 = Player()
+        self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
         self.players = list[Player]
 
         self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-        self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
         self.camera.add(self.p1)
         self.camera.move_to(self.p1.get_center(), instant=True)
-
-        self.running = False
+        self.camera.tilemap = self.tilemap
     
     def run(self):
         self.running = True
-
+       
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -101,8 +80,8 @@ class Game:
     
     def debug_display(self):
         text = f'{self.p1.state_machine.current_state.name}\n'
-        text += f'{int(self.p1.pos.x):04},{int(self.p1.pos.y):04} \n'
-        text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
+        text += f'x: {int(self.p1.pos.x):04}, y:{int(self.p1.pos.y):04} \n'
+        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.p1.collisions.items())
         text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
         self.camera.display.blit(text_surf, (0, 0))
 
