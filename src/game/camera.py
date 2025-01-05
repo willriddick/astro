@@ -18,11 +18,13 @@ class Camera:
         # Entity management
         self.entities: list[Entity] = []
         self.tilemap: TileMap = None
+
+        self.fill_color = (24, 20, 37)
     
     def update(self):
         """Update the camera and render the display surface."""
         # Clear display surface
-        self.display.fill((0, 0, 0))
+        self.display.fill(self.fill_color)
 
         # Calculate the offset from the in-game position
         self.offset = pygame.Vector2(
