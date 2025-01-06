@@ -49,7 +49,7 @@ class Player(PhysicsEntity):
         sheet = swap_palette(
             load_image('player/player.png', False),
             load_palette('player/palette_key.png'), 
-            load_palette('player/palette_1.png')
+            load_palette('player/palette1.png')
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
 
