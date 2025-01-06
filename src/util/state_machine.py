@@ -1,11 +1,10 @@
 from .state import State
 
 class StateMachine:
-    def __init__(self, owner: object, states: list[State], debug: bool=False):
+    def __init__(self, owner: object, states: list[State]):
         self.owner = owner
         self.states: dict[int, State] = {}
         self.add_states(states)
-        self.debug = debug
         self.current_state: State = states[0]
         self.previous_state: State = self.current_state
    
@@ -23,8 +22,6 @@ class StateMachine:
             self.current_state.on_exit()
         
         self.current_state = self.states[_id]
-        if self.debug:
-            print(f'state: {self.current_state.name}')
         self.current_state.on_enter()
     
     def add_states(self, states: list[State]):

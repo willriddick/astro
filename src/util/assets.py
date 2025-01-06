@@ -1,5 +1,5 @@
 import pygame
-from .load import load_image, load_sprite_sheet
+from .surface import load_image, load_sprite_sheet
 
 class Assets:
     FONT = None

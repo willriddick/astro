@@ -39,8 +39,6 @@ class Camera:
         for entity in self.entities:
             entity.render(self.display, -self.offset)
 
-        #self.draw_debug()
-    
     def render_tilemap(self, tilemap):
         if not tilemap:
             return

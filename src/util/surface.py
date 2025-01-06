@@ -44,11 +44,11 @@ def swap_color(image: pygame.Surface, old_color: pygame.color.Color, new_color: 
     image_copy.set_colorkey((0, 0, 0))
     return image_copy
 
-def swap_palette(image: pygame.Surface, old_palette: list[pygame.color.Color], new_palette: list[pygame.color.Color]) -> pygame.Surface:
-    assert len(old_palette) == len(new_palette), f'Old ({len(old_palette)}) and new ({len(new_palette)}) palette must have the same size'
-    for index, old_color in enumerate(old_palette):
+def swap_palette(image: pygame.Surface, key_palette: list[pygame.color.Color], new_palette: list[pygame.color.Color]) -> pygame.Surface:
+    assert len(key_palette) == len(new_palette), f'Old ({len(key_palette)}) and new ({len(new_palette)}) palette must have the same size'
+    for index, key_color in enumerate(key_palette):
         new_color = new_palette[index]
-        image = swap_color(image, old_color, new_color)
+        image = swap_color(image, key_color, new_color)
     return image
 
 def load_palette(path: str) -> list[pygame.color.Color]:

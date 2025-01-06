@@ -7,7 +7,7 @@ from .animation import Animation
 
 class Player(PhysicsEntity):
     def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0)):
-        super().__init__(pos, (7, 14))
+        super().__init__(pos, (8, 14))
 
         # Velocity and acceleration
         self.move_dir = 1 # starts at one because the player is facing right
@@ -48,12 +48,12 @@ class Player(PhysicsEntity):
         # Setup sprite
         sheet = swap_palette(
             load_image('player/player.png', False),
-            load_palette('player/palette.png'), 
-            load_palette('player/palette.png')
+            load_palette('player/palette_key.png'), 
+            load_palette('player/palette_1.png')
         )
-        image_list = load_sprite_sheet(sheet, (32, 32))
+        image_list = load_sprite_sheet(sheet, (16, 18))
 
-        self.sprite = Sprite(pos, image_offset=(13, 18))
+        self.sprite = Sprite(pos, image_offset=(4, 4))
         self.sprite.add_animation(Animation.IDLE, image_list, 5, range_=(0,4))
         self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
         self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
@@ -77,7 +77,7 @@ class Player(PhysicsEntity):
             Air(),
             WallSlide(),
             WallJump()
-        ], debug=False)
+        ])
 
     def update(self, tilemap):
         self.handle_input()
