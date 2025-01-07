@@ -13,7 +13,7 @@ class Idle(State):
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
 
-        if self.owner.move_dir != 0:
+        if self.owner.move_dir.x != 0:
             self.switch(States.RUN)
         
         if not self.owner.on_ground:

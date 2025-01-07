@@ -11,12 +11,12 @@ class WallSlide(State):
         self.owner.set_animation(Animation.SLIDE)
     
     def on_exit(self):
-        self.owner.last_move_dir = -self.owner.slide_dir
+        self.owner.last_rotate_dir = -self.owner.slide_dir
     
     def update(self):
-        self.owner.accelerate_x(self.owner.move_dir, self.owner.air_move_speed, self.owner.air_acc)
+        self.owner.accelerate_x(self.owner.move_dir.x, self.owner.air_move_speed, self.owner.air_acc)
 
-        if self.owner.velocity.y < 0 or self.owner.move_dir != self.owner.slide_dir:
+        if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.slide_dir:
             self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         else:
             self.owner.apply_gravity(self.owner.slide_gravity, self.owner.slide_speed)

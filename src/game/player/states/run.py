@@ -8,7 +8,7 @@ class Run(State):
         super().__init__(States.RUN)
     
     def update(self):
-        self.owner.accelerate_x(self.owner.move_dir, self.owner.ground_move_speed, self.owner.ground_acc)
+        self.owner.accelerate_x(self.owner.move_dir.x, self.owner.ground_move_speed, self.owner.ground_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
         self.handle_animation()
@@ -20,14 +20,15 @@ class Run(State):
             self.switch(States.AIR)
         
     def handle_animation(self):
-        if self.owner.move_dir != 0 and self.owner.move_dir != self.owner.last_move_dir:
+        move_dir = self.owner.move_dir.x
+        if move_dir != 0 and move_dir != self.owner.last_rotate_dir:
             self.owner.rotate_timer = self.owner.rotate_duration
             self.owner.rotate_dir = choice(self.owner.rotate_choice)
         
-        if self.owner.move_dir != 0:
-            self.owner.sprite.flip = self.owner.move_dir == -1
-            self.owner.last_move_dir = self.owner.move_dir
-        
+        if move_dir != 0:
+            self.owner.sprite.flip = move_dir == -1
+            self.owner.last_rotate_dir = move_dir
+
         self.owner.rotate_timer = max(0, self.owner.rotate_timer - 1)
         
         animation = Animation.IDLE

@@ -10,7 +10,7 @@ class Player(PhysicsEntity):
         super().__init__(pos, (8, 14))
 
         # Velocity and acceleration
-        self.move_dir = 1 # starts at one because the player is facing right
+        self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.ground_move_speed: float = 1.15  
         self.ground_acc = (0.1, 0.2) # (acceleration, deceleration)
         self.air_move_speed: float = 1.15  
@@ -49,7 +49,7 @@ class Player(PhysicsEntity):
         sheet = swap_palette(
             load_image('player/player.png', False),
             load_palette('player/palette_key.png'), 
-            load_palette('player/palette1.png')
+            load_palette('player/palette2.png')
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
 
@@ -67,7 +67,7 @@ class Player(PhysicsEntity):
         self.rotate_duration = 11
         self.rotate_choice = [1] # 0: back | 1: front 
         self.rotate_dir = 0
-        self.last_move_dir = 1
+        self.last_rotate_dir = 1
 
         # Setup state machine
         self.state_machine = StateMachine(self, [
@@ -112,7 +112,10 @@ class Player(PhysicsEntity):
         pressed = pygame.key.get_pressed()
         just_pressed = pygame.key.get_just_pressed()
 
-        self.move_dir = int(pressed[pygame.K_d]) - int(pressed[pygame.K_a])
+        self.move_dir = pygame.Vector2(
+            int(pressed[pygame.K_d]) - int(pressed[pygame.K_a]),
+            int(pressed[pygame.K_w]) - int(pressed[pygame.K_s])
+        )
         
         self.jump_input_timer = max(0, self.jump_input_timer - 1)
         if just_pressed[pygame.K_SPACE]:
