@@ -19,30 +19,36 @@ class Game:
         self.running = False
         self.clock = pygame.time.Clock()
 
-        self.fullscreen = False
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE
         )
+        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.fullscreen = False
         Assets.load_assets()
 
         self.command_active = False
         self.command_input = ''
 
-        self.tilemap = MapBuilder.generate('configs/test1.json')
-
         self.p1 = Player()
-        self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
+        self.camera.add(self.p1)
         self.players = list[Player]
 
-        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-        self.camera.set_boundary(self.tilemap.get_rect())
-        self.camera.add(self.p1)
+   
+    def new(self):
+        self.tilemap = MapBuilder.generate('configs/test1.json')
+
+        self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
+        self.p1.set_state_id(PlayerState.AIR)
+
         self.camera.move_to(self.p1.get_center(), instant=True)
         self.camera.tilemap = self.tilemap
+        self.camera.set_boundary(self.tilemap.get_rect())
+    
     
     def run(self):
         self.running = True
+        self.new()
        
         while self.running:
             for event in pygame.event.get():
@@ -86,18 +92,20 @@ class Game:
         match command.split():
             case ['load', path]:
                 self.tilemap = TileMap.load(path, self.TYPES)
-            case ['quit']:
-                self.running = False
             case ['g']:
                 if self.p1.get_state_id() == PlayerState.GHOST:
                     self.p1.set_state_id(PlayerState.AIR)
                 else:
                     self.p1.set_state_id(PlayerState.GHOST)
+            case ['n']:
+                self.new()
+            case ['tp', x, y]:
+                self.p1.pos = pygame.Vector2(int(x), int(y))
             case ['jumps', amount]:
                 self.p1.max_jumps = int(amount)
                 self.p1.jumps_remaining = self.p1.max_jumps
-            case ['tp', x, y]:
-                self.p1.pos = pygame.Vector2(int(x), int(y))
+            case ['quit']:
+                self.running = False
             case _:
                 print(f'Unknown command: {command}')
     
