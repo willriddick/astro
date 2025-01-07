@@ -1,10 +1,10 @@
-from src.util import State, approach
-from .states import States
+from src.util import State 
+from .player_state import PlayerState
 from ..animation import Animation
 
 class WallJump(State):
     def __init__(self):
-        super().__init__(States.WALL_JUMP)
+        super().__init__(PlayerState.WALL_JUMP)
         self.timer = 0
     
     def on_enter(self):
@@ -32,9 +32,9 @@ class WallJump(State):
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
-                self.switch(States.IDLE)
+                self.switch(PlayerState.IDLE)
             else:
-                self.switch(States.RUN)
+                self.switch(PlayerState.RUN)
         elif self.timer == 0:
-            self.switch(States.AIR)
+            self.switch(PlayerState.AIR)
     

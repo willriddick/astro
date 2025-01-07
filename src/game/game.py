@@ -2,7 +2,7 @@ import sys
 import pygame
 from src.tilemap import TileMap 
 from src.util import Assets, draw_transparent_rect
-from .player import Player
+from .player import Player, PlayerState
 from .camera import Camera
 from .map_builder import MapBuilder
 
@@ -88,8 +88,11 @@ class Game:
                 self.tilemap = TileMap.load(path, self.TYPES)
             case ['quit']:
                 self.running = False
-            case ['collision' | 'col']:
-                self.p1.collision_enabled = not self.p1.collision_enabled 
+            case ['g']:
+                if self.p1.get_state_id() == PlayerState.GHOST:
+                    self.p1.set_state_id(PlayerState.AIR)
+                else:
+                    self.p1.set_state_id(PlayerState.GHOST)
             case ['jumps', amount]:
                 self.p1.max_jumps = int(amount)
                 self.p1.jumps_remaining = self.p1.max_jumps

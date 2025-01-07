@@ -1,9 +1,9 @@
 from src.util import State
-from .states import States
+from .player_state import PlayerState
 
 class Jump(State):
     def __init__(self):
-        super().__init__(States.JUMP)
+        super().__init__(PlayerState.JUMP)
     
     def on_enter(self):
         # Special case for coyote time
@@ -19,5 +19,5 @@ class Jump(State):
             self.owner.coyote_timer = 0
             self.owner.variable_jump_timer = self.owner.variable_jump_buffer
         
-        self.switch(States.AIR)
+        self.switch(PlayerState.AIR)
    

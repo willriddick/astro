@@ -1,10 +1,10 @@
 from src.util import State, Direction
-from .states import States
+from .player_state import PlayerState
 from ..animation import Animation
 
 class WallSlide(State):
     def __init__(self):
-        super().__init__(States.WALL_SLIDE)
+        super().__init__(PlayerState.WALL_SLIDE)
 
     def on_enter(self):
         self.owner.sprite.flip = (self.owner.slide_dir == 1)
@@ -25,12 +25,12 @@ class WallSlide(State):
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
-                self.switch(States.IDLE)
+                self.switch(PlayerState.IDLE)
             else:
-                self.switch(States.RUN)
+                self.switch(PlayerState.RUN)
         
         if not self.owner.collisions[Direction.LEFT] and not self.owner.collisions[Direction.RIGHT]:
             self.owner.pressed_left_timer = 0
             self.owner.pressed_right_timer = 0
-            self.switch(States.AIR)
+            self.switch(PlayerState.AIR)
         

@@ -2,7 +2,7 @@ import pygame
 from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, load_image, load_palette
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
-from .states import States, Idle, Run, Air, Jump, WallSlide, WallJump
+from .states import PlayerState, Idle, Run, Air, Jump, WallSlide, WallJump, Ghost
 from .animation import Animation
 
 class Player(PhysicsEntity):
@@ -76,7 +76,8 @@ class Player(PhysicsEntity):
             Jump(),
             Air(),
             WallSlide(),
-            WallJump()
+            WallJump(),
+            Ghost()
         ])
 
     def update(self, tilemap):
@@ -84,6 +85,12 @@ class Player(PhysicsEntity):
         self.state_machine.update()
         self.handle_collision(tilemap)
         self.sprite.update(self.pos)
+    
+    def set_state_id(self, state: PlayerState):
+        self.state_machine.switch(state)
+
+    def get_state_id(self) -> PlayerState:
+        return self.state_machine.current_state.id
     
     def handle_jump(self):
         self.coyote_timer = max(0, self.coyote_timer - 1)
@@ -93,7 +100,7 @@ class Player(PhysicsEntity):
             self.jumps_remaining = self.max_jumps
        
         if self.jump_input_timer > 0 and self.jumps_remaining:
-            self.state_machine.switch(States.JUMP)
+            self.state_machine.switch(PlayerState.JUMP)
    
     def handle_wall_jump(self):
         self.slide_timer = max(0, self.slide_timer - 1)
@@ -106,7 +113,7 @@ class Player(PhysicsEntity):
             self.slide_dir = -1
         
         if self.jump_input_timer > 0 and self.slide_timer:
-            self.state_machine.switch(States.WALL_JUMP)
+            self.state_machine.switch(PlayerState.WALL_JUMP)
 
     def handle_input(self):
         pressed = pygame.key.get_pressed()
@@ -114,7 +121,7 @@ class Player(PhysicsEntity):
 
         self.move_dir = pygame.Vector2(
             int(pressed[pygame.K_d]) - int(pressed[pygame.K_a]),
-            int(pressed[pygame.K_w]) - int(pressed[pygame.K_s])
+            int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
         )
         
         self.jump_input_timer = max(0, self.jump_input_timer - 1)

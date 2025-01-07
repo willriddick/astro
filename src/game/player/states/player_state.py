@@ -1,6 +1,7 @@
 from enum import Enum
 
-class States(Enum):
+class PlayerState(Enum):
+    GHOST = -1
     IDLE = 0
     RUN = 1
     JUMP = 2

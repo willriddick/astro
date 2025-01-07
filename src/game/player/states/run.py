@@ -1,11 +1,11 @@
 from random import choice
 from src.util import State
-from .states import States
+from .player_state import PlayerState
 from ..animation import Animation
 
 class Run(State):
     def __init__(self):
-        super().__init__(States.RUN)
+        super().__init__(PlayerState.RUN)
     
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, self.owner.ground_move_speed, self.owner.ground_acc)
@@ -14,10 +14,10 @@ class Run(State):
         self.handle_animation()
         
         if self.owner.velocity.x == 0:
-            self.switch(States.IDLE)
+            self.switch(PlayerState.IDLE)
         
         if not self.owner.on_ground:
-            self.switch(States.AIR)
+            self.switch(PlayerState.AIR)
         
     def handle_animation(self):
         move_dir = self.owner.move_dir.x
