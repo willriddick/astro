@@ -7,6 +7,10 @@ class Run(State):
     def __init__(self):
         super().__init__(PlayerState.RUN)
     
+    def on_enter(self):
+        if self.owner.move_dir.y == 1 and self.owner.state_machine.previous_state.id == PlayerState.AIR:
+            self.switch(PlayerState.SLIDE)
+    
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, self.owner.ground_move_speed, self.owner.ground_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)

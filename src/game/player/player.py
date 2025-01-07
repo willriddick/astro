@@ -2,7 +2,7 @@ import pygame
 from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, load_image, load_palette
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
-from .states import PlayerState, Idle, Run, Air, Jump, WallSlide, WallJump, Ghost
+from .states import PlayerState, Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
 from .animation import Animation
 
 class Player(PhysicsEntity):
@@ -13,7 +13,7 @@ class Player(PhysicsEntity):
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.ground_move_speed: float = 1.15  
         self.ground_acc = (0.1, 0.2) # (acceleration, deceleration)
-        self.air_move_speed: float = 1.15  
+        self.air_move_speed: float = 1.3  
         self.air_acc = (0.05, 0.01)   
 
         # Jumping
@@ -28,7 +28,7 @@ class Player(PhysicsEntity):
 
         # Wall jump and sliding
         self.wall_jump_duration = 12
-        self.wall_jump_speed = (2.5, 2.7)
+        self.wall_jump_speed = (2.5, 2.5)
         self.wall_jump_acc = (0.13, 0.13)
         self.slide_speed = 0.5
         self.slide_gravity = 0.05
@@ -75,6 +75,7 @@ class Player(PhysicsEntity):
             Run(),
             Jump(),
             Air(),
+            Slide(),
             WallSlide(),
             WallJump(),
             Ghost()
