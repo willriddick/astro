@@ -22,19 +22,28 @@ class Player(PhysicsEntity):
         self.jump_speed = 3
         self.coyote_timer = 0
         self.coyote_buffer = 7
-        self.variable_jump_multiplier = 0.7
-        self.variable_jump_buffer = 15
+        self.variable_jump_multiplier = 0.8
+        self.variable_jump_buffer = 10
         self.variable_jump_timer = 0
+
+        # Sliding
+        self.slide_input_timer = 0
+        self.slide_input_buffer = 14
+        self.slide_dir = 0
+        self.slide_duration = 15
+        self.initial_slide_multiplier = 1.3
+        self.slide_speed = 1.6
+        self.slide_acc = (0.05, 0.05)
 
         # Wall jump and sliding
         self.wall_jump_duration = 12
         self.wall_jump_speed = (2.5, 2.5)
         self.wall_jump_acc = (0.13, 0.13)
-        self.slide_speed = 0.5
-        self.slide_gravity = 0.05
-        self.slide_dir = 0
-        self.slide_timer = 0
-        self.slide_buffer = 10
+        self.wall_slide_speed = 0.5
+        self.wall_slide_gravity = 0.05
+        self.wall_slide_dir = 0
+        self.wall_slide_timer = 0
+        self.wall_slide_buffer = 10
 
         # Inputs
         self.holding_jump = False
@@ -60,7 +69,8 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
         self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
         self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
-        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(14,15))
+        self.sprite.add_animation(Animation.WALL_SLIDE, image_list, 0, range_=(14,15))
+        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.set_animation(Animation.IDLE)
 
         self.rotate_timer = 0
@@ -87,10 +97,10 @@ class Player(PhysicsEntity):
         self.handle_collision(tilemap)
         self.sprite.update(self.pos)
     
-    def set_state_id(self, state: PlayerState):
+    def set_state(self, state: PlayerState):
         self.state_machine.switch(state)
 
-    def get_state_id(self) -> PlayerState:
+    def get_state(self) -> PlayerState:
         return self.state_machine.current_state.id
     
     def handle_jump(self):
@@ -102,18 +112,25 @@ class Player(PhysicsEntity):
        
         if self.jump_input_timer > 0 and self.jumps_remaining:
             self.state_machine.switch(PlayerState.JUMP)
+        
+        self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
+        if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
+            self.velocity.y *= (self.variable_jump_multiplier / (1 / self.gravity_multiplier))
    
     def handle_wall_jump(self):
-        self.slide_timer = max(0, self.slide_timer - 1)
+        self.wall_slide_timer = max(0, self.wall_slide_timer - 1)
 
         if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
-            self.slide_timer = self.slide_buffer
-            self.slide_dir = 1
+            self.wall_slide_timer = self.wall_slide_buffer
+            self.wall_slide_dir = 1
         elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
-            self.slide_timer = self.slide_buffer
-            self.slide_dir = -1
+            self.wall_slide_timer = self.wall_slide_buffer
+            self.wall_slide_dir = -1
         
-        if self.jump_input_timer > 0 and self.slide_timer:
+        if (not self.collisions[Direction.LEFT] and not self.collisions[Direction.RIGHT]):
+            self.wall_slide_timer = 0
+        
+        if self.jump_input_timer > 0 and self.wall_slide_timer:
             self.state_machine.switch(PlayerState.WALL_JUMP)
 
     def handle_input(self):
@@ -130,6 +147,10 @@ class Player(PhysicsEntity):
             self.jump_input_timer = self.jump_input_buffer
         
         self.holding_jump = pressed[pygame.K_SPACE]
+
+        self.slide_input_timer = max(0, self.slide_input_timer - 1)
+        if just_pressed[pygame.K_s]:
+            self.slide_input_timer = self.slide_input_buffer
 
         if pressed[pygame.K_a]:
             self.pressed_left_timer = self.pressed_left_buffer

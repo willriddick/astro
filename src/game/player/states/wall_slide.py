@@ -7,19 +7,21 @@ class WallSlide(State):
         super().__init__(PlayerState.WALL_SLIDE)
 
     def on_enter(self):
-        self.owner.sprite.flip = (self.owner.slide_dir == 1)
-        self.owner.set_animation(Animation.SLIDE)
+        self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
+        self.owner.set_animation(Animation.WALL_SLIDE)
     
     def on_exit(self):
-        self.owner.last_rotate_dir = -self.owner.slide_dir
+        self.owner.last_rotate_dir = -self.owner.wall_slide_dir
+        self.owner.slide_left_timer = 0
+        self.owner.slide_right_timer = 0
     
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, self.owner.air_move_speed, self.owner.air_acc)
 
-        if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.slide_dir:
+        if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:
             self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         else:
-            self.owner.apply_gravity(self.owner.slide_gravity, self.owner.slide_speed)
+            self.owner.apply_gravity(self.owner.wall_slide_gravity, self.owner.wall_slide_speed)
         
         self.owner.handle_wall_jump()
 
@@ -29,8 +31,11 @@ class WallSlide(State):
             else:
                 self.switch(PlayerState.RUN)
         
-        if not self.owner.collisions[Direction.LEFT] and not self.owner.collisions[Direction.RIGHT]:
-            self.owner.pressed_left_timer = 0
-            self.owner.pressed_right_timer = 0
+        if (
+            (self.owner.wall_slide_dir == -1 and not self.owner.collisions[Direction.LEFT])
+            or (self.owner.wall_slide_dir == 1 and not self.owner.collisions[Direction.RIGHT])
+            or (self.owner.move_dir.x != self.owner.wall_slide_dir)
+            or (self.owner.move_dir.x == 0)
+        ):
             self.switch(PlayerState.AIR)
         

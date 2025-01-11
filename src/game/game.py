@@ -33,18 +33,16 @@ class Game:
         self.p1 = Player()
         self.camera.add(self.p1)
         self.players = list[Player]
-
    
-    def new(self):
-        self.tilemap = MapBuilder.generate('configs/test1.json')
+    def new(self, seed):
+        self.tilemap = MapBuilder.generate('configs/test1.json', seed)
 
         self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
-        self.p1.set_state_id(PlayerState.AIR)
+        self.p1.set_state(PlayerState.AIR)
 
         self.camera.move_to(self.p1.get_center(), instant=True)
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
-    
     
     def run(self):
         self.running = True
@@ -99,6 +97,8 @@ class Game:
                     self.p1.set_state_id(PlayerState.GHOST)
             case ['n']:
                 self.new()
+            case ['n', seed]:
+                self.new(seed)
             case ['tp', x, y]:
                 self.p1.pos = pygame.Vector2(int(x), int(y))
             case ['jumps', amount]:

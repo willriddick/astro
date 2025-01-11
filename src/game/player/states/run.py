@@ -6,16 +6,23 @@ from ..animation import Animation
 class Run(State):
     def __init__(self):
         super().__init__(PlayerState.RUN)
-    
+
     def on_enter(self):
-        if self.owner.move_dir.y == 1 and self.owner.state_machine.previous_state.id == PlayerState.AIR:
-            self.switch(PlayerState.SLIDE)
-    
+        self.timer = 0
+        
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, self.owner.ground_move_speed, self.owner.ground_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
         self.handle_animation()
+
+        self.timer = max(0, self.timer + 1)
+        if self.timer < 5:
+            if (
+                self.owner.slide_input_timer
+                and self.owner.state_machine.previous_state.id == PlayerState.AIR
+            ):
+                self.switch(PlayerState.SLIDE)
         
         if self.owner.velocity.x == 0:
             self.switch(PlayerState.IDLE)

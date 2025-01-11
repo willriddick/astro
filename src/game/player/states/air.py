@@ -11,15 +11,10 @@ class Air(State):
         self.owner.accelerate_x(self.owner.move_dir.x, self.owner.air_move_speed, self.owner.air_acc)
         self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
         self.owner.handle_jump()
-
-        self.owner.variable_jump_timer = max(0, self.owner.variable_jump_timer - 1)
-        if not self.owner.holding_jump and self.owner.variable_jump_timer > 0 and self.owner.velocity.y < 0:
-            self.owner.velocity.y *= (self.owner.variable_jump_multiplier / (1 / self.owner.gravity_multiplier))
-
         self.owner.handle_wall_jump()
         self.handle_animation()
 
-        if self.owner.slide_timer:
+        if self.owner.wall_slide_timer:
             self.switch(PlayerState.WALL_SLIDE)
 
         if self.owner.on_ground:
