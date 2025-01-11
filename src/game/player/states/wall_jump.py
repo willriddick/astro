@@ -8,7 +8,7 @@ class WallJump(State):
     
     def on_enter(self):
         self.timer = Player.WALL_JUMP_DURATION
-        self.owner.set_animation(Animation.AIR_UP)
+        self.owner.sprite.set_animation(Animation.AIR_UP)
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
         self.owner.velocity.x = Player.WALL_JUMP_SPEED[0] * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
         self.owner.velocity.y = -Player.WALL_JUMP_SPEED[1] * self.owner.velocity_multiplier.y

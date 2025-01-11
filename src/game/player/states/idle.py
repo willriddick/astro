@@ -6,7 +6,7 @@ class Idle(State):
         super().__init__(PlayerState.IDLE)
     
     def on_enter(self):
-        self.owner.set_animation(Animation.IDLE)
+        self.owner.sprite.set_animation_duration(Animation.IDLE_A, 30, Animation.IDLE_B)
     
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)

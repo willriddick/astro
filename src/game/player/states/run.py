@@ -33,10 +33,10 @@ class Run(State):
         move_dir = self.owner.move_dir.x
         if move_dir != 0 and move_dir != self.owner.last_facing_dir:
             self.owner.rotate_dir = choice(Player.ROTATE_CHOICE)
-            self.owner.sprite.animate(Animation.FRONT, Player.ROTATE_DURATION)
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION)
         
         if move_dir != 0:
             self.owner.sprite.flip = move_dir == -1
             self.owner.last_facing_dir = move_dir
         
-        self.owner.sprite.queue_animation(Animation.RUN)
+        self.owner.sprite.set_next(Animation.RUN)

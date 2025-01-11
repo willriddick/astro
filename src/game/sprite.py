@@ -11,7 +11,7 @@ class Sprite:
         self.subindex = 0
         self.flip = False
 
-        self.animation_timer = 0
+        self.next_timer = 0
         self.next_animation = None
 
         self.last_update_time = pygame.time.get_ticks()
@@ -19,8 +19,8 @@ class Sprite:
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
 
-        self.animation_timer = max(0, self.animation_timer - 1)
-        if self.animation_timer == 1 and self.next_animation:
+        self.next_timer = max(0, self.next_timer - 1)
+        if self.next_timer == 1 and self.next_animation:
             self.set_animation(self.next_animation)
             self.next_animation = None
 
@@ -47,20 +47,20 @@ class Sprite:
             self.frame = frame
             self.current = id_
 
-            self.animation_timer = 0
+            self.next_timer = 0
             self.next_animation = None
     
     def get_animation(self) -> tuple[list[pygame.Surface], int]:
         return self.animations.get(self.current)
     
-    def animate(self, id_: int, duration: int, next_id: int=None):
+    def set_animation_duration(self, id_: int, duration: int, next_id: int=None):
         self.set_animation(id_)
-        self.animation_timer = duration + 1
+        self.next_timer = duration + 1
         if next_id:
             self.next_animation = next_id
     
-    def queue_animation(self, id_: int):
-        if self.animation_timer:
+    def set_next(self, id_: int):
+        if self.next_timer:
             self.next_animation = id_
         else:
             self.set_animation(id_)

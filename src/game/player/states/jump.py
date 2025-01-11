@@ -1,5 +1,5 @@
 from src.util import State
-from ..player import Player, PlayerState
+from ..player import Player, PlayerState, Animation
 
 class Jump(State):
     def __init__(self):
@@ -12,6 +12,7 @@ class Jump(State):
         ):
             self.owner.jumps_remaining -= 1
         
+        
         # Decrement remaining jumps
         if self.owner.jumps_remaining:
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
@@ -21,5 +22,6 @@ class Jump(State):
             self.owner.coyote_timer = 0
             self.owner.variable_jump_timer = Player.VARIABLE_JUMP_BUFFER
         
+        self.owner.sprite.set_animation(Animation.AIR_UP)
         self.switch(PlayerState.AIR)
    

@@ -7,7 +7,7 @@ class WallSlide(State):
 
     def on_enter(self):
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
-        self.owner.set_animation(Animation.WALL_SLIDE)
+        self.owner.sprite.set_animation(Animation.WALL_SLIDE)
     
     def on_exit(self):
         self.owner.last_rotate_dir = -self.owner.wall_slide_dir
@@ -22,10 +22,10 @@ class WallSlide(State):
             self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         else:
             self.owner.apply_gravity(Player.WALL_SLIDE_GRAVITY, Player.WALL_SLIDE_SPEED)
-            self.owner.set_animation(Animation.WALL_SLIDE)
+            self.owner.sprite.set_animation(Animation.WALL_SLIDE)
         
         if self.owner.move_dir.x != self.owner.wall_slide_dir:
-            self.owner.set_animation(Animation.AIR_DOWN if self.owner.falling else Animation.AIR_UP)
+            self.owner.sprite.set_animation(Animation.AIR_DOWN if self.owner.falling else Animation.AIR_UP)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:

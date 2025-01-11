@@ -12,10 +12,6 @@ class Entity(pygame.sprite.Sprite):
         assert self.sprite, 'Sprite not set {self}'
         self.sprite.render(display, offset)
     
-    def set_animation(self, animation: int):
-        assert self.sprite, 'Sprite not set {self}'
-        self.sprite.set_animation(animation)
-   
     def set_pos(self, pos: pygame.Vector2):
         self.pos = pos
     
