@@ -16,7 +16,7 @@ class WallJump(State):
         self.owner.wall_slide_timer = 0
     
     def on_exit(self):
-        self.owner.last_rotate_dir = -self.owner.wall_slide_dir
+        self.owner.last_facing_dir = -self.owner.wall_slide_dir
     
     def update(self):
         self.timer = max(0, self.timer - 1)

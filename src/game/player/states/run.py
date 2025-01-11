@@ -31,20 +31,12 @@ class Run(State):
         
     def handle_animation(self):
         move_dir = self.owner.move_dir.x
-        if move_dir != 0 and move_dir != self.owner.last_rotate_dir:
-            self.owner.rotate_timer = Player.ROTATE_DURATION
+        if move_dir != 0 and move_dir != self.owner.last_facing_dir:
             self.owner.rotate_dir = choice(Player.ROTATE_CHOICE)
+            self.owner.sprite.animate(Animation.FRONT, Player.ROTATE_DURATION)
         
         if move_dir != 0:
             self.owner.sprite.flip = move_dir == -1
-            self.owner.last_rotate_dir = move_dir
-
-        self.owner.rotate_timer = max(0, self.owner.rotate_timer - 1)
+            self.owner.last_facing_dir = move_dir
         
-        animation = Animation.IDLE
-        if self.owner.rotate_timer > 0:
-            animation = Animation.FRONT if self.owner.rotate_dir else Animation.BACK
-        elif self.owner.move_dir != 0:
-            animation = Animation.RUN
-        
-        self.owner.set_animation(animation)
+        self.owner.sprite.queue_animation(Animation.RUN)

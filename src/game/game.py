@@ -104,7 +104,7 @@ class Game:
             case ['jumps', amount]:
                 self.p1.max_jumps = int(amount)
                 self.p1.jumps_remaining = self.p1.max_jumps
-            case ['quit']:
+            case ['q']:
                 self.running = False
             case _:
                 print(f'Unknown command: {command}')

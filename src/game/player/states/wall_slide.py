@@ -20,10 +20,12 @@ class WallSlide(State):
 
         if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:
             self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
-            self.owner.set_animation(Animation.AIR_DOWN)
         else:
             self.owner.apply_gravity(Player.WALL_SLIDE_GRAVITY, Player.WALL_SLIDE_SPEED)
             self.owner.set_animation(Animation.WALL_SLIDE)
+        
+        if self.owner.move_dir.x != self.owner.wall_slide_dir:
+            self.owner.set_animation(Animation.AIR_DOWN if self.owner.falling else Animation.AIR_UP)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:

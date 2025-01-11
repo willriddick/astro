@@ -11,14 +11,14 @@ class Player(PhysicsEntity):
     AIR_MOVE_SPEED = 1.3
     AIR_ACC = (0.05, 0.01)
 
-    GRAVITY = 0.16
-    FALL_SPEED = 3
+    GRAVITY = 0.14
+    FALL_SPEED = 3.2
 
-    JUMP_SPEED = 3.2
+    JUMP_SPEED = 3
     MAX_JUMPS = 1
     COYOTE_BUFFER = 7
     VARIABLE_JUMP_MULTIPLIER = 0.8
-    VARIABLE_JUMP_BUFFER = 10
+    VARIABLE_JUMP_BUFFER = 20
 
     SLIDE_INPUT_BUFFER = 14
     SLIDE_DURATION = 15
@@ -84,9 +84,8 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.set_animation(Animation.IDLE)
 
-        self.rotate_timer = 0
-        self.rotate_dir = 0
-        self.last_rotate_dir = 1
+        self.facing_dir = 0
+        self.last_facing_dir = 1
 
         # Setup state machine
         from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
@@ -130,12 +129,13 @@ class Player(PhysicsEntity):
     def handle_wall_jump(self):
         self.wall_slide_timer = max(0, self.wall_slide_timer - 1)
 
-        if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
-            self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
-            self.wall_slide_dir = 1
-        elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
-            self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
-            self.wall_slide_dir = -1
+        if not self.on_ground:
+            if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
+                self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
+                self.wall_slide_dir = 1
+            elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
+                self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
+                self.wall_slide_dir = -1
         
         if (not self.collisions[Direction.LEFT] and not self.collisions[Direction.RIGHT]):
             self.wall_slide_timer = 0
