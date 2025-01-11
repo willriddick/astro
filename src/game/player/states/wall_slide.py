@@ -1,6 +1,5 @@
 from src.util import State, Direction
-from .player_state import PlayerState
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class WallSlide(State):
     def __init__(self):
@@ -16,12 +15,12 @@ class WallSlide(State):
         self.owner.slide_right_timer = 0
     
     def update(self):
-        self.owner.accelerate_x(self.owner.move_dir.x, self.owner.air_move_speed, self.owner.air_acc)
+        self.owner.accelerate_x(self.owner.move_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
 
         if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:
-            self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+            self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         else:
-            self.owner.apply_gravity(self.owner.wall_slide_gravity, self.owner.wall_slide_speed)
+            self.owner.apply_gravity(Player.WALL_SLIDE_GRAVITY, Player.WALL_SLIDE_SPEED)
         
         self.owner.handle_wall_jump()
 

@@ -1,6 +1,5 @@
 from src.util import State
-from .player_state import PlayerState
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class Slide(State):
     def __init__(self):
@@ -10,19 +9,19 @@ class Slide(State):
     def on_enter(self):
         self.owner.set_animation(Animation.SLIDE)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
-        self.owner.velocity.x = self.owner.velocity.x * self.owner.initial_slide_multiplier
+        self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
         self.entry_speed = abs(self.owner.velocity.x)
-        self.timer = self.owner.slide_duration
+        self.timer = Player.SLIDE_DURATION
 
     def update(self):
-        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
 
         self.timer = max(0, self.timer - 1)
-        goal_velocity = 0 if not self.timer else min(self.owner.slide_speed, self.entry_speed)
-        self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, self.owner.slide_acc)
+        goal_velocity = 0 if not self.timer else min(Player.SLIDE_SPEED, self.entry_speed)
+        self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
     
-        if (self.owner.velocity.x == self.owner.ground_move_speed
+        if (self.owner.velocity.x == Player.GROUND_MOVE_SPEED
             or self.owner.move_dir.y != 1
         ):
             self.switch(PlayerState.RUN)

@@ -1,6 +1,5 @@
 from src.util import State
-from .player_state import PlayerState
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class Idle(State):
     def __init__(self):
@@ -10,7 +9,7 @@ class Idle(State):
         self.owner.set_animation(Animation.IDLE)
     
     def update(self):
-        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
 
         if self.owner.move_dir.x != 0:

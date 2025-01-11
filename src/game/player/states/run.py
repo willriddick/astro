@@ -1,7 +1,6 @@
 from random import choice
 from src.util import State
-from .player_state import PlayerState
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class Run(State):
     def __init__(self):
@@ -11,8 +10,8 @@ class Run(State):
         self.timer = 0
         
     def update(self):
-        self.owner.accelerate_x(self.owner.move_dir.x, self.owner.ground_move_speed, self.owner.ground_acc)
-        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        self.owner.accelerate_x(self.owner.move_dir.x, Player.GROUND_MOVE_SPEED, Player.GROUND_ACC)
+        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
         self.handle_animation()
 
@@ -33,8 +32,8 @@ class Run(State):
     def handle_animation(self):
         move_dir = self.owner.move_dir.x
         if move_dir != 0 and move_dir != self.owner.last_rotate_dir:
-            self.owner.rotate_timer = self.owner.rotate_duration
-            self.owner.rotate_dir = choice(self.owner.rotate_choice)
+            self.owner.rotate_timer = Player.ROTATE_DURATION
+            self.owner.rotate_dir = choice(Player.ROTATE_CHOICE)
         
         if move_dir != 0:
             self.owner.sprite.flip = move_dir == -1

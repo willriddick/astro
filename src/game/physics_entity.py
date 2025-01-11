@@ -7,14 +7,9 @@ class PhysicsEntity(Entity):
     def __init__(self, pos: tuple[int, int], rect_size: tuple[int, int]):
         super().__init__(pos, rect_size)
 
-        # Velocity
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)
-
-        # Gravity
         self.gravity_multiplier = 1
-        self.gravity = 0.14
-        self.fall_speed = 3
 
         # Collision
         self.tiles_around = []
@@ -34,7 +29,7 @@ class PhysicsEntity(Entity):
     def accelerate_y(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.y = self.accelerate_decelerate(self.velocity.y, max_speed, dir_, acc, self.velocity_multiplier.y)
     
-    def apply_gravity(self, gravity: float, max_speed: float, ):
+    def apply_gravity(self, gravity: float, max_speed: float):
         self.velocity.y = min(
             max_speed * self.gravity_multiplier,
             self.velocity.y + gravity * self.gravity_multiplier

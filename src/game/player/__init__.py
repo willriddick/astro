@@ -1,2 +1,3 @@
 from .player import Player
-from .states import PlayerState
+from .player_state import PlayerState
+from .animation import Animation

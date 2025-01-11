@@ -1,6 +1,5 @@
 from src.util import State 
-from .player_state import PlayerState
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class WallJump(State):
     def __init__(self):
@@ -8,11 +7,11 @@ class WallJump(State):
         self.timer = 0
     
     def on_enter(self):
-        self.timer = self.owner.wall_jump_duration
+        self.timer = Player.WALL_JUMP_DURATION
         self.owner.set_animation(Animation.AIR_UP)
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
-        self.owner.velocity.x = self.owner.wall_jump_speed[0] * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
-        self.owner.velocity.y = -self.owner.wall_jump_speed[1] * self.owner.velocity_multiplier.y
+        self.owner.velocity.x = Player.WALL_JUMP_SPEED[0] * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
+        self.owner.velocity.y = -Player.WALL_JUMP_SPEED[1] * self.owner.velocity_multiplier.y
         self.owner.jump_input_timer = 0
         self.owner.wall_slide_timer = 0
     
@@ -24,11 +23,11 @@ class WallJump(State):
 
         self.owner.accelerate_x(
             dir_ = -self.owner.wall_slide_dir, 
-            max_speed = self.owner.air_move_speed,
-            acc = self.owner.wall_jump_acc
+            max_speed = Player.AIR_MOVE_SPEED,
+            acc = Player.AIR_ACC
         )
 
-        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
+        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:

@@ -34,7 +34,7 @@ class Game:
         self.camera.add(self.p1)
         self.players = list[Player]
    
-    def new(self, seed):
+    def new(self, seed=None):
         self.tilemap = MapBuilder.generate('configs/test1.json', seed)
 
         self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
