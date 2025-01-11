@@ -16,13 +16,14 @@ class WallSlide(State):
     
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
+        self.owner.handle_wall_jump()
 
         if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:
             self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
+            self.owner.set_animation(Animation.AIR_DOWN)
         else:
             self.owner.apply_gravity(Player.WALL_SLIDE_GRAVITY, Player.WALL_SLIDE_SPEED)
-        
-        self.owner.handle_wall_jump()
+            self.owner.set_animation(Animation.WALL_SLIDE)
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
@@ -33,8 +34,6 @@ class WallSlide(State):
         if (
             (self.owner.wall_slide_dir == -1 and not self.owner.collisions[Direction.LEFT])
             or (self.owner.wall_slide_dir == 1 and not self.owner.collisions[Direction.RIGHT])
-            or (self.owner.move_dir.x != self.owner.wall_slide_dir)
-            or (self.owner.move_dir.x == 0)
         ):
             self.switch(PlayerState.AIR)
         

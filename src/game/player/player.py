@@ -11,10 +11,10 @@ class Player(PhysicsEntity):
     AIR_MOVE_SPEED = 1.3
     AIR_ACC = (0.05, 0.01)
 
-    GRAVITY = 0.14
+    GRAVITY = 0.16
     FALL_SPEED = 3
 
-    JUMP_SPEED = 3
+    JUMP_SPEED = 3.2
     MAX_JUMPS = 1
     COYOTE_BUFFER = 7
     VARIABLE_JUMP_MULTIPLIER = 0.8
@@ -27,7 +27,7 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (0.05, 0.05)
 
     WALL_JUMP_DURATION = 10
-    WALL_JUMP_SPEED = (2, 2.5)
+    WALL_JUMP_SPEED = (2, 2.6)
     WALL_JUMP_ACC = (0.13, 0.13)
     WALL_SLIDE_SPEED = 0.5
     WALL_SLIDE_GRAVITY = 0.05
@@ -41,7 +41,7 @@ class Player(PhysicsEntity):
     ROTATE_CHOICE = [1] # 0: back | 1: front 
 
     def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0)):
-        super().__init__(pos, (8, 14))
+        super().__init__(pos, (8, 13))
 
         # Velocity and acceleration
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
@@ -73,7 +73,7 @@ class Player(PhysicsEntity):
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
 
-        self.sprite = Sprite(pos, image_offset=(4, 4))
+        self.sprite = Sprite(pos, image_offset=(4, 5))
         self.sprite.add_animation(Animation.IDLE, image_list, 5, range_=(0,4))
         self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
         self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
