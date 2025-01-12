@@ -25,7 +25,6 @@ class Air(State):
     def handle_animation(self):
         move_dir = self.owner.move_dir.x
         if move_dir != 0 and move_dir != self.owner.last_facing_dir:
-            self.owner.rotate_dir = choice(Player.ROTATE_CHOICE)
             self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION)
         
         if move_dir != 0:

@@ -7,7 +7,7 @@ from .animation import Animation
 
 class Player(PhysicsEntity):
     GROUND_MOVE_SPEED = 1.15
-    GROUND_ACC = (0.1, 0.2)
+    GROUND_ACC = (0.1, 0.2) # (Acceleration, Deceleration)
     AIR_MOVE_SPEED = 1.3
     AIR_ACC = (0.05, 0.01)
 
@@ -16,29 +16,30 @@ class Player(PhysicsEntity):
 
     JUMP_SPEED = 3
     MAX_JUMPS = 1
-    COYOTE_BUFFER = 7
-    VARIABLE_JUMP_MULTIPLIER = 0.8
-    VARIABLE_JUMP_BUFFER = 20
+    COYOTE_BUFFER = 7 # time after falling to allow jump
+    VARIABLE_JUMP_MULTIPLIER = 0.8 # multiplies velocity when releasing jump
+    VARIABLE_JUMP_BUFFER = 20 # time after jumping to allow variable jump
 
-    SLIDE_INPUT_BUFFER = 14
-    SLIDE_DURATION = 15
-    INITIAL_SLIDE_MULTIPLIER = 1.3
-    SLIDE_SPEED = 1.6
+    SLIDE_INPUT_BUFFER = 14 # amount of time after pressing down to allow slide
+    SLIDE_DURATION = 15 # after this time, the player will decelerate to 0
+    INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
+    SLIDE_SPEED = 1.6 
     SLIDE_ACC = (0.05, 0.05)
+    SLIDE_BUFFER = 7 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 10
+    WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
     WALL_JUMP_SPEED = (2, 2.6)
     WALL_JUMP_ACC = (0.13, 0.13)
+
     WALL_SLIDE_SPEED = 0.5
     WALL_SLIDE_GRAVITY = 0.05
-    WALL_SLIDE_BUFFER = 10
+    WALL_SLIDE_BUFFER = 10 # amount of time after wall sliding to allow wall jump
 
     JUMP_INPUT_BUFFER = 4
     PRESSED_LEFT_BUFFER = 5
     PRESSED_RIGHT_BUFFER = 5
 
-    ROTATE_DURATION = 11
-    ROTATE_CHOICE = [1] # 0: back | 1: front 
+    ROTATE_DURATION = 11 # time to play FRONT animation when rotating
 
     def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=2):
         super().__init__(pos, (8, 13))

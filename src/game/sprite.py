@@ -41,7 +41,7 @@ class Sprite:
         else:
             self.animations[id_] = (frames, frame_rate)
     
-    def set_animation(self, id_: str, frame: int = 0):
+    def set_animation(self, id_: int, frame: int = 0):
         assert id_ in self.animations, f'Animation {id_} not found'
         if self.current != id_:
             self.frame = frame

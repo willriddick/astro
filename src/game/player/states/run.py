@@ -8,6 +8,7 @@ class Run(State):
 
     def on_enter(self):
         self.timer = 0
+        self.owner.sprite.set_animation(Animation.RUN)
         
     def update(self):
         self.owner.accelerate_x(self.owner.move_dir.x, Player.GROUND_MOVE_SPEED, Player.GROUND_ACC)
@@ -16,7 +17,7 @@ class Run(State):
         self.handle_animation()
 
         self.timer = max(0, self.timer + 1)
-        if self.timer < 5:
+        if self.timer < Player.SLIDE_BUFFER:
             if (
                 self.owner.slide_input_timer
                 and self.owner.state_machine.previous_state.id == PlayerState.AIR
@@ -32,7 +33,6 @@ class Run(State):
     def handle_animation(self):
         move_dir = self.owner.move_dir.x
         if move_dir != 0 and move_dir != self.owner.last_facing_dir:
-            self.owner.rotate_dir = choice(Player.ROTATE_CHOICE)
             self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION)
         
         if move_dir != 0:
