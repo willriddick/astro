@@ -98,6 +98,8 @@ class Game:
                 self.new()
             case ['n', seed]:
                 self.new(seed)
+            case ['p', index]:
+                self.p1.load_sprite(int(index))
             case ['tp', x, y]:
                 self.p1.pos = pygame.Vector2(int(x), int(y))
             case ['jumps', amount]:

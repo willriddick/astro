@@ -40,7 +40,7 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=1):
+    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=6):
         super().__init__(pos, (8, 13))
 
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
@@ -65,25 +65,7 @@ class Player(PhysicsEntity):
         self.rotated = False
         self.facing_dir = 0
         self.last_facing_dir = 1
-
-        sheet = swap_palette(
-            Assets.PLAYER_SHEET,
-            Assets.PLAYER_PALETTES[0],
-            Assets.PLAYER_PALETTES[self.palette_index],
-        )
-        image_list = load_sprite_sheet(sheet, (16, 18))
-
-        self.sprite = Sprite(pos, image_offset=(4, 5))
-        self.sprite.add_animation(Animation.IDLE_A, image_list, 0, range_=(0,1))
-        self.sprite.add_animation(Animation.IDLE_B, image_list, 5, range_=(0,4))
-        self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
-        self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
-        self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
-        self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
-        self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
-        self.sprite.add_animation(Animation.WALL_SLIDE, image_list, 0, range_=(14,15))
-        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.set_animation(Animation.IDLE_B)
+        self.load_sprite(palette_index)
 
         # setup state machine
         from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
@@ -97,7 +79,7 @@ class Player(PhysicsEntity):
             WallJump(),
             Ghost()
         ])
-
+    
     def update(self, tilemap):
         self.handle_input()
         self.state_machine.update()
@@ -180,4 +162,28 @@ class Player(PhysicsEntity):
         self.pressed_right_timer = max(0, self.pressed_right_timer - 1)
         if pressed[pygame.K_d]:
             self.pressed_right_timer = Player.PRESSED_RIGHT_BUFFER
+    
+    def load_sprite(self, palette_index: int):
+        self.palette_index = palette_index % len(Assets.PLAYER_PALETTES)
+
+        sheet = swap_palette(
+            Assets.PLAYER_SHEET,
+            Assets.PLAYER_PALETTES[0],
+            Assets.PLAYER_PALETTES[self.palette_index],
+        )
+        image_list = load_sprite_sheet(sheet, (16, 18))
+
+        self.sprite = Sprite(self.pos, image_offset=(4, 5))
+        self.sprite.add_animation(Animation.IDLE_A, image_list, 0, range_=(0,1))
+        self.sprite.add_animation(Animation.IDLE_B, image_list, 5, range_=(0,4))
+        self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
+        self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
+        self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
+        self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
+        self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
+        self.sprite.add_animation(Animation.WALL_SLIDE, image_list, 0, range_=(14,15))
+        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
+        self.sprite.set_animation(Animation.IDLE_B)
+
+
         
