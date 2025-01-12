@@ -26,4 +26,5 @@ class Assets:
             load_palette('player/palette2.png'),
             load_palette('player/palette3.png'),
             load_palette('player/palette4.png'),
+            load_palette('player/palette5.png'),
         ]

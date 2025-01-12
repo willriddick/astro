@@ -40,7 +40,7 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11
     ROTATE_CHOICE = [1] # 0: back | 1: front 
 
-    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=3):
+    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=2):
         super().__init__(pos, (8, 13))
 
         # Velocity and acceleration
