@@ -1,8 +1,6 @@
-
-import pygame
 import random
 import os
-from src.level_gen import LevelBuilder, Level, Attribute
+from src.level_gen import LevelBuilder, Attribute
 from src.tilemap import TileMap, Tile 
 from src.util import Assets
 
@@ -21,10 +19,12 @@ class MapBuilder:
             new_map = TileMap.load(map_path, Assets.TILESET)
             
             if room.has_attribute(Attribute.ENTRANCE):
-                pos = random.choice(new_map.get_valid_floor('stone')).tile_pos
+                floors = new_map.get_valid_floor('stone')
+                pos = random.choice(floors).tile_pos
                 spawn_tile = new_map.create_tile(Assets.TILESET.get_by_name('door'), 0, (pos[0], pos[1] - 1))
 
-            tilemap.place(new_map, room.position, False)
+            tilemap.place_map(new_map, room.position, False)
         
-        return tilemap, spawn_tile
+        tilemap.spawn_tile = spawn_tile
+        return tilemap
     

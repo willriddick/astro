@@ -22,7 +22,7 @@ class Player(PhysicsEntity):
 
     SLIDE_INPUT_BUFFER = 14 # amount of time after pressing down to allow slide
     SLIDE_DURATION = 15 # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
+    INITIAL_SLIDE_MULTIPLIER = 1.4 # multiplies velocity when entering slide state
     SLIDE_SPEED = 1.6 
     SLIDE_ACC = (0.05, 0.05)
     SLIDE_BUFFER = 7 # time after landing to allow slide
@@ -122,7 +122,7 @@ class Player(PhysicsEntity):
        
         if self.jump_input_timer > 0 and self.jumps_remaining:
             self.state_machine.switch(PlayerState.JUMP)
-        
+       
         self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
         if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
             self.velocity.y *= (Player.VARIABLE_JUMP_MULTIPLIER / (1 / self.gravity_multiplier))

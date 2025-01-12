@@ -15,7 +15,6 @@ class Slide(State):
     def update(self):
         self.timer = max(0, self.timer - 1)
 
-        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
 
         goal_velocity = 0 if not self.timer else min(Player.SLIDE_SPEED, self.entry_speed)
@@ -27,5 +26,5 @@ class Slide(State):
         ):
             self.switch(PlayerState.RUN)
         
-        if not self.owner.on_ground:
+        if not self.owner.on_ground and self.timer == 0:
             self.switch(PlayerState.AIR)

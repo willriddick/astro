@@ -12,7 +12,10 @@ class Tile:
         self.tile_pos = tile_pos
     
     def __str__(self):
-        return f'{self.type}:{self.variant} ({self.tile_pos[0]}, {self.tile_pos[1]})'
+        return f'{self.type.name}:{self.variant} ({self.tile_pos[0]}, {self.tile_pos[1]})'
+    
+    def __repr__(self):
+        return self.__str__()
     
     @property
     def pixel_pos(self) -> tuple[int, int]:

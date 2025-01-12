@@ -35,8 +35,8 @@ class Game:
         self.players = list[Player]
    
     def new(self, seed=None):
-        self.tilemap, spawn_tile = MapBuilder.generate('configs/test1.json', seed)
-        self.p1.set_pos(pygame.Vector2(spawn_tile.pixel_pos))
+        self.tilemap =  MapBuilder.generate('configs/test1.json', seed)
+        self.p1.set_pos(pygame.Vector2(self.tilemap.spawn_tile.pixel_pos))
         self.p1.set_state(PlayerState.AIR)
 
         self.camera.move_to(self.p1.get_center(), instant=True)
@@ -90,10 +90,10 @@ class Game:
             case ['load', path]:
                 self.tilemap = TileMap.load(path, self.TYPES)
             case ['g']:
-                if self.p1.get_state_id() == PlayerState.GHOST:
-                    self.p1.set_state_id(PlayerState.AIR)
+                if self.p1.get_state() == PlayerState.GHOST:
+                    self.p1.set_state(PlayerState.AIR)
                 else:
-                    self.p1.set_state_id(PlayerState.GHOST)
+                    self.p1.set_state(PlayerState.GHOST)
             case ['n']:
                 self.new()
             case ['n', seed]:

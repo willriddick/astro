@@ -13,6 +13,9 @@ class TileMap:
         self.tileset = tileset
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
+
+        self.spawn_tile = None
+
         self.debug = debug
     
     @property
@@ -52,10 +55,6 @@ class TileMap:
         return tiles
     
     def create_tile(self, type: TileType, variant: int, tile_pos: tuple[int, int]) -> Tile:
-        x, y = tile_pos
-        if not (0 <= x < self.size[0] and 0 <= y < self.size[1]):
-            return
-
         if tile_pos in self.map:
             self.remove_tile(tile_pos)
         new_tile = Tile(self, type, variant, tile_pos)
@@ -64,12 +63,6 @@ class TileMap:
 
         return new_tile
     
-    def place_tile(self, tile: Tile, new_pos: tuple[int, int]):
-        tile.tile_pos = new_pos
-        self.map[new_pos] = tile
-        if tile.type.autotile:
-            self._update_autotiles_around(new_pos)
-                
     def remove_tile(self, tile_pos: tuple[int, int]):
         if tile := self.get_tile(tile_pos):
             del self.map[tile.tile_pos]
@@ -87,23 +80,34 @@ class TileMap:
         output = []
         for tile in self.map.values():
             if tile.type.name in filter_:
-                pos = tile.tile_pos
-                if self.get_tile(pos, Direction.UP) is None:
+                x, y = tile.tile_pos
+                if (
+                    self.get_tile((x, y - 1)) is None 
+                    and y - 1 >= 0
+                    and x > 0 
+                    and x < self.size[0] - 1
+                ):
                     output.append(tile)
         return output
     
-    def place(self, room: 'Tilemap', offset: tuple[int, int], flip: bool):
-        x_start = offset[0] * room.size[0]
-        y_start = offset[1] * room.size[1]
+    def place_tile(self, tile: Tile, new_pos: tuple[int, int]):
+        tile.tile_pos = new_pos
+        self.map[new_pos] = tile
+        if tile.type.autotile:
+            self._update_autotiles_around(new_pos)
+    
+    def place_map(self, map_: 'Tilemap', offset: tuple[int, int], flip: bool):
+        x_start = offset[0] * map_.size[0]
+        y_start = offset[1] * map_.size[1]
         self.size = (
-            max(self.size[0], room.size[0] * (offset[0] + 1)), 
-            max(self.size[1], room.size[1] * (offset[1] + 1))
+            max(self.size[0], map_.size[0] * (offset[0] + 1)), 
+            max(self.size[1], map_.size[1] * (offset[1] + 1))
         )
 
         if flip:
-            room.flip()
+            map_.flip()
 
-        for tile in room.map.values():
+        for tile in map_.map.values():
             new_pos = (x_start + tile.tile_pos[0], y_start + tile.tile_pos[1])
             self.place_tile(tile, new_pos)
 
