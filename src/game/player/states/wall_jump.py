@@ -4,7 +4,6 @@ from ..player import Player, PlayerState, Animation
 class WallJump(State):
     def __init__(self):
         super().__init__(PlayerState.WALL_JUMP)
-        self.timer = 0
     
     def on_enter(self):
         self.timer = Player.WALL_JUMP_DURATION

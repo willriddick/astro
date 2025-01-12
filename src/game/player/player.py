@@ -35,6 +35,7 @@ class Player(PhysicsEntity):
     WALL_SLIDE_GRAVITY = 0.05
     WALL_SLIDE_BUFFER = 10 # amount of time after wall sliding to allow wall jump
 
+    SLIDE_INPUT_BUFFER = 10
     JUMP_INPUT_BUFFER = 4
     PRESSED_LEFT_BUFFER = 5
     PRESSED_RIGHT_BUFFER = 5
@@ -44,30 +45,29 @@ class Player(PhysicsEntity):
     def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=2):
         super().__init__(pos, (8, 13))
 
-        # Velocity and acceleration
-        self.palette_index = palette_index
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
+        self.slide_dir = 0
 
-        # Jumping
+        # jumping and wall sliding
         self.jumps_remaining = 0
         self.coyote_timer = 0
         self.variable_jump_timer = 0
-
-        # Sliding
-        self.slide_input_timer = 0
-        self.slide_dir = 0
-
-        # Wall jump and sliding
         self.wall_slide_dir = 0
         self.wall_slide_timer = 0
 
-        # Inputs
+        # inputs
+        self.slide_input_timer = 0
         self.holding_jump = False
         self.jump_input_timer = 0
         self.pressed_left_timer = 0
         self.pressed_right_timer = 0
 
-        # Setup sprite
+        # setup sprite
+        self.palette_index = palette_index
+        self.rotated = False
+        self.facing_dir = 0
+        self.last_facing_dir = 1
+
         sheet = swap_palette(
             Assets.PLAYER_SHEET,
             Assets.PLAYER_PALETTES[0],
@@ -87,10 +87,7 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.set_animation(Animation.IDLE_B)
 
-        self.facing_dir = 0
-        self.last_facing_dir = 1
-
-        # Setup state machine
+        # setup state machine
         from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
         self.state_machine = StateMachine(self, [
             Idle(),
@@ -150,24 +147,38 @@ class Player(PhysicsEntity):
         pressed = pygame.key.get_pressed()
         just_pressed = pygame.key.get_just_pressed()
 
+        # update move direction
         self.move_dir = pygame.Vector2(
             int(pressed[pygame.K_d]) - int(pressed[pygame.K_a]),
             int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
         )
+
+        # update rotated field
+        if self.move_dir.x != 0 and self.move_dir.x != self.last_facing_dir:
+            self.rotated = True
+        else:
+            self.rotated = False
         
+        if self.move_dir.x != 0:
+            self.last_facing_dir = self.move_dir.x
+ 
+        # update slide input timer
+        self.slide_input_timer = max(0, self.slide_input_timer - 1)
+        if just_pressed[pygame.K_s]:
+            self.slide_input_timer = Player.SLIDE_INPUT_BUFFER
+        
+        # update jumping input timer
         self.holding_jump = pressed[pygame.K_SPACE]
         self.jump_input_timer = max(0, self.jump_input_timer - 1)
         if just_pressed[pygame.K_SPACE]:
             self.jump_input_timer = Player.JUMP_INPUT_BUFFER
 
-        self.slide_input_timer = max(0, self.slide_input_timer - 1)
-        if just_pressed[pygame.K_s]:
-            self.slide_input_timer = Player.SLIDE_INPUT_BUFFER
-
+        # update pressed left input timer
         self.pressed_left_timer = max(0, self.pressed_left_timer - 1)
         if pressed[pygame.K_a]:
             self.pressed_left_timer = Player.PRESSED_LEFT_BUFFER
 
+        # update pressed right input timer
         self.pressed_right_timer = max(0, self.pressed_right_timer - 1)
         if pressed[pygame.K_d]:
             self.pressed_right_timer = Player.PRESSED_RIGHT_BUFFER

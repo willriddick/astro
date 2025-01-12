@@ -4,7 +4,6 @@ from ..player import Player, PlayerState, Animation
 class Slide(State):
     def __init__(self):
         super().__init__(PlayerState.SLIDE)
-        self.timer = 0
     
     def on_enter(self):
         self.owner.sprite.set_animation(Animation.SLIDE)
@@ -14,14 +13,16 @@ class Slide(State):
         self.timer = Player.SLIDE_DURATION
 
     def update(self):
+        self.timer = max(0, self.timer - 1)
+
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
 
-        self.timer = max(0, self.timer - 1)
         goal_velocity = 0 if not self.timer else min(Player.SLIDE_SPEED, self.entry_speed)
         self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
     
-        if (self.owner.velocity.x == Player.GROUND_MOVE_SPEED
+        if (
+            self.owner.velocity.x == Player.GROUND_MOVE_SPEED
             or self.owner.move_dir.y != 1
         ):
             self.switch(PlayerState.RUN)
