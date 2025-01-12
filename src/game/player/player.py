@@ -1,5 +1,5 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, load_image, load_palette
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
 from .player_state import PlayerState
@@ -10,10 +10,13 @@ class Player(PhysicsEntity):
     GROUND_ACC = (0.1, 0.2) # (acceleration, deceleration)
     AIR_MOVE_SPEED = 1.3
     AIR_ACC = (0.05, 0.01)
+    PRESSED_LEFT_BUFFER = 5
+    PRESSED_RIGHT_BUFFER = 5
 
     GRAVITY = 0.14
     FALL_SPEED = 3.2
 
+    JUMP_INPUT_BUFFER = 4
     JUMP_SPEED = 3
     MAX_JUMPS = 1
     COYOTE_BUFFER = 7 # time after falling to allow jump
@@ -21,29 +24,23 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_BUFFER = 20 # time after jumping to allow variable jump
 
     SLIDE_INPUT_BUFFER = 14 # amount of time after pressing down to allow slide
-    SLIDE_DURATION = 15 # after this time, the player will decelerate to 0
+    SLIDE_DURATION = 12 # after this time, the player will decelerate to 0
     INITIAL_SLIDE_MULTIPLIER = 1.4 # multiplies velocity when entering slide state
-    SLIDE_SPEED = 1.6 
+    SLIDE_SPEED = 1.7
     SLIDE_ACC = (0.05, 0.05)
-    SLIDE_BUFFER = 7 # time after landing to allow slide
+    SLIDE_BUFFER = 10 # time after landing to allow slide
 
     WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
     WALL_JUMP_SPEED = (2, 2.6)
     WALL_JUMP_ACC = (0.13, 0.13)
-
     WALL_SLIDE_SPEED = 0.5
     WALL_SLIDE_GRAVITY = 0.05
     WALL_SLIDE_BUFFER = 10 # amount of time after wall sliding to allow wall jump
 
-    SLIDE_INPUT_BUFFER = 10
-    JUMP_INPUT_BUFFER = 4
-    PRESSED_LEFT_BUFFER = 5
-    PRESSED_RIGHT_BUFFER = 5
-
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=2):
+    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=1):
         super().__init__(pos, (8, 13))
 
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right

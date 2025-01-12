@@ -13,10 +13,9 @@ class TileMap:
         self.tileset = tileset
         self.size = size
         self.map: dict[tuple[int, int], Tile] = {}
+        self.debug = debug
 
         self.spawn_tile = None
-
-        self.debug = debug
     
     @property
     def tile_size(self) -> int:

@@ -14,11 +14,17 @@ class Slide(State):
 
     def update(self):
         self.timer = max(0, self.timer - 1)
-
         self.owner.handle_jump()
 
         goal_velocity = 0 if not self.timer else min(Player.SLIDE_SPEED, self.entry_speed)
-        self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
+
+        # if trying to move in opposite direction of slide
+        if self.owner.move_dir.x != 0 and self.owner.move_dir.x != self.owner.slide_dir:
+            # brake the slide
+            self.owner.accelerate_x(self.owner.move_dir.x, goal_velocity, Player.SLIDE_ACC * 8)
+        else:
+            # continue sliding in the same direction
+            self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
     
         if (
             self.owner.velocity.x == Player.GROUND_MOVE_SPEED
