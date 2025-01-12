@@ -46,7 +46,6 @@ class Sprite:
         if self.current != id_:
             self.frame = frame
             self.current = id_
-
             self.next_timer = 0
             self.next_animation = None
     
@@ -64,7 +63,7 @@ class Sprite:
             self.next_animation = id_
         else:
             self.set_animation(id_)
-  
+    
     def get_surface(self) -> pygame.Surface:
         return pygame.transform.flip(
             self.get_animation()[0][self.frame],

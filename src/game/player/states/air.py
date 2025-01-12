@@ -6,6 +6,9 @@ class Air(State):
     def __init__(self):
         super().__init__(PlayerState.AIR)
     
+    def on_enter(self):
+        self.owner.sprite.set_next(Animation.AIR_UP if self.owner.velocity.y < 0 else Animation.AIR_DOWN)
+
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
@@ -14,8 +17,8 @@ class Air(State):
 
         # handle rotation animation
         if self.owner.rotated:
-            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION)
-        self.owner.sprite.set_next(Animation.RUN)
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.AIR_ROTATE_DURATION)
+        self.owner.sprite.set_next(Animation.AIR_UP if self.owner.velocity.y < 0 else Animation.AIR_DOWN)
         
         if self.owner.move_dir.x != 0:
             self.owner.sprite.flip = self.owner.move_dir.x == -1

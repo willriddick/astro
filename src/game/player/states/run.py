@@ -8,7 +8,9 @@ class Run(State):
 
     def on_enter(self):
         self.timer = 0 # duration player has been in RUN state
-        self.owner.sprite.set_animation(Animation.RUN)
+        self.owner.sprite.set_next(Animation.RUN)
+        if self.owner.rotated:
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
         
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
@@ -17,8 +19,7 @@ class Run(State):
 
         # animate player
         if self.owner.rotated:
-            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION)
-        self.owner.sprite.set_next(Animation.RUN)
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
         
         if self.owner.move_dir.x != 0:
             self.owner.sprite.flip = self.owner.move_dir.x == -1

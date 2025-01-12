@@ -7,7 +7,7 @@ from .animation import Animation
 
 class Player(PhysicsEntity):
     GROUND_MOVE_SPEED = 1.15
-    GROUND_ACC = (0.1, 0.2) # (Acceleration, Deceleration)
+    GROUND_ACC = (0.1, 0.2) # (acceleration, deceleration)
     AIR_MOVE_SPEED = 1.3
     AIR_ACC = (0.05, 0.01)
 
@@ -41,6 +41,7 @@ class Player(PhysicsEntity):
     PRESSED_RIGHT_BUFFER = 5
 
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
+    AIR_ROTATE_DURATION = 15
 
     def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=2):
         super().__init__(pos, (8, 13))
