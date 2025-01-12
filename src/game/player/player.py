@@ -1,5 +1,5 @@
 import pygame
-from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, load_image, load_palette
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, load_image, load_palette
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
 from .player_state import PlayerState
@@ -40,10 +40,11 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11
     ROTATE_CHOICE = [1] # 0: back | 1: front 
 
-    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0)):
+    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=3):
         super().__init__(pos, (8, 13))
 
         # Velocity and acceleration
+        self.palette_index = palette_index
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
 
         # Jumping
@@ -67,9 +68,9 @@ class Player(PhysicsEntity):
 
         # Setup sprite
         sheet = swap_palette(
-            load_image('player/player.png', False),
-            load_palette('player/palette_key.png'), 
-            load_palette('player/palette2.png')
+            Assets.PLAYER_SHEET,
+            Assets.PLAYER_PALETTES[0],
+            Assets.PLAYER_PALETTES[self.palette_index],
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
 
