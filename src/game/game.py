@@ -35,9 +35,8 @@ class Game:
         self.players = list[Player]
    
     def new(self, seed=None):
-        self.tilemap = MapBuilder.generate('configs/test1.json', seed)
-
-        self.p1.set_pos(MapBuilder.get_spawn_pos(self.tilemap))
+        self.tilemap, spawn_tile = MapBuilder.generate('configs/test1.json', seed)
+        self.p1.set_pos(pygame.Vector2(spawn_tile.pixel_pos))
         self.p1.set_state(PlayerState.AIR)
 
         self.camera.move_to(self.p1.get_center(), instant=True)

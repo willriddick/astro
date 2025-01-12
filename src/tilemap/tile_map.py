@@ -43,15 +43,15 @@ class TileMap:
                 output.append(tile)
         return output
     
-    def get_tiles_around(self, tile_pos: tuple[int, int], filter: list[str]) -> list[Tile]:
+    def get_tiles_around(self, tile_pos: tuple[int, int], filter_: list[str]) -> list[Tile]:
         tiles = []
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
-            if tile and tile.type.name in filter:
+            if tile and tile.type.name in filter_:
                 tiles.append(tile)
         return tiles
     
-    def create_tile(self, type: TileType, variant: int, tile_pos: tuple[int, int]):
+    def create_tile(self, type: TileType, variant: int, tile_pos: tuple[int, int]) -> Tile:
         x, y = tile_pos
         if not (0 <= x < self.size[0] and 0 <= y < self.size[1]):
             return
@@ -61,6 +61,14 @@ class TileMap:
         new_tile = Tile(self, type, variant, tile_pos)
         self.map[tile_pos] = new_tile
         self._update_autotiles_around(tile_pos)
+
+        return new_tile
+    
+    def place_tile(self, tile: Tile, new_pos: tuple[int, int]):
+        tile.tile_pos = new_pos
+        self.map[new_pos] = tile
+        if tile.type.autotile:
+            self._update_autotiles_around(new_pos)
                 
     def remove_tile(self, tile_pos: tuple[int, int]):
         if tile := self.get_tile(tile_pos):
@@ -75,6 +83,15 @@ class TileMap:
             tile.tile_pos = (new_x, y)
         self.map = new_map
     
+    def get_valid_floor(self, filter_: list[str]) -> list[Tile]:
+        output = []
+        for tile in self.map.values():
+            if tile.type.name in filter_:
+                pos = tile.tile_pos
+                if self.get_tile(pos, Direction.UP) is None:
+                    output.append(tile)
+        return output
+    
     def place(self, room: 'Tilemap', offset: tuple[int, int], flip: bool):
         x_start = offset[0] * room.size[0]
         y_start = offset[1] * room.size[1]
@@ -88,7 +105,7 @@ class TileMap:
 
         for tile in room.map.values():
             new_pos = (x_start + tile.tile_pos[0], y_start + tile.tile_pos[1])
-            self.create_tile(tile.type, tile.variant, new_pos)
+            self.place_tile(tile, new_pos)
 
     def _update_autotiles_around(self, tile_pos: tuple[int, int]):
         for direction in Direction:
