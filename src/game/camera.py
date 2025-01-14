@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 from src.tilemap import TileMap
+from src.util import Assets
 from .entity import Entity
 
 class Camera:

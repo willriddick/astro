@@ -8,6 +8,10 @@ class Entity(pygame.sprite.Sprite):
         self.rect_size = rect_size
         self.sprite: Sprite = None
     
+    def update(self):
+        if self.sprite:
+            self.sprite.update(self.pos)
+    
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         assert self.sprite, 'Sprite not set {self}'
         self.sprite.render(display, offset)

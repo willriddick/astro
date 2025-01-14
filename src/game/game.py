@@ -5,6 +5,7 @@ from src.util import Assets, draw_transparent_rect
 from .player import Player, PlayerState
 from .camera import Camera
 from .map_builder import MapBuilder
+from .asteroid import AsteroidSpawner
 
 FPS = 60
 WINDOW_SCALE = 4
@@ -33,6 +34,8 @@ class Game:
         self.p1 = Player()
         self.camera.add(self.p1)
         self.players = list[Player]
+
+        self.asteroid_spawner = AsteroidSpawner()
    
     def new(self, seed=None):
         self.tilemap =  MapBuilder.generate('configs/test1.json', seed)
@@ -42,6 +45,11 @@ class Game:
         self.camera.move_to(self.p1.get_center(), instant=True)
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
+        
+        self.asteroid_spawner.clear()
+        self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
+        self.asteroid_spawner.spawn(10)
+        self.camera.add(self.asteroid_spawner)
     
     def run(self):
         self.running = True
@@ -67,6 +75,7 @@ class Game:
             else:
                 self.p1.update(self.tilemap)
                 self.camera.move_to(self.p1.get_center())
+                self.asteroid_spawner.update()
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))

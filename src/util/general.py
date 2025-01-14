@@ -1,3 +1,5 @@
+from random import randrange
+
 def approach(value: float, target: float, step: float) -> float:
     if value + step < target:
         return min(target, value + step)
@@ -5,3 +7,6 @@ def approach(value: float, target: float, step: float) -> float:
         return max(target, value - step)
     else:
         return target
+
+def randf(start: float, stop: float, step: float) -> float:
+    return randrange(int(start / step), int(stop / step)) * step

@@ -44,10 +44,13 @@ class Sprite:
     def set_animation(self, id_: int, frame: int = 0):
         assert id_ in self.animations, f'Animation {id_} not found'
         if self.current != id_:
-            self.frame = frame
             self.current = id_
+            self.frame = frame
             self.next_timer = 0
             self.next_animation = None
+    
+    def set_frame(self, frame: int):
+        self.frame = frame
     
     def get_animation(self) -> tuple[list[pygame.Surface], int]:
         return self.animations.get(self.current)

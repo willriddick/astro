@@ -1,5 +1,5 @@
 import pygame
-from .load import load_image, load_sprite_sheet 
+from .load import load_image, load_images, load_sprite_sheet 
 from .palette import Palette, load_palettes
 
 ASSET_PATH = 'assets/'
@@ -9,6 +9,7 @@ class Assets:
     TILESET = None
     PLAYER_SHEET: pygame.Surface = None
     PLAYER_PALETTES: list[Palette] = None
+    ASTEROIDS: list[pygame.Surface] = None
 
     @staticmethod
     def load_assets():
@@ -22,3 +23,5 @@ class Assets:
 
         Assets.PLAYER_SHEET = load_image('player/player.png', False)
         Assets.PLAYER_PALETTES = load_palettes('player/palettes')
+
+        Assets.ASTEROIDS = load_images('asteroids', True)

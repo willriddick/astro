@@ -23,6 +23,9 @@ class PhysicsEntity(Entity):
             Direction.LEFT: False
         }
     
+    def update(self):
+        super().update()
+    
     def accelerate_x(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.x = self.accelerate_decelerate(self.velocity.x, max_speed, dir_, acc, self.velocity_multiplier.x)
     
