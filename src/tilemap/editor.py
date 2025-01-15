@@ -24,6 +24,8 @@ class Editor:
 
         self.command_active = False
         self.command_input = ''
+        self.command_index = -1
+        self.command_history = []
 
         if args.load:
             self.last_path = args.load
@@ -77,8 +79,8 @@ class Editor:
 
                 # Calculate selected tile position
                 tile_pos = Vec2(
-                    int((mouse_pos.x + self.camera_offset[0]) // Assets.TILESET.tile_size), 
-                    int((mouse_pos.y + self.camera_offset[1]) // Assets.TILESET.tile_size)
+                    int((mouse_pos.x + self.camera_offset[0]) // Assets.TILESET.tile_size.x), 
+                    int((mouse_pos.y + self.camera_offset[1]) // Assets.TILESET.tile_size.y)
                 )
 
                 # Change tile type and variant
@@ -129,6 +131,9 @@ class Editor:
         sys.exit()
     
     def handle_command(self, command: str):
+        self.command_history.append(command)
+        self.command_index = -1
+
         match command.split():
             case ['help' | 'h']:
                 print('Available commands:')
@@ -149,7 +154,7 @@ class Editor:
                 self.tilemap.clear()
                 print(f'Tilemap cleared')
             case ['size' | 'z', width, height]:
-                self.tilemap.set_size((int(width), int(height)))
+                self.tilemap.set_size(Vec2(int(width), int(height)))
             case ['place', path, x, y, flip]:
                 room = TileMap.load(path, Assets.TILESET)
                 self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
@@ -159,94 +164,108 @@ class Editor:
                 print(f'Unknown command: {command}')
 
     def move_camera(self):
-        keys = pygame.key.get_pressed()
-        self.camera_direction = Vec2(
-            keys[pygame.K_d] - keys[pygame.K_a],
-            keys[pygame.K_s] - keys[pygame.K_w]
-        )
-        self.camera_offset = pygame.Vector2(
-            round(self.camera_offset.x + self.camera_direction.x * self.camera_speed.x),
-            round(self.camera_offset.y + self.camera_direction.y * self.camera_speed.y)
-        )
+        if not self.command_active:
+            keys = pygame.key.get_pressed()
+            self.camera_direction = Vec2(
+                keys[pygame.K_d] - keys[pygame.K_a],
+                keys[pygame.K_s] - keys[pygame.K_w]
+            )
+            self.camera_offset = pygame.Vector2(
+                round(self.camera_offset.x + self.camera_direction.x * self.camera_speed.x),
+                round(self.camera_offset.y + self.camera_direction.y * self.camera_speed.y)
+            )
     
     def draw_tile_square(self, tile_pos):
         tile_size = Assets.TILESET.tile_size
-        current_tile = pygame.Surface((tile_size, tile_size), pygame.SRCALPHA)
+        current_tile = pygame.Surface((tile_size.x, tile_size.y), pygame.SRCALPHA)
         current_tile.set_alpha(100)
         pygame.draw.rect(
             current_tile, (255, 255, 255),
-            (0, 0, tile_size, tile_size), 1
+            (0, 0, tile_size.x, tile_size.y), 1
         )
         self.display.blit(
             current_tile, 
-            (tile_pos[0] * tile_size - self.camera_offset[0], 
-            tile_pos[1] * tile_size - self.camera_offset[1])
+            (tile_pos.x * tile_size.x - self.camera_offset.x, 
+            tile_pos.y * tile_size.y - self.camera_offset.y)
         )
     
     def draw_border(self):
         tile_size = Assets.TILESET.tile_size
         size = self.tilemap.size
-        border = pygame.Surface((size[0] * tile_size, size[1] * tile_size), pygame.SRCALPHA)
+        border = pygame.Surface((size.x * tile_size.x, size.y * tile_size.y), pygame.SRCALPHA)
         border.set_alpha(100)
         pygame.draw.rect(
             border, (255, 0, 0),
-            (0, 0, size[0] * tile_size, size[1] * tile_size), 1
+            (0, 0, size.x * tile_size.x, size.y * tile_size.y), 1
         )
-        self.display.blit(border, (-self.camera_offset[0], -self.camera_offset[1]))
+        self.display.blit(border, (-self.camera_offset.x, -self.camera_offset.y))
     
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:
             self.running = False
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LSHIFT:
-                self.shift_pressed = True
-            if event.key == pygame.K_q:
-                self.q_pressed = True
-            if event.key == pygame.K_e:
-                self.e_pressed = True
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LSHIFT:
-                self.shift_pressed = False
-            if event.key == pygame.K_q:
-                self.q_pressed = False
-            if event.key == pygame.K_e:
-                self.e_pressed = False
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                self.left_click = True
-            if event.button == 3:
-                self.right_click = True
-        if event.type == pygame.MOUSEBUTTONUP: 
-            if event.button == 1:
-                self.left_click = False
-            if event.button == 3:
-                self.right_click = False
-
-        if event.type == pygame.KEYDOWN:
-            if not self.command_active:
-                if event.key == pygame.K_SLASH:
-                    self.command_active = True
-                    self.command_input = ''
-            else:
+        if self.command_active:
+            if event.type == pygame.KEYDOWN:
                 match event.key:
                     case pygame.K_RETURN:
                         if self.command_input:
                             self.handle_command(self.command_input)
                         self.command_active = False
                         self.command_input = ''
+                        self.command_index = -1
                     case pygame.K_ESCAPE:
                         self.command_active = False
                         self.command_input = ''
+                        self.command_index = -1
                     case pygame.K_BACKSPACE:
                         self.command_input = self.command_input[:-1]
+                    case pygame.K_UP:
+                        self.command_index = (self.command_index - 1) % len(self.command_history)
+                        self.command_input = self.command_history[self.command_index]
+                    case pygame.K_DOWN:
+                        if self.command_index == len(self.command_history) - 1:
+                            self.command_input = ''
+                            self.command_index = -1
+                        else:
+                            self.command_index = (self.command_index + 1) % len(self.command_history)
+                            self.command_input = self.command_history[self.command_index]
                     case _:
                         self.command_input += event.unicode
+        else:
+            # Handle regular key events
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LSHIFT:
+                    self.shift_pressed = True
+                elif event.key == pygame.K_q:
+                    self.q_pressed = True
+                elif event.key == pygame.K_e:
+                    self.e_pressed = True
+                elif event.key == pygame.K_SLASH:
+                    self.command_active = True
+                    self.command_input = ''
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LSHIFT:
+                    self.shift_pressed = False
+                elif event.key == pygame.K_q:
+                    self.q_pressed = False
+                elif event.key == pygame.K_e:
+                    self.e_pressed = False
+
+            # Handle mouse button events
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    self.left_click = True
+                elif event.button == 3:
+                    self.right_click = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    self.left_click = False
+                elif event.button == 3:
+                    self.right_click = False
 
 def parse_tuple(s):
     try:
-        return tuple(map(int, s.split(',')))
+        return Vec2(map(int, s.split(',')))
     except ValueError:
         raise argparse.ArgumentTypeError("Tuple must be in the form \"int,int\"")
 
