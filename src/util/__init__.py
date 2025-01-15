@@ -6,3 +6,4 @@ from .state import State
 from .general import approach, randf
 from .draw import draw_transparent_rect
 from .types import Vec2, Direction
+from .command_prompt import CommandPrompt

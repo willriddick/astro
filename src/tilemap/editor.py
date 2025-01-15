@@ -1,7 +1,7 @@
 import sys
 import argparse
 import pygame
-from src.util import Assets, Vec2
+from src.util import Assets, Vec2, CommandPrompt
 from .tile_map import TileMap
 from .tile_type import TileType
 
@@ -33,6 +33,8 @@ class Editor:
         self.shift_pressed = False
         self.q_pressed = False
         self.e_pressed = False
+
+        self.command_prompt = CommandPrompt()
     
     def run(self):
         mouse_pos = Vec2(0, 0)
@@ -47,6 +49,7 @@ class Editor:
 
             for event in pygame.event.get():
                 self.handle_event(event)
+                self.command_prompt.handle_event(event)
 
             # Calculate mouse position
             mouse_pos = Vec2(
@@ -94,6 +97,9 @@ class Editor:
             # Draw border
             self.draw_border()
 
+            # Draw command prompt
+            self.command_prompt.render(self.display)
+
             # Update display
             self.move_camera() 
 
@@ -107,6 +113,36 @@ class Editor:
         pygame.quit()
         sys.exit()
     
+    def handle_command(self, command: str):
+        match command.split():
+            case ['help' | 'h']:
+                print('Available commands:')
+                print('/help - Show this help message')
+                print('/save <path> - Save the tilemap to the specified path')
+                print('/load <path> - Load the tilemap from the specified path')
+                print('/clear - Clear the tilemap')
+                print('/quit - Quit the editor\n')
+            case ['save' | 's']:
+                if self.last_path:
+                    TileMap.save(self.tilemap, self.last_path)
+            case ['save' | 's', path]:
+                TileMap.save(self.tilemap, path)
+            case ['load' | 'l', path]:
+                self.last_path = path
+                self.tilemap = TileMap.load(path, Assets.TILESET)
+            case ['clear' | 'c']: 
+                self.tilemap.clear()
+                print(f'Tilemap cleared')
+            case ['size' | 'z', width, height]:
+                self.tilemap.set_size(Vec2(int(width), int(height)))
+            case ['place', path, x, y, flip]:
+                room = TileMap.load(path, Assets.TILESET)
+                self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
+            case ['quit' | 'q']:
+                self.running = False
+            case _:
+                print(f'Unknown command: {command}')
+
     def move_camera(self):
         keys = pygame.key.get_pressed()
         self.camera_direction = Vec2(
