@@ -1,7 +1,7 @@
 import sys
 import argparse
 import pygame
-from src.util import Assets, draw_transparent_rect
+from src.util import Assets, draw_transparent_rect, Vec2
 from .tile_map import TileMap
 from .tile_type import TileType
 
@@ -34,9 +34,9 @@ class Editor:
         if args.size:
             self.tilemap.set_size(args.size)
        
-        self.camera_direction = (0, 0)
-        self.camera_speed = (2, 2)
-        self.camera_offset = (0, 0)
+        self.camera_direction = Vec2(0, 0)
+        self.camera_speed = Vec2(2, 2)
+        self.camera_offset = pygame.Vector2(0, 0)
     
         self.left_click = False
         self.right_click = False
@@ -45,8 +45,8 @@ class Editor:
         self.e_pressed = False
     
     def run(self):
-        mouse_pos = (0, 0)
-        tile_pos = (0, 0)
+        mouse_pos = Vec2(0, 0)
+        tile_pos = Vec2(0, 0)
         type_index = 0
         tile_type: TileType = Assets.TILESET.get_by_index(type_index)
         tile_variant = 0
@@ -70,15 +70,15 @@ class Editor:
                 self.display.blit(text_surf, (4, DISPLAY_HEIGHT - 8))            
             else:
                 # Calculate mouse position
-                mouse_pos = (
+                mouse_pos = Vec2(
                     pygame.mouse.get_pos()[0] / RENDER_SCALE, 
                     pygame.mouse.get_pos()[1] / RENDER_SCALE
                 )
 
                 # Calculate selected tile position
-                tile_pos = (
-                    int((mouse_pos[0] + self.camera_offset[0]) // Assets.TILESET.tile_size), 
-                    int((mouse_pos[1] + self.camera_offset[1]) // Assets.TILESET.tile_size)
+                tile_pos = Vec2(
+                    int((mouse_pos.x + self.camera_offset[0]) // Assets.TILESET.tile_size), 
+                    int((mouse_pos.y + self.camera_offset[1]) // Assets.TILESET.tile_size)
                 )
 
                 # Change tile type and variant
@@ -160,13 +160,13 @@ class Editor:
 
     def move_camera(self):
         keys = pygame.key.get_pressed()
-        self.camera_direction = (
+        self.camera_direction = Vec2(
             keys[pygame.K_d] - keys[pygame.K_a],
             keys[pygame.K_s] - keys[pygame.K_w]
         )
-        self.camera_offset = (
-            round(self.camera_offset[0] + self.camera_direction[0] * self.camera_speed[0]),
-            round(self.camera_offset[1] + self.camera_direction[1] * self.camera_speed[1])
+        self.camera_offset = pygame.Vector2(
+            round(self.camera_offset.x + self.camera_direction.x * self.camera_speed.x),
+            round(self.camera_offset.y + self.camera_direction.y * self.camera_speed.y)
         )
     
     def draw_tile_square(self, tile_pos):

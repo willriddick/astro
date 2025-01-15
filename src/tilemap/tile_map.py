@@ -4,15 +4,16 @@ from src.util import Direction
 from .tile_set import TileSet
 from .tile import Tile
 from .tile_type import TileType
+from src.util import Vec2
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class TileMap:
-    def __init__(self, tileset: TileSet, size: tuple[int, int]=(0, 0), debug: bool = False):
+    def __init__(self, tileset: TileSet, size: Vec2=Vec2(0,0), debug: bool = False):
         self.tileset = tileset
         self.size = size
-        self.map: dict[tuple[int, int], Tile] = {}
+        self.map: dict[Vec2, Tile] = {}
         self.debug = debug
 
         self.spawn_tile = None
@@ -22,30 +23,26 @@ class TileMap:
         return self.tileset.tile_size
     
     def get_rect(self) -> pygame.Rect:
-        return pygame.Rect(0, 0, self.size[0] * self.tile_size, self.size[1] * self.tile_size)
+        return pygame.Rect(0, 0, self.size.x * self.tile_size, self.size.y * self.tile_size)
 
-    def set_size(self, size: tuple[int, int]):
+    def set_size(self, size: Vec2):
         self.size = size
     
     def clear(self):
         self.map = {}
     
-    def render(self, surf: pygame.Surface, offset=(0, 0)):
+    def render(self, surf: pygame.Surface, offset: pygame.Vector2):
         for tile in self.map.values():
             tile.render(surf, offset)
     
-    def get_tile(self, tile_pos: tuple[int, int], direction: Direction = Direction.NONE) -> Tile | None:
-        new_pos = (tile_pos[0] + direction.value[0], tile_pos[1] + direction.value[1])
+    def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
+        new_pos = Vec2(tile_pos.x + offset.value.x, tile_pos.y + offset.value.y)
         return self.map.get(new_pos)
     
     def get_tiles_with_type(self, type: str) -> list[Tile]:
-        output = []
-        for tile in self.map.values():
-            if tile.type.name == type:
-                output.append(tile)
-        return output
+        return list(filter(lambda x: x.type.name == type, self.map.values))
     
-    def get_tiles_around(self, tile_pos: tuple[int, int], filter_: list[str]) -> list[Tile]:
+    def get_tiles_around(self, tile_pos: Vec2, filter_: list[str]) -> list[Tile]:
         tiles = []
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
@@ -53,7 +50,7 @@ class TileMap:
                 tiles.append(tile)
         return tiles
     
-    def create_tile(self, type: TileType, variant: int, tile_pos: tuple[int, int]) -> Tile:
+    def create_tile(self, type: TileType, variant: int, tile_pos: Vec2) -> Tile:
         if tile_pos in self.map:
             self.remove_tile(tile_pos)
         new_tile = Tile(self, type, variant, tile_pos)
@@ -62,17 +59,17 @@ class TileMap:
 
         return new_tile
     
-    def remove_tile(self, tile_pos: tuple[int, int]):
+    def remove_tile(self, tile_pos: Vec2):
         if tile := self.get_tile(tile_pos):
             del self.map[tile.tile_pos]
             self._update_autotiles_around(tile_pos)
     
-    def flip(self):
+    def flip_x(self):
         new_map = {}
-        for (x, y), tile in self.map.items():
-            new_x = self.size[0] - x - 1
-            new_map[(new_x, y)] = tile
-            tile.tile_pos = (new_x, y)
+        for pos, tile in self.map.items():
+            new_x = self.size.x - pos.x - 1
+            new_map[(new_x, pos.y)] = tile
+            tile.tile_pos = (new_x, pos.y)
         self.map = new_map
     
     def get_valid_floor(self, filter_: list[str]) -> list[Tile]:
@@ -89,28 +86,28 @@ class TileMap:
                     output.append(tile)
         return output
     
-    def place_tile(self, tile: Tile, new_pos: tuple[int, int]):
+    def place_tile(self, tile: Tile, new_pos: Vec2):
         tile.tile_pos = new_pos
         self.map[new_pos] = tile
         if tile.type.autotile:
             self._update_autotiles_around(new_pos)
     
-    def place_map(self, map_: 'Tilemap', offset: tuple[int, int], flip: bool):
-        x_start = offset[0] * map_.size[0]
-        y_start = offset[1] * map_.size[1]
+    def place_tilemap(self, tilemap: 'Tilemap', offset: Vec2, flip: bool):
+        x_start = offset.x * tilemap.size.x
+        y_start = offset.y * tilemap.size.y
         self.size = (
-            max(self.size[0], map_.size[0] * (offset[0] + 1)), 
-            max(self.size[1], map_.size[1] * (offset[1] + 1))
+            max(self.size.x, tilemap.size.x * (offset.x + 1)), 
+            max(self.size.y, tilemap.size.y * (offset.y + 1))
         )
 
         if flip:
-            map_.flip()
+            tilemap.flip_x()
 
-        for tile in map_.map.values():
-            new_pos = (x_start + tile.tile_pos[0], y_start + tile.tile_pos[1])
+        for tile in tilemap.map.values():
+            new_pos = Vec2(x_start + tile.tile_pos.x, y_start + tile.tile_pos.y)
             self.place_tile(tile, new_pos)
 
-    def _update_autotiles_around(self, tile_pos: tuple[int, int]):
+    def _update_autotiles_around(self, tile_pos: Vec2):
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
             if tile and tile.type.autotile:
@@ -184,7 +181,7 @@ class TileMap:
             for offset in range(header_offset, len(content), step):
                 data = struct.unpack(TILE_FORMAT, content[offset:offset + step])
                 type = tileset.get_by_name(data[0].decode().rstrip('\00'))
-                tilemap.create_tile(type, data[1], (data[2], data[3]))
+                tilemap.create_tile(type, data[1], Vec2(data[2], data[3]))
 
             return tilemap
         except FileNotFoundError:
