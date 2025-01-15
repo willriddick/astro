@@ -1,3 +1,4 @@
+import json
 import struct
 import pygame
 from src.util import Direction
@@ -10,20 +11,17 @@ HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
 class TileMap:
-    def __init__(self, tileset: TileSet, size: Vec2=Vec2(0,0), debug: bool = False):
+    def __init__(self, tileset: TileSet, size: Vec2=Vec2(0,0)):
         self.tileset = tileset
         self.size = size
         self.map: dict[Vec2, Tile] = {}
-        self.debug = debug
-
-        self.spawn_tile = None
     
     @property
-    def tile_size(self) -> int:
+    def tile_size(self) -> Vec2:
         return self.tileset.tile_size
     
     def get_rect(self) -> pygame.Rect:
-        return pygame.Rect(0, 0, self.size.x * self.tile_size, self.size.y * self.tile_size)
+        return pygame.Rect(0, 0, self.size.x * self.tile_size.x, self.size.y * self.tile_size.y)
 
     def set_size(self, size: Vec2):
         self.size = size
@@ -39,7 +37,7 @@ class TileMap:
         new_pos = Vec2(tile_pos.x + offset.value.x, tile_pos.y + offset.value.y)
         return self.map.get(new_pos)
     
-    def get_tiles_with_type(self, type: str) -> list[Tile]:
+    def get_tiles_with(self, type: str) -> list[Tile]:
         return list(filter(lambda x: x.type.name == type, self.map.values))
     
     def get_tiles_around(self, tile_pos: Vec2, filter_: list[str]) -> list[Tile]:
@@ -81,7 +79,7 @@ class TileMap:
                     self.get_tile((x, y - 1)) is None 
                     and y - 1 >= 0
                     and x > 0 
-                    and x < self.size[0] - 1
+                    and x < self.size.x - 1
                 ):
                     output.append(tile)
         return output
@@ -95,7 +93,7 @@ class TileMap:
     def place_tilemap(self, tilemap: 'Tilemap', offset: Vec2, flip: bool):
         x_start = offset.x * tilemap.size.x
         y_start = offset.y * tilemap.size.y
-        self.size = (
+        self.size = Vec2(
             max(self.size.x, tilemap.size.x * (offset.x + 1)), 
             max(self.size.y, tilemap.size.y * (offset.y + 1))
         )
@@ -153,35 +151,47 @@ class TileMap:
 
         # Update variant
         tile.variant = variant
-   
+  
+    import json
+
     @staticmethod
-    def save(tilemap, path: str):
+    def save(tilemap: 'Tilemap', path: str):
         try:
-            with open(path, 'wb') as f:
-                f.write(struct.pack(HEADER_FORMAT, tilemap.tile_size, *tilemap.size))
-                for tile in tilemap.map.values():
-                    f.write(struct.pack(
-                        TILE_FORMAT, tile.type.name.encode(), tile.variant, *tile.tile_pos
-                    ))
+            tilemap_data = {
+                'size': list(tilemap.size),
+                'tiles': []
+            }
+
+            for tile in tilemap.map.values():
+                tile_data = {
+                    'type': tile.type.name,
+                    'variant': tile.variant,
+                    'tile_pos': {'x': tile.tile_pos.x, 'y': tile.tile_pos.y}
+                }
+                tilemap_data['tiles'].append(tile_data)
+
+            # Write data to JSON file
+            with open(path, 'w') as f:
+                json.dump(tilemap_data, f, indent=4)
+
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
             print(f'Save failed... file not found: {path}')
-
+    
     @staticmethod
     def load(path: str, tileset: TileSet) -> 'TileMap':
         try:
-            with open(path, 'rb') as f:
-                content = f.read()
+            # Read data from JSON file
+            with open(path, 'r') as f:
+                tilemap_data = json.load(f)
 
-            header_offset = struct.calcsize(HEADER_FORMAT)
-            tile_size, *size = struct.unpack(HEADER_FORMAT, content[:header_offset])
-            tilemap = TileMap(tileset, size)
+            # Reconstruct tilemap from data
+            tilemap = TileMap(tileset, Vec2(*tilemap_data['size']))
 
-            step = struct.calcsize(TILE_FORMAT)
-            for offset in range(header_offset, len(content), step):
-                data = struct.unpack(TILE_FORMAT, content[offset:offset + step])
-                type = tileset.get_by_name(data[0].decode().rstrip('\00'))
-                tilemap.create_tile(type, data[1], Vec2(data[2], data[3]))
+            for tile_data in tilemap_data['tiles']:
+                tile_type = tileset.get_by(tile_data['type'])
+                tile_pos = Vec2(tile_data['tile_pos']['x'], tile_data['tile_pos']['y'])
+                tilemap.create_tile(tile_type, tile_data['variant'], tile_pos)
 
             return tilemap
         except FileNotFoundError:
