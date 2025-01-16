@@ -1,6 +1,6 @@
 import pygame
 from src.tilemap import TileMap
-from src.util import approach, Direction
+from src.util import approach, Direction, Vec2
 from .entity import Entity
 
 class PhysicsEntity(Entity):
@@ -58,7 +58,7 @@ class PhysicsEntity(Entity):
             return
 
         # Update tile position
-        tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
+        tile_pos = Vec2(self.pos.x // tilemap.tile_size.x, self.pos.y // tilemap.tile_size.y)
         self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])
 
         # Update y position

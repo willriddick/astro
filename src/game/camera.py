@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 from src.tilemap import TileMap
-from src.util import Assets
+from src.util import Assets, Vec2
 from .entity import Entity
 
 class Camera:
@@ -45,13 +45,13 @@ class Camera:
             return
 
         tile_size = tilemap.tile_size
-        x_start = int(-self.offset.x // tile_size)
-        x_stop = int((self.offset.x + self.display.width) // tile_size + 1)
-        y_start = int(-self.offset.y // tile_size)
-        y_stop = int((self.offset.y + self.height) // tile_size + 1)
+        x_start = int(-self.offset.x // tile_size.x)
+        x_stop = int((self.offset.x + self.display.width) // tile_size.x + 1)
+        y_start = int(-self.offset.y // tile_size.y)
+        y_stop = int((self.offset.y + self.height) // tile_size.y + 1)
         for x in range(x_start, x_stop):
             for y in range(y_start, y_stop):
-                tile = tilemap.get_tile((x, y))
+                tile = tilemap.get_tile(Vec2(x, y))
                 if tile:
                     tile.render(self.display, self.offset)
         

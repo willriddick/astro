@@ -76,7 +76,7 @@ class TileMap:
             if tile.type.name in filter_:
                 x, y = tile.tile_pos
                 if (
-                    self.get_tile((x, y - 1)) is None 
+                    self.get_tile(Vec2(x, y - 1)) is None 
                     and y - 1 >= 0
                     and x > 0 
                     and x < self.size.x - 1
