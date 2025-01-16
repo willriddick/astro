@@ -29,7 +29,6 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
-
         self.p1 = Player()
         self.camera.add(self.p1)
         self.players = list[Player]

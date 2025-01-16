@@ -42,7 +42,6 @@ class CommandPrompt:
         return last
 
     def handle_event(self, event: pygame.Event):
-        # Handle commands if enabled
         if self.enabled and event.type == pygame.KEYDOWN:
             match event.key:
                 case pygame.K_RETURN:
@@ -52,35 +51,70 @@ class CommandPrompt:
                 case pygame.K_ESCAPE:
                     self.disable()
                 case pygame.K_UP:
-                    self.history_index = max(self.history_index - 1, 0)
-                    if len(self.history) > 0:
-                        self.input = self.history[self.history_index]
-                        self.cursor_index = len(self.input)
+                    self.handle_up_arrow()
                 case pygame.K_DOWN:
-                    self.history_index = min(self.history_index + 1, len(self.history))
-                    if self.history_index == len(self.history):
-                        self.input = ''
-                    else:
-                        self.input = self.history[self.history_index]
-                    self.cursor_index = len(self.input)
+                    self.handle_down_arrow()
                 case pygame.K_LEFT:
-                    self.cursor_index = max(self.cursor_index - 1, 0)
+                    self.handle_left_arrow(event)
                 case pygame.K_RIGHT:
-                    self.cursor_index = min(self.cursor_index + 1, len(self.input))
+                    self.handle_right_arrow(event)
                 case pygame.K_BACKSPACE:
-                    if self.cursor_index > 0:
-                        self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
-                        self.cursor_index -= 1
+                    self.handle_backspace(event)
                 case _:
-                    if ALLOWED_CHARACTERS.match(event.unicode):
-                        self.input = self.input[:self.cursor_index] + event.unicode + self.input[self.cursor_index:]
-                        self.cursor_index += 1
+                    self.handle_character_input(event)
 
         # Enabled prompt with K_SLASH
         if (not self.enabled 
             and event.type == pygame.KEYDOWN 
             and event.key == pygame.K_SLASH):
             self.enable()
+    
+    def handle_up_arrow(self):
+        self.history_index = max(self.history_index - 1, 0)
+        if len(self.history) > 0:
+            self.input = self.history[self.history_index]
+            self.cursor_index = len(self.input)
+
+    def handle_down_arrow(self):
+        self.history_index = min(self.history_index + 1, len(self.history))
+        if self.history_index == len(self.history):
+            self.input = ''
+        else:
+            self.input = self.history[self.history_index]
+        self.cursor_index = len(self.input)
+
+    def handle_left_arrow(self, event):
+        if event.mod & pygame.KMOD_CTRL:
+            self.cursor_index = 0
+        else:
+            self.cursor_index = max(self.cursor_index - 1, 0)
+
+    def handle_right_arrow(self, event):
+        if event.mod & pygame.KMOD_CTRL:
+            self.cursor_index = len(self.input)
+        else:
+            self.cursor_index = min(self.cursor_index + 1, len(self.input))
+
+    def handle_backspace(self, event):
+        if event.mod & pygame.KMOD_CTRL:
+            # Delete until the next word boundary (space or underscore)
+            if self.cursor_index > 0:
+                while self.cursor_index > 0 and self.input[self.cursor_index - 1] not in (' ', '_'):
+                    self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
+                    self.cursor_index -= 1
+                # Remove the space or underscore if present
+                if self.cursor_index > 0 and self.input[self.cursor_index - 1] in (' ', '_'):
+                    self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
+                    self.cursor_index -= 1
+        else:
+            if self.cursor_index > 0:
+                self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
+                self.cursor_index -= 1
+
+    def handle_character_input(self, event):
+        if ALLOWED_CHARACTERS.match(event.unicode):
+            self.input = self.input[:self.cursor_index] + event.unicode + self.input[self.cursor_index:]
+            self.cursor_index += 1
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
