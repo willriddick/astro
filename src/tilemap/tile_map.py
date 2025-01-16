@@ -66,8 +66,8 @@ class TileMap:
         new_map = {}
         for pos, tile in self.map.items():
             new_x = self.size.x - pos.x - 1
-            new_map[(new_x, pos.y)] = tile
-            tile.tile_pos = (new_x, pos.y)
+            new_map[Vec2(new_x, pos.y)] = tile
+            tile.tile_pos = Vec2(new_x, pos.y)
         self.map = new_map
     
     def get_valid_floor(self, filter_: list[str]) -> list[Tile]:

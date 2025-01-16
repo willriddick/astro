@@ -45,10 +45,10 @@ class Game:
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
         
-        self.asteroid_spawner.clear()
-        self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
-        self.asteroid_spawner.spawn(10)
-        self.camera.add(self.asteroid_spawner)
+        #self.asteroid_spawner.clear()
+        #self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
+        #self.asteroid_spawner.spawn(10)
+        #self.camera.add(self.asteroid_spawner)
     
     def run(self):
         self.running = True
@@ -67,7 +67,7 @@ class Game:
                 
                 self.p1.update(self.tilemap)
                 self.camera.move_to(self.p1.get_center())
-                self.asteroid_spawner.update()
+                #self.asteroid_spawner.update()
 
             # Draw command prompt
             self.command_prompt.render(self.camera.display)

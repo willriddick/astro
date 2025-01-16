@@ -43,7 +43,7 @@ class MapBuilder:
                 pos = random.choice(floors).tile_pos
                 spawn_tile = new_map.create_tile(Assets.TILESET.get_by('door'), 0, Vec2(pos[0], pos[1] - 1))
 
-            tilemap.place_tilemap(new_map, room.position, False)
+            tilemap.place_tilemap(new_map, room.position, flip_x)
         
         tilemap.spawn_tile = spawn_tile
         return tilemap
