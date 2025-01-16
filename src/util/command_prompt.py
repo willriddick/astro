@@ -1,9 +1,10 @@
-import time
+import re
 import pygame
 from .assets import Assets
 from .draw import draw_transparent_rect
 
 RECT_COLOR = (0, 40, 80)
+ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:
     def __init__(self):
@@ -71,7 +72,7 @@ class CommandPrompt:
                         self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
                         self.cursor_index -= 1
                 case _:
-                    if event.unicode.isprintable():
+                    if ALLOWED_CHARACTERS.match(event.unicode):
                         self.input = self.input[:self.cursor_index] + event.unicode + self.input[self.cursor_index:]
                         self.cursor_index += 1
 

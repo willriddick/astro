@@ -37,7 +37,7 @@ class Game:
         self.asteroid_spawner = AsteroidSpawner()
    
     def new(self, seed=None):
-        self.tilemap =  MapBuilder.generate('configs/test1.json', seed)
+        self.tilemap =  MapBuilder.generate('configs/1.json', seed)
         self.p1.set_pos(pygame.Vector2(self.tilemap.spawn_tile.pixel_pos))
         self.p1.set_state(PlayerState.AIR)
 
