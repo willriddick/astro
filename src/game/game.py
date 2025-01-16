@@ -1,7 +1,7 @@
 import sys
 import pygame
 from src.tilemap import TileMap 
-from src.util import Assets, draw_transparent_rect
+from src.util import Assets, CommandPrompt
 from .player import Player, PlayerState
 from .camera import Camera
 from .map_builder import MapBuilder
@@ -19,6 +19,7 @@ class Game:
 
         self.running = False
         self.clock = pygame.time.Clock()
+        self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
@@ -28,8 +29,6 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
-        self.command_active = False
-        self.command_input = ''
 
         self.p1 = Player()
         self.camera.add(self.p1)
@@ -58,24 +57,20 @@ class Game:
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
+                self.command_prompt.handle_event(event)
             
-            self.camera.update()
-            self.debug_display()
+            self.handle_commands()
             
-            if self.command_active:
-                draw_transparent_rect(
-                    self.camera.display, 
-                    rect=pygame.Rect(0, self.camera.height - 12, self.camera.width, 12),
-                    color=(0, 0, 0), 
-                    alpha=128
-                )
-                text = f'/{self.command_input}'
-                text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
-                self.camera.display.blit(text_surf, (4, self.camera.height - 8))
-            else:
+            if not self.command_prompt.enabled:
+                self.camera.update()
+                self.debug_display()
+                
                 self.p1.update(self.tilemap)
                 self.camera.move_to(self.p1.get_center())
                 self.asteroid_spawner.update()
+
+            # Draw command prompt
+            self.command_prompt.render(self.camera.display)
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -94,7 +89,11 @@ class Game:
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         self.camera.display.blit(text_surf, (0, 0))
 
-    def handle_command(self, command: str):
+    def handle_commands(self):
+        command = self.command_prompt.pop_command()
+        if command == '': 
+            return
+
         match command.split():
             case ['load', path]:
                 self.tilemap = TileMap.load(path, self.TYPES)
@@ -126,25 +125,6 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen()
-        if event.type == pygame.KEYDOWN:
-            if not self.command_active:
-                if event.key == pygame.K_SLASH:
-                    self.command_active = True
-                    self.command_input = ''
-            else:
-                match event.key:
-                    case pygame.K_RETURN:
-                        if self.command_input:
-                            self.handle_command(self.command_input)
-                        self.command_active = False
-                        self.command_input = ''
-                    case pygame.K_ESCAPE:
-                        self.command_active = False
-                        self.command_input = ''
-                    case pygame.K_BACKSPACE:
-                        self.command_input = self.command_input[:-1]
-                    case _:
-                        self.command_input += event.unicode
     
     def handle_resize(self, width, height):
         new_width = width

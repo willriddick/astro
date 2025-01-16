@@ -47,6 +47,7 @@ class CommandPrompt:
                 case pygame.K_RETURN:
                     if self.input:
                         self.handle_command(self.input)
+                    self.disable()
                 case pygame.K_ESCAPE:
                     self.disable()
                 case pygame.K_UP:
