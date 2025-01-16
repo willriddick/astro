@@ -11,10 +11,30 @@ class MapBuilder:
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
 
         for room in level.map.values():
-            map_folder = f'maps/{room.key}' 
+            map_folder = ''
+            flip_x = False
+
+            match room.key:
+                case 1 | 2:  
+                    map_folder = 'maps/1_2'
+                    flip_x = room.key == 2
+                case 5 | 6:
+                    map_folder = 'maps/5_6'
+                    flip_x = room.key == 6
+                case 9 | 10:
+                    map_folder = 'maps/9_10'
+                    flip_x = room.key == 10
+                case 13 | 14:
+                    map_folder = 'maps/13_14'
+                    flip_x = room.key == 14
+                case _:
+                    map_folder = f'maps/{room.key}'
+                    flip_x = random.choice([True, False])
+            
             map_paths: list[str] = []
             for name in os.listdir(map_folder):
                 map_paths.append(map_folder + '/' + name)
+
             map_path = random.choice(map_paths)
             new_map = TileMap.load(map_path, Assets.TILESET)
             
