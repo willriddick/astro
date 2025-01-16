@@ -152,8 +152,6 @@ class TileMap:
         # Update variant
         tile.variant = variant
   
-    import json
-
     @staticmethod
     def save(tilemap: 'Tilemap', path: str):
         try:
@@ -164,15 +162,15 @@ class TileMap:
 
             for tile in tilemap.map.values():
                 tile_data = {
-                    'type': tile.type.name,
-                    'variant': tile.variant,
-                    'tile_pos': {'x': tile.tile_pos.x, 'y': tile.tile_pos.y}
+                    't': tile.type.name,
+                    'v': tile.variant,
+                    'p': {'x': tile.tile_pos.x, 'y': tile.tile_pos.y}
                 }
                 tilemap_data['tiles'].append(tile_data)
 
             # Write data to JSON file
             with open(path, 'w') as f:
-                json.dump(tilemap_data, f, indent=4)
+                json.dump(tilemap_data, f, separators=(',', ':'))
 
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
@@ -189,9 +187,9 @@ class TileMap:
             tilemap = TileMap(tileset, Vec2(*tilemap_data['size']))
 
             for tile_data in tilemap_data['tiles']:
-                tile_type = tileset.get_by(tile_data['type'])
-                tile_pos = Vec2(tile_data['tile_pos']['x'], tile_data['tile_pos']['y'])
-                tilemap.create_tile(tile_type, tile_data['variant'], tile_pos)
+                tile_type = tileset.get_by(tile_data['t'])
+                tile_pos = Vec2(tile_data['p']['x'], tile_data['p']['y'])
+                tilemap.create_tile(tile_type, tile_data['v'], tile_pos)
 
             return tilemap
         except FileNotFoundError:

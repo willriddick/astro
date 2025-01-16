@@ -17,6 +17,7 @@ class Editor:
         self.running = False
         self.clock = pygame.time.Clock()
         self.last_path = ''
+        self.command_prompt = CommandPrompt()
 
         self.display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.screen = pygame.display.set_mode((DISPLAY_WIDTH * RENDER_SCALE, DISPLAY_HEIGHT * RENDER_SCALE))
@@ -34,14 +35,13 @@ class Editor:
         self.q_pressed = False
         self.e_pressed = False
 
-        self.command_prompt = CommandPrompt()
-    
+        self.mouse_pos = Vec2(0, 0)
+        self.tile_pos = Vec2(0, 0)
+        self.type_index = 0
+        self.tile_type: TileType = Assets.TILESET.get_by_index(self.type_index)
+        self.tile_variant = 0
+
     def run(self):
-        mouse_pos = Vec2(0, 0)
-        tile_pos = Vec2(0, 0)
-        type_index = 0
-        tile_type: TileType = Assets.TILESET.get_by_index(type_index)
-        tile_variant = 0
         self.running = True
 
         while self.running:
@@ -50,58 +50,28 @@ class Editor:
             for event in pygame.event.get():
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
-
-            # Calculate mouse position
-            mouse_pos = Vec2(
-                pygame.mouse.get_pos()[0] / RENDER_SCALE, 
-                pygame.mouse.get_pos()[1] / RENDER_SCALE
-            )
-
-            # Calculate selected tile position
-            tile_pos = Vec2(
-                int((mouse_pos.x + self.camera_offset[0]) // Assets.TILESET.tile_size.x), 
-                int((mouse_pos.y + self.camera_offset[1]) // Assets.TILESET.tile_size.y)
-            )
-
-            # Change tile type and variant
-            if self.q_pressed or self.e_pressed:
-                direction = -1 if self.q_pressed else 1
-                self.q_pressed = False
-                self.e_pressed = False
-
-                if self.shift_pressed:
-                    tile_variant = (tile_variant + direction) % len(tile_type.images)
-                else:
-                    type_index = type_index + direction
-                    tile_type = Assets.TILESET.get_by_index(type_index)
-                    tile_variant = 0
-
-            # Create or remove tile
-            if self.left_click:
-                self.tilemap.create_tile(tile_type, tile_variant, tile_pos)
             
-            if self.right_click:
-                self.tilemap.remove_tile(tile_pos)
+            self.handle_commands()
+
+            if not self.command_prompt.enabled:
+                self.handle_editing()
 
             # Render tilemap
             self.tilemap.render(self.display, self.camera_offset)
 
             # Render selected tile
-            selected_tile = tile_type.images[tile_variant].copy()
+            selected_tile = self.tile_type.images[self.tile_variant].copy()
             selected_tile.set_alpha(100)
             self.display.blit(selected_tile, (0, 0))
 
             # Draw current tile position
-            self.draw_tile_square(tile_pos)
+            self.draw_tile_square(self.tile_pos)
 
             # Draw border
             self.draw_border()
 
             # Draw command prompt
             self.command_prompt.render(self.display)
-
-            # Update display
-            self.move_camera() 
 
             try:
                 self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()))
@@ -113,7 +83,47 @@ class Editor:
         pygame.quit()
         sys.exit()
     
-    def handle_command(self, command: str):
+    def handle_editing(self):
+        # Calculate mouse position
+        self.mouse_pos = Vec2(
+            pygame.mouse.get_pos()[0] / RENDER_SCALE, 
+            pygame.mouse.get_pos()[1] / RENDER_SCALE
+        )
+
+        # Calculate selected tile position
+        self.tile_pos = Vec2(
+            int((self.mouse_pos.x + self.camera_offset[0]) // Assets.TILESET.tile_size.x), 
+            int((self.mouse_pos.y + self.camera_offset[1]) // Assets.TILESET.tile_size.y)
+        )
+
+        # Change tile type and variant
+        if self.q_pressed or self.e_pressed:
+            direction = -1 if self.q_pressed else 1
+            self.q_pressed = False
+            self.e_pressed = False
+
+            if self.shift_pressed:
+                self.tile_variant = (self.tile_variant + direction) % len(self.tile_type.images)
+            else:
+                self.type_index += direction
+                self.tile_type = Assets.TILESET.get_by_index(self.type_index)
+                self.tile_variant = 0
+
+        # Create or remove tile
+        if self.left_click:
+            self.tilemap.create_tile(self.tile_type, self.tile_variant, self.tile_pos)
+        
+        if self.right_click:
+            self.tilemap.remove_tile(self.tile_pos)
+        
+        # Update display
+        self.move_camera() 
+
+    def handle_commands(self):
+        command = self.command_prompt.pop_command()
+        if command == '': 
+            return
+
         match command.split():
             case ['help' | 'h']:
                 print('Available commands:')
