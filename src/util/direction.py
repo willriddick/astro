@@ -34,7 +34,7 @@ class Direction(Enum):
 
     @classmethod
     def diagonals(cls) -> list['Direction']:
-        """Returns the four cardinal directions."""
+        """Returns the four diagonal directions."""
         return [cls.UP_LEFT, cls.UP_RIGHT, cls.DOWN_LEFT, cls.DOWN_RIGHT]
     
     @property
