@@ -106,7 +106,7 @@ class TileMap:
             self.place_tile(tile, new_pos)
 
     def _update_autotiles_around(self, tile_pos: Vec2):
-        for direction in Direction.cardinals():
+        for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
             if tile and tile.type.autotile:
                 self._autotile(tile)
