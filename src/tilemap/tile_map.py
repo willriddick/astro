@@ -34,7 +34,7 @@ class TileMap:
             tile.render(surf, offset)
     
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
-        new_pos = Vec2(tile_pos.x + offset.value.x, tile_pos.y + offset.value.y)
+        new_pos = Vec2(tile_pos.x + offset.vector.x, tile_pos.y + offset.vector.y)
         return self.map.get(new_pos)
     
     def get_tiles_with(self, type: str) -> list[Tile]:
@@ -106,7 +106,7 @@ class TileMap:
             self.place_tile(tile, new_pos)
 
     def _update_autotiles_around(self, tile_pos: Vec2):
-        for direction in Direction:
+        for direction in Direction.cardinals():
             tile = self.get_tile(tile_pos, direction)
             if tile and tile.type.autotile:
                 self._autotile(tile)
@@ -115,22 +115,30 @@ class TileMap:
         pos = tile.tile_pos
         name = tile.type.name
 
-        # Edge detection (No bit shifting yet)
-        u = int(self.get_tile(pos, Direction.UP) is not None and self.get_tile(pos, Direction.UP).type.name == name)
-        r = int(self.get_tile(pos, Direction.RIGHT) is not None and self.get_tile(pos, Direction.RIGHT).type.name == name)
-        d = int(self.get_tile(pos, Direction.DOWN) is not None and self.get_tile(pos, Direction.DOWN).type.name == name)
-        l = int(self.get_tile(pos, Direction.LEFT) is not None and self.get_tile(pos, Direction.LEFT).type.name == name)
+        # Get surrounding tiles
+        tile_up = self.get_tile(pos, Direction.UP)
+        tile_right = self.get_tile(pos, Direction.RIGHT)
+        tile_down = self.get_tile(pos, Direction.DOWN)
+        tile_left = self.get_tile(pos, Direction.LEFT)
+        tile_up_left = self.get_tile(pos, Direction.UP_LEFT)
+        tile_up_right = self.get_tile(pos, Direction.UP_RIGHT)
+        tile_down_right = self.get_tile(pos, Direction.DOWN_RIGHT)
+        tile_down_left = self.get_tile(pos, Direction.DOWN_LEFT)
 
-        # Calculate edges bitmask (bit shifting happens here)
+        # Edge detection
+        u = int(tile_up is not None and tile_up.type.name == name)
+        r = int(tile_right is not None and tile_right.type.name == name)
+        d = int(tile_down is not None and tile_down.type.name == name)
+        l = int(tile_left is not None and tile_left.type.name == name)
+
+        # Corner detection
+        ul = int(u and l and tile_up_left is not None and tile_up_left.type.name == name)
+        ur = int(u and r and tile_up_right is not None and tile_up_right.type.name == name)
+        dr = int(d and r and tile_down_right is not None and tile_down_right.type.name == name)
+        dl = int(d and l and tile_down_left is not None and tile_down_left.type.name == name)
+
+        # Calculate bitmasks
         edges = u | (r << 1) | (d << 2) | (l << 3)
-
-        # Corner detection (must match GameMaker logic)
-        ul = int(u and l and self.get_tile(pos, Direction.UP_LEFT) is not None and self.get_tile(pos, Direction.UP_LEFT).type.name == name)
-        ur = int(u and r and self.get_tile(pos, Direction.UP_RIGHT) is not None and self.get_tile(pos, Direction.UP_RIGHT).type.name == name)
-        dr = int(d and r and self.get_tile(pos, Direction.DOWN_RIGHT) is not None and self.get_tile(pos, Direction.DOWN_RIGHT).type.name == name)
-        dl = int(d and l and self.get_tile(pos, Direction.DOWN_LEFT) is not None and self.get_tile(pos, Direction.DOWN_LEFT).type.name == name)
-
-        # Calculate corners bitmask
         corners = ul | (ur << 1) | (dr << 2) | (dl << 3)
 
         # Determine the correct variant

@@ -173,7 +173,7 @@ class Room:
         from .level import Level
         assert isinstance(level, Level), 'level must be of type Level'
 
-        for direction in Direction:
+        for direction in Direction.cardinals():
             adjacent_room = level.get_room_at(room.position, direction)
 
             if isinstance(adjacent_room, Room):
