@@ -1,13 +1,12 @@
 from random import seed, choice, randint
 from typing import TypeVar
-
+from src.util import Direction
 from .config import Config
 from .level import Level
 from .room import Room
 from .path import Path
 from .status import Status
 from .attribute import Attribute
-from .direction import Direction
 from .position import Position
 
 class LevelBuilder:

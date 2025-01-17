@@ -1,7 +1,6 @@
 from json import load, JSONDecodeError
 from random import randint
-
-from .direction import Direction
+from src.util import Direction
 
 KEYS = ['rows', 'cols', 'main_length', 'room_count', 'bridge_count', 'item_count']
 RANGES = ['branch_length_range']
@@ -72,7 +71,7 @@ class Config:
                 raise ValueError(f"Attribute '{key}' must be a dictionary.")
             
             weights = {}
-            for direction in Direction:
+            for direction in Direction.cardinals():
                 if direction.name not in value:
                     raise ValueError(f"Missing '{direction}' key in '{key}' dictionary.")
                 if not isinstance(value[direction.name], int):

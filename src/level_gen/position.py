@@ -1,6 +1,6 @@
 from typing import NamedTuple
 from math import sqrt
-from .direction import Direction
+from src.util import Direction
 
 class Position(NamedTuple):
     """

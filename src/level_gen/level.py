@@ -1,6 +1,7 @@
+from src.util import Direction 
+
 from .config import Config
 from .room import Room
-from .direction import Direction 
 from .position import Position
 from .path import Path
 

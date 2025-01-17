@@ -1,7 +1,7 @@
 import pygame
 from .load import load_image, load_images, load_sprite_sheet 
 from .palette import Palette, load_palettes
-from .types import Vec2
+from .vec2 import Vec2
 
 ASSET_PATH = 'assets/'
 

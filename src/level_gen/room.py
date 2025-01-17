@@ -1,4 +1,4 @@
-from .direction import Direction 
+from src.util import Direction 
 from .status import Status
 from .position import Position
 from .attribute import Attribute

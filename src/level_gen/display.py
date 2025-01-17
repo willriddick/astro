@@ -1,8 +1,8 @@
 import numpy as np
+from src.util import Direction
 from .level import Level
 from .room import Room
 from .status import Status
-from .direction import Direction
 
 HORIZONTAL = '─'
 VERTICAL = '│'
