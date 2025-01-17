@@ -172,7 +172,7 @@ class TileMap:
                 tile_data = {
                     't': tile.type.name,
                     'v': tile.variant,
-                    'p': {'x': tile.tile_pos.x, 'y': tile.tile_pos.y}
+                    'p': [tile.tile_pos.x,  tile.tile_pos.y]
                 }
                 tilemap_data['tiles'].append(tile_data)
 
@@ -196,7 +196,11 @@ class TileMap:
 
             for tile_data in tilemap_data['tiles']:
                 tile_type = tileset.get_by(tile_data['t'])
-                tile_pos = Vec2(tile_data['p']['x'], tile_data['p']['y'])
+                pos_data = tile_data['p']
+                if isinstance(pos_data, dict):
+                    tile_pos = Vec2(pos_data['x'], pos_data['y'])
+                elif isinstance(pos_data, list):
+                    tile_pos = Vec2(pos_data[0], pos_data[1])
                 tilemap.create_tile(tile_type, tile_data['v'], tile_pos)
 
             return tilemap

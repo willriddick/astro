@@ -9,7 +9,7 @@ class MapBuilder:
     def generate(config: str, seed: int | float | str = None) -> tuple[TileMap, Tile]:
         level = LevelBuilder.generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
-        size = "10x8"
+        size = "14x10"
 
         for room in level.map.values():
             map_folder = ''

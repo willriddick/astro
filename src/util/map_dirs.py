@@ -20,13 +20,13 @@ def create_map_directories(base_path, x_size, y_size):
         # Define the content of the 0.json file
         content = {
             "size": [x_size, y_size],
-            "tiles": []
+            "tiles": [{"t":"stone","v":0,"p":[1,1]}]
         }
 
         # Write the 0.json file
         json_file_path = os.path.join(subdir_path, "0.json")
         with open(json_file_path, 'w') as json_file:
-            json.dump(content, json_file, indent=4)
+            json.dump(content, json_file, separators=(',', ':'))
 
 # Usage example
 base_path = "maps"
