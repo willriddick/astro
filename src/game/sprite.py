@@ -1,7 +1,8 @@
 import pygame
+from src.util import Vec2
 
 class Sprite:
-    def __init__(self, pos: tuple[int, int], image_offset: tuple[int, int]):
+    def __init__(self, pos: pygame.Vector2, image_offset: Vec2):
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
 
@@ -74,9 +75,11 @@ class Sprite:
             False
         )
 
-    def render(self, display: pygame.Surface, offset=(0, 0)):
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
         display.blit( 
             self.get_surface(),
-            (self.pos.x - self.offset[0] + offset[0], 
-             self.pos.y - self.offset[1] + offset[1])
+            (
+                self.pos.x - self.offset.x + offset.x, 
+                self.pos.y - self.offset.y + offset.y
+            )
         )

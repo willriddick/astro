@@ -1,5 +1,5 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
 from .player_state import PlayerState
@@ -31,7 +31,7 @@ class Player(PhysicsEntity):
     SLIDE_BUFFER = 10 # time after landing to allow slide
 
     WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = (2.1, 2.6)
+    WALL_JUMP_SPEED = Vec2(2.1, 2.6)
     WALL_JUMP_ACC = (0.13, 0.13)
     WALL_SLIDE_SPEED = 0.5
     WALL_SLIDE_GRAVITY = 0.05
@@ -40,8 +40,8 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, pos: tuple[float, float]=pygame.Vector2(0, 0), palette_index: int=1):
-        super().__init__(pos, (8, 13))
+    def __init__(self, pos: pygame.Vector2=pygame.Vector2(0, 0), palette_index: int=1):
+        super().__init__(pos, Vec2(8, 13))
 
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
@@ -81,10 +81,10 @@ class Player(PhysicsEntity):
         ])
     
     def update(self, tilemap):
+        self.sprite.update(self.pos)
         self.handle_input()
         self.state_machine.update()
         self.handle_collision(tilemap)
-        self.sprite.update(self.pos)
     
     def set_state(self, state: PlayerState):
         self.state_machine.switch(state)
@@ -173,7 +173,7 @@ class Player(PhysicsEntity):
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
 
-        self.sprite = Sprite(self.pos, image_offset=(4, 5))
+        self.sprite = Sprite(self.pos, image_offset=Vec2(4, 5))
         self.sprite.add_animation(Animation.IDLE_A, image_list, 0, range_=(0,1))
         self.sprite.add_animation(Animation.IDLE_B, image_list, 5, range_=(0,4))
         self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
@@ -184,6 +184,3 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animation.WALL_SLIDE, image_list, 0, range_=(14,15))
         self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.set_animation(Animation.IDLE_B)
-
-
-        

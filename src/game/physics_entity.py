@@ -4,7 +4,7 @@ from src.util import approach, Direction, Vec2
 from .entity import Entity
 
 class PhysicsEntity(Entity):
-    def __init__(self, pos: tuple[int, int], rect_size: tuple[int, int]):
+    def __init__(self, pos: pygame.Vector2, rect_size: Vec2):
         super().__init__(pos, rect_size)
 
         self.velocity = pygame.Vector2(0, 0)
@@ -22,9 +22,6 @@ class PhysicsEntity(Entity):
             Direction.RIGHT: False, 
             Direction.LEFT: False
         }
-    
-    def update(self):
-        super().update()
     
     def accelerate_x(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.x = self.accelerate_decelerate(self.velocity.x, max_speed, dir_, acc, self.velocity_multiplier.x)

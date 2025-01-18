@@ -1,9 +1,9 @@
-import pygame
 from random import choice, randint
+import pygame
+from src.util import Assets, randf, Vec2
 from .entity import Entity
 from .physics_entity import PhysicsEntity
 from .sprite import Sprite
-from src.util import Assets, randf
 
 class AsteroidSpawner(Entity):
     def __init__(self):
@@ -60,17 +60,17 @@ class AsteroidSpawner(Entity):
 
 class Asteroid(PhysicsEntity):
     def __init__(self, spawner: AsteroidSpawner):
-        super().__init__((0, 0), (16, 16))
+        super().__init__(pygame.Vector2(0, 0), Vec2(16, 16))
         self.spawner = spawner
-        self.sprite = Sprite((0, 0), (0, 0))
+        self.sprite = Sprite(self.pos, Vec2(0, 0))
         self.sprite.add_animation(0, Assets.ASTEROIDS, 0)
     
     def __str__(self):
         return f'asteroid: pos={self.pos}, vel={self.velocity}, frame={self.sprite.frame}'
     
     def update(self):
-        super().update()
         self.pos += self.velocity
+        self.sprite.update(self.pos)
         
         if not self.spawner.boundary.collidepoint(self.get_center()):
             self.spawner.reset_asteroid(self)
