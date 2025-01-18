@@ -7,8 +7,8 @@ class TileSet:
         self.tileset: list[TileType] = []
         self.tile_size = tile_size
     
-    def add(self, name: str, images: list[pygame.Surface], autotile: bool = False):
-        self.tileset.append(TileType(name, images, autotile, self.tile_size))
+    def add(self, type: TileType):
+        self.tileset.append(type)
     
     def get_by(self, name: str) -> TileType:
         for tile in self.tileset:
