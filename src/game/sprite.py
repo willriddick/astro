@@ -1,20 +1,29 @@
 import pygame
+from src.util import Vec2
 
 class Sprite:
-    def __init__(self, pos: tuple[int, int], image_offset: tuple[int, int]):
+    def __init__(self, pos: pygame.Vector2, image_offset: Vec2):
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
 
-        self.animations: dict[str, tuple[list[pygame.Surface, int]]] = {} # id: (frames, frame_rate)
-        self.current = ''
+        self.animations: dict[int, tuple[list[pygame.Surface, int]]] = {} # id: (frames, frame_rate)
+        self.current = 0
         self.frame = 0
         self.subindex = 0
         self.flip = False
+
+        self.next_timer = 0
+        self.next_animation = None
 
         self.last_update_time = pygame.time.get_ticks()
     
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
+
+        self.next_timer = max(0, self.next_timer - 1)
+        if self.next_timer == 1 and self.next_animation:
+            self.set_animation(self.next_animation)
+            self.next_animation = None
 
         frames, frame_rate = self.get_animation()
         if len(frames) != 1 and frame_rate != 0:
@@ -33,15 +42,32 @@ class Sprite:
         else:
             self.animations[id_] = (frames, frame_rate)
     
-    def set_animation(self, id_: str, frame: int = 0):
+    def set_animation(self, id_: int, frame: int = 0):
         assert id_ in self.animations, f'Animation {id_} not found'
         if self.current != id_:
-            self.frame = frame
             self.current = id_
+            self.frame = frame
+            self.next_timer = 0
+            self.next_animation = None
+    
+    def set_frame(self, frame: int):
+        self.frame = frame
     
     def get_animation(self) -> tuple[list[pygame.Surface], int]:
         return self.animations.get(self.current)
-
+    
+    def set_animation_duration(self, id_: int, duration: int, next_id: int=None):
+        self.set_animation(id_)
+        self.next_timer = duration + 1
+        if next_id:
+            self.next_animation = next_id
+    
+    def set_next(self, id_: int):
+        if self.next_timer:
+            self.next_animation = id_
+        else:
+            self.set_animation(id_)
+    
     def get_surface(self) -> pygame.Surface:
         return pygame.transform.flip(
             self.get_animation()[0][self.frame],
@@ -49,9 +75,11 @@ class Sprite:
             False
         )
 
-    def render(self, display: pygame.Surface, offset=(0, 0)):
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
         display.blit( 
             self.get_surface(),
-            (self.pos.x - self.offset[0] + offset[0], 
-             self.pos.y - self.offset[1] + offset[1])
+            (
+                self.pos.x - self.offset.x + offset.x, 
+                self.pos.y - self.offset.y + offset.y
+            )
         )

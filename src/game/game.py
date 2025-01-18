@@ -1,69 +1,75 @@
 import sys
-import threading
 import pygame
-from src.tilemap import Tilemap, TileType
-from src.util import load_sprite_sheet, load_image
-from .player import Player
+from src.tilemap import TileMap 
+from src.util import Assets, CommandPrompt
+from .player import Player, PlayerState
 from .camera import Camera
+from .map_builder import MapBuilder
+from .asteroid import AsteroidSpawner
 
 FPS = 60
-WINDOW_SCALE = 3
+WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
 class Game:
     def __init__(self):
         pygame.init()
-
-        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-        self.window = pygame.display.set_mode(
-            (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
-            pygame.RESIZABLE)
-        self.fullscreen = False
         pygame.display.set_caption('GAME')
 
-        self.FONT = pygame.font.Font('assets/fonts/DePixelIllegible.ttf', 8)
-        
-        self.TYPES = {
-            TileType('stone', 
-                load_sprite_sheet(load_image('stone_tileset/stone_tileset.png'), (16,16)), 
-                autotile=True, 
-                tile_size=16
-            ),
-        }
-        self.tilemap: Tilemap = None
-
-        self.p1 = Player((self.camera.width // 2, self.camera.height // 2))
-        self.players = list[Player]
-        self.camera.set_target(self.p1)
-
-        self.clock = pygame.time.Clock()
         self.running = False
-        self.command_thread = threading.Thread(target=self.handle_commands)
-        self.command_thread.daemon = True
+        self.clock = pygame.time.Clock()
+        self.command_prompt = CommandPrompt()
+
+        self.window = pygame.display.set_mode(
+            (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
+            pygame.RESIZABLE
+        )
+        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.fullscreen = False
+        Assets.load_assets()
+
+        self.p1 = Player()
+        self.camera.add(self.p1)
+        self.players = list[Player]
+
+        self.asteroid_spawner = AsteroidSpawner()
+   
+    def new(self, seed=None):
+        self.tilemap =  MapBuilder.generate('configs/1.json', seed)
+        self.p1.set_pos(pygame.Vector2(self.tilemap.spawn_tile.pixel_pos))
+        self.p1.set_state(PlayerState.AIR)
+
+        self.camera.move_to(self.p1.get_center(), instant=True)
+        self.camera.tilemap = self.tilemap
+        self.camera.set_boundary(self.tilemap.get_rect())
+        
+        self.asteroid_spawner.clear()
+        self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
+        self.asteroid_spawner.spawn(10)
+        self.camera.add(self.asteroid_spawner)
     
     def run(self):
         self.running = True
-        self.command_thread.start()
-        self.handle_game()
-
-    def handle_game(self):
-        self.tilemap = Tilemap.load('maps/test1', self.TYPES)
-
+        self.new()
+       
         while self.running:
             for event in pygame.event.get():
                 self.handle_event(event)
+                self.command_prompt.handle_event(event)
             
-            self.camera.update()
-            self.tilemap.render(self.camera.display, self.camera.offset)
-            self.p1.update(self.tilemap)
+            self.handle_commands()
             
-            text = f'State: {self.p1.state_machine.current_state.name}\n'
-            text += f'Jumps: {self.p1.jumps_remaining}\n'
-            text += f'Velocity: {self.p1.velocity[0]:.2f}, {self.p1.velocity[1]:.2f}\n'
-            text += '\n'.join(f'{dir_.name}: {val}' for dir_, val in self.p1.collisions.items())
-            text_surf = self.FONT.render(text, antialias=False, color=(255, 255, 255))
-            self.camera.display.blit(text_surf, (0, 0))
+            if not self.command_prompt.enabled:
+                self.camera.update()
+                self.debug_display()
+                
+                self.p1.update(self.tilemap)
+                self.camera.move_to(self.p1.get_center())
+                self.asteroid_spawner.update()
+
+            # Draw command prompt
+            self.command_prompt.render(self.camera.display)
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -74,28 +80,42 @@ class Game:
 
         pygame.quit()
         sys.exit()
+    
+    def debug_display(self):
+        text = f'{self.p1.state_machine.current_state.name}\n'
+        text += f'x: {int(self.p1.pos.x):04}, y:{int(self.p1.pos.y):04} \n'
+        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.p1.collisions.items())
+        text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
+        self.camera.display.blit(text_surf, (0, 0))
 
     def handle_commands(self):
-        while self.running:
-            try:
-                command = input()
-                match command.split():
-                    case ['/help']:
-                        print('Available commands:')
-                        print('/help - Show this help message')
-                        print('/load - Load new tilemap')
-                        print('/quit - Quit the game')
-                    case ['/load', path]:
-                        self.tilemap = Tilemap.load(path, self.TYPES)
-                    case ['/quit']:
-                        self.running = False
-                    case _:
-                        print(f'Unknown command: {command}')
-                        print('Type /help for a list of commands')
-            except EOFError:
+        command = self.command_prompt.pop_command()
+        if command == '': 
+            return
+
+        match command.split():
+            case ['load', path]:
+                self.tilemap = TileMap.load(path, self.TYPES)
+            case ['g']:
+                if self.p1.get_state() == PlayerState.GHOST:
+                    self.p1.set_state(PlayerState.AIR)
+                else:
+                    self.p1.set_state(PlayerState.GHOST)
+            case ['n']:
+                self.new()
+            case ['n', seed]:
+                self.new(seed)
+            case ['p', index]:
+                self.p1.load_sprite(int(index))
+            case ['tp', x, y]:
+                self.p1.pos = pygame.Vector2(int(x), int(y))
+            case ['jumps', amount]:
+                self.p1.max_jumps = int(amount)
+                self.p1.jumps_remaining = self.p1.max_jumps
+            case ['q']:
                 self.running = False
-            except KeyboardInterrupt:
-                self.running = False
+            case _:
+                print(f'Unknown command: {command}')
     
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:

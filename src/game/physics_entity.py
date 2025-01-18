@@ -1,25 +1,21 @@
 import pygame
-from src.tilemap import Tilemap
-from src.util import approach, Direction
+from src.tilemap import TileMap
+from src.util import approach, Direction, Vec2
 from .entity import Entity
 
 class PhysicsEntity(Entity):
-    def __init__(self, pos: tuple[int, int], rect_size: tuple[int, int]):
+    def __init__(self, pos: pygame.Vector2, rect_size: Vec2):
         super().__init__(pos, rect_size)
 
-        # Velocity
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)
-
-        # Gravity
         self.gravity_multiplier = 1
-        self.gravity = 0.14
-        self.fall_speed = 3
 
         # Collision
         self.tiles_around = []
         self.falling = False
         self.on_ground = False
+        self.collision_enabled = True
         self.collisions = { 
             Direction.UP: False,
             Direction.DOWN: False,
@@ -33,7 +29,7 @@ class PhysicsEntity(Entity):
     def accelerate_y(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.y = self.accelerate_decelerate(self.velocity.y, max_speed, dir_, acc, self.velocity_multiplier.y)
     
-    def apply_gravity(self, gravity: float, max_speed: float, ):
+    def apply_gravity(self, gravity: float, max_speed: float):
         self.velocity.y = min(
             max_speed * self.gravity_multiplier,
             self.velocity.y + gravity * self.gravity_multiplier
@@ -53,9 +49,13 @@ class PhysicsEntity(Entity):
                 step=acc[0] * multiplier
             )
    
-    def handle_collision(self, tilemap: Tilemap):
+    def handle_collision(self, tilemap: TileMap):
+        if not self.collision_enabled:
+            self.pos += self.velocity
+            return
+
         # Update tile position
-        tile_pos = (self.pos.x // tilemap.tile_size, self.pos.y // tilemap.tile_size)
+        tile_pos = Vec2(self.pos.x // tilemap.tile_size.x, self.pos.y // tilemap.tile_size.y)
         self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])
 
         # Update y position

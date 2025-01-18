@@ -1,39 +1,42 @@
 from random import choice
 from src.util import State
-from .states import States
-from ..animation import Animation
+from ..player import Player, PlayerState, Animation
 
 class Run(State):
     def __init__(self):
-        super().__init__(States.RUN)
-    
-    def update(self):
-        self.owner.accelerate_x(self.owner.move_dir, self.owner.ground_move_speed, self.owner.ground_acc)
-        self.owner.apply_gravity(self.owner.gravity, self.owner.fall_speed)
-        self.owner.handle_jump()
-        self.handle_animation()
+        super().__init__(PlayerState.RUN)
+
+    def on_enter(self):
+        self.timer = 0 # duration player has been in RUN state
+        self.owner.sprite.set_next(Animation.RUN)
+        if self.owner.rotated:
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
         
+    def update(self):
+        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
+        self.owner.accelerate_x(self.owner.move_dir.x, Player.GROUND_MOVE_SPEED, Player.GROUND_ACC)
+        self.owner.handle_jump()
+
+        # animate player
+        if self.owner.rotated:
+            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
+        
+        if self.owner.move_dir.x != 0:
+            self.owner.sprite.flip = self.owner.move_dir.x == -1
+
+        # switch to slide state
+        self.timer = max(0, self.timer + 1)
+        if self.timer < Player.SLIDE_BUFFER:
+            if (
+                self.owner.slide_input_timer
+                and self.owner.state_machine.previous_state.id == PlayerState.AIR
+            ):
+                self.switch(PlayerState.SLIDE)
+        
+        # switch states
         if self.owner.velocity.x == 0:
-            self.switch(States.IDLE)
+            self.switch(PlayerState.IDLE)
         
         if not self.owner.on_ground:
-            self.switch(States.AIR)
+            self.switch(PlayerState.AIR)
         
-    def handle_animation(self):
-        if self.owner.move_dir != 0 and self.owner.move_dir != self.owner.last_move_dir:
-            self.owner.rotate_timer = self.owner.rotate_duration
-            self.owner.rotate_dir = choice(self.owner.rotate_choice)
-        
-        if self.owner.move_dir != 0:
-            self.owner.sprite.flip = self.owner.move_dir == -1
-            self.owner.last_move_dir = self.owner.move_dir
-        
-        self.owner.rotate_timer = max(0, self.owner.rotate_timer - 1)
-        
-        animation = Animation.IDLE
-        if self.owner.rotate_timer > 0:
-            animation = Animation.FRONT if self.owner.rotate_dir else Animation.BACK
-        elif self.owner.move_dir != 0:
-            animation = Animation.RUN
-        
-        self.owner.set_animation(animation)

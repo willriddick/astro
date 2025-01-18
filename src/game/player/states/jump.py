@@ -1,23 +1,27 @@
 from src.util import State
-from .states import States
+from ..player import Player, PlayerState, Animation
 
 class Jump(State):
     def __init__(self):
-        super().__init__(States.JUMP)
+        super().__init__(PlayerState.JUMP)
     
     def on_enter(self):
-        # Special case for coyote time
-        if self.owner.jumps_remaining == self.owner.max_jumps and not self.owner.on_ground and self.owner.coyote_timer == 0:
+        # special case for coyote time 
+        if (
+            self.owner.jumps_remaining == Player.MAX_JUMPS 
+            and not self.owner.on_ground and self.owner.coyote_timer == 0
+        ):
             self.owner.jumps_remaining -= 1
         
-        # Decrement remaining jumps
+        # upddate velocity and jump count
         if self.owner.jumps_remaining:
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
 
-            self.owner.velocity.y = -self.owner.jump_speed * self.owner.velocity_multiplier.y
+            self.owner.velocity.y = -Player.JUMP_SPEED * self.owner.velocity_multiplier.y
             self.owner.jump_input_timer = 0
             self.owner.coyote_timer = 0
-            self.owner.variable_jump_timer = self.owner.variable_jump_buffer
+            self.owner.variable_jump_timer = Player.VARIABLE_JUMP_BUFFER
         
-        self.switch(States.AIR)
+        # switch to AIR
+        self.switch(PlayerState.AIR)
    
