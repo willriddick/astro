@@ -1,6 +1,6 @@
 import numpy as np
 from src.util import Direction
-from .level import Level
+from .level_map import LevelMap
 from .room import Room
 from .status import Status
 
@@ -10,17 +10,12 @@ TOP_LEFT_CORNER = '╭'
 TOP_RIGHT_CORNER = '╮'
 BOTTOM_RIGHT_CORNER = '╯'
 BOTTOM_LEFT_CORNER = '╰'
-"""
-═ ║ ╔ ╗ ╚ ╝ ┄ ┅ ┆ ┇ ╞ ╡ ╱ ╲ ╳ ✦ ✧ ★ ☆ ■ 
-□ ▲ △ ● ○ ❂ ∞ ☀ ❄ ♥ ✓ ▢ ▣ ▤ ▥ ▦ ▧ ▨ ▩ ▪ ▫ ▬ ▭ 
-▮ ▯ ⟠ ⟡ ⦾ ⦿ ⩠ ⩡ ✮ ✯ ✰ ✱
-"""
 
 class Display:
     """
     A class that generates and displays an ASCII representation of a level map.
     Attributes:
-        level (Level): The level to display.
+        level (LevelMap): The level to display.
         room_rows (int): Number of rows for each room
         room_cols (int): Number of columns for each room
         rows (int): Number of rows in the level map.
@@ -28,7 +23,7 @@ class Display:
         room_size (int): Size of each room in the grid, in characters.
         display (list[list[str]]): 2D array representing the ASCII display of the map.
     """
-    def __init__(self, level: Level):
+    def __init__(self, level: LevelMap):
         self.level = level
         self.room_rows = 5
         self.room_cols = 10

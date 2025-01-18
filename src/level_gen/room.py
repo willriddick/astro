@@ -1,6 +1,5 @@
-from src.util import Direction 
+from src.util import Direction, Vec2
 from .status import Status
-from .position import Position
 from .attribute import Attribute
 
 class Room:
@@ -9,7 +8,7 @@ class Room:
     and dicitonary for adjacent directions.
     Attributes:
         index (int): Unique identifier.
-        position (Position): The position object.
+        position (Vec2): The position object.
         attributes (list[RoomAttribute]): Stores the rooms associated attributes.
         adjacents (dict[Direction, AdjacentStatus]): Dictionary of directions and associated status
         key (int): Bitmask value (0-15) representing presence of LINKED rooms: UP (8) | DOWN (4) | LEFT (2) | RIGHT (1):
@@ -22,7 +21,7 @@ class Room:
             . R .   . R →   ← R .   ← R →   . R .   . R →   ← R .   ← R →
               .       .       .       .       ↓       ↓       ↓       ↓
     """
-    def __init__(self, index: int, position: Position):
+    def __init__(self, index: int, position: Vec2):
         self.index = index
         self.position = position
         self.attributes: list[Attribute] = list()
@@ -170,8 +169,8 @@ class Room:
             room (Room): The room whose directions are being updated.
             level (Level): The level object containing the layout of rooms and their positions.
         """
-        from .level import Level
-        assert isinstance(level, Level), 'level must be of type Level'
+        from .level_map import LevelMap
+        assert isinstance(level, LevelMap), 'level must be of type Level'
 
         for direction in Direction.cardinals():
             adjacent_room = level.get_room_at(room.position, direction)

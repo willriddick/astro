@@ -1,13 +1,13 @@
 import random
 import os
-from src.level_gen import LevelBuilder, Attribute
+from src.level_gen import generate_level, Attribute
 from src.tilemap import TileMap, Tile 
 from src.util import Assets, Vec2
 
 class MapBuilder:
     @staticmethod
     def generate(config: str, seed: int | float | str = None) -> tuple[TileMap, Tile]:
-        level = LevelBuilder.generate_level(config, seed)
+        level = generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
         size = "10x8"
 
