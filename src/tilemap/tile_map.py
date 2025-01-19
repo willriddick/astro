@@ -1,11 +1,11 @@
 import json
 import struct
+from typing import Callable
 import pygame
-from src.util import Direction
+from src.util import Direction, Vec2
 from .tile_set import TileSet
 from .tile import Tile
 from .tile_type import TileType
-from src.util import Vec2
 
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
@@ -34,19 +34,13 @@ class TileMap:
             tile.render(surf, offset)
     
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
-        new_pos = Vec2(tile_pos.x + offset.vector.x, tile_pos.y + offset.vector.y)
-        return self.map.get(new_pos)
+        return self.map.get(Vec2.move(tile_pos, offset))
     
     def get_tiles_with(self, type: str) -> list[Tile]:
         return list(filter(lambda x: x.type.name == type, self.map.values))
     
-    def get_tiles_around(self, tile_pos: Vec2, filter_: list[str]) -> list[Tile]:
-        tiles = []
-        for direction in Direction:
-            tile = self.get_tile(tile_pos, direction)
-            if tile and tile.type.name in filter_:
-                tiles.append(tile)
-        return tiles
+    def get_tiles_around(self, tile_pos: Vec2) -> list[Tile]:
+        return [tile for direction in Direction if (tile := self.get_tile(tile_pos, direction)) is not None]
     
     def create_tile(self, type: TileType, variant: int, tile_pos: Vec2) -> Tile:
         if tile_pos in self.map:

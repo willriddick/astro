@@ -27,12 +27,13 @@ class Assets:
         Assets.TILESET.add(TileType(
             name='stone', 
             images=load_sprite_sheet(load_image('tileset/template.png'), (16,16)), 
-            collision=(True, True, True, True),
+            collision=True,
             autotile=True,
         ))
 
         Assets.TILESET.add(TileType(
             name='door', 
             images=[load_sprite_sheet(load_image('items.png'), (16,16))[0]],
-            autotile=False
+            collision=False,
+            autotile=False,
         ))

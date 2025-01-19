@@ -56,33 +56,43 @@ class PhysicsEntity(Entity):
 
         # Update tile position
         tile_pos = Vec2(self.pos.x // tilemap.tile_size.x, self.pos.y // tilemap.tile_size.y)
-        self.tiles_around = tilemap.get_tiles_around(tile_pos, ['stone'])
+        self.tiles_around = tilemap.get_tiles_around(tile_pos)
 
         # Update y position
         self.pos.y += self.velocity.y
         entity_rect = self.get_rect()
         for tile in self.tiles_around:
+            if not tile.type.collision:
+                continue
+
             rect = tile.get_rect()
             if entity_rect.colliderect(rect):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
+                    self.pos.y = entity_rect.y
+                    self.velocity.y = 0
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
-                self.pos.y = entity_rect.y
-                self.velocity.y = 0
+                    self.pos.y = entity_rect.y
+                    self.velocity.y = 0
 
         # Update x position
         self.pos.x += self.velocity.x
         entity_rect = self.get_rect()
         for tile in self.tiles_around:
+            if not tile.type.collision:
+                continue
+
             rect = tile.get_rect()
             if entity_rect.colliderect(rect):
                 if self.velocity.x > 0:
                     entity_rect.right = rect.left
+                    self.pos.x = entity_rect.x
+                    self.velocity.x = 0
                 if self.velocity.x < 0:
                     entity_rect.left = rect.right
-                self.pos.x = entity_rect.x
-                self.velocity.x = 0
+                    self.pos.x = entity_rect.x
+                    self.velocity.x = 0
         
         # Update collisions
         points = {
