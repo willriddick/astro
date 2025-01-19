@@ -1,6 +1,6 @@
 import pygame
-from .tile_type import TileType
 from src.util import Vec2
+from .tile_type import TileType
 
 class Tile:
     def __init__(self, tilemap, type: TileType, variant: int, tile_pos: Vec2):

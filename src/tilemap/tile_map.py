@@ -21,7 +21,8 @@ class TileMap:
     def tile_size(self) -> Vec2:
         return self.tileset.tile_size
     
-    def get_rect(self) -> pygame.Rect:
+    @property
+    def rect(self) -> pygame.Rect:
         return pygame.Rect(0, 0, self.size.x * self.tile_size.x, self.size.y * self.tile_size.y)
 
     def set_size(self, size: Vec2):
