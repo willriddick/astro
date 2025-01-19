@@ -62,6 +62,7 @@ class PhysicsEntity(Entity):
         self.pos.y += self.velocity.y
         entity_rect = self.get_rect()
         for tile in self.tiles_around:
+            # Skip non-collision tiles
             if not tile.type.collision:
                 continue
 
@@ -80,6 +81,7 @@ class PhysicsEntity(Entity):
         self.pos.x += self.velocity.x
         entity_rect = self.get_rect()
         for tile in self.tiles_around:
+            # Skip non-collision tiles
             if not tile.type.collision:
                 continue
 
@@ -107,6 +109,10 @@ class PhysicsEntity(Entity):
         }
         for direction, points in points.items():
             for tile in self.tiles_around:
+                # Skip non-collision tiles
+                if not tile.type.collision:
+                    continue
+
                 tile_rect = tile.get_rect()
                 if any(tile_rect.collidepoint(point) for point in points):
                     self.collisions[direction] = True

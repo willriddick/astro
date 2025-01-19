@@ -31,9 +31,19 @@ class Assets:
             autotile=True,
         ))
 
+        test_tiles = load_sprite_sheet(load_image('test_tiles.png'), (16,16))
+
         Assets.TILESET.add(TileType(
             name='door', 
-            images=[load_sprite_sheet(load_image('items.png'), (16,16))[0]],
+            images=[test_tiles[0]],
             collision=False,
+            autotile=False,
+        ))
+
+        Assets.TILESET.add(TileType(
+            name='platform', 
+            images=[test_tiles[2]],
+            collision=True,
+            size=Vec2(16, 4),
             autotile=False,
         ))

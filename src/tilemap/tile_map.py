@@ -15,6 +15,7 @@ class TileMap:
         self.tileset = tileset
         self.size = size
         self.map: dict[Vec2, Tile] = {}
+        self.spawn_tile = None
     
     @property
     def tile_size(self) -> Vec2:

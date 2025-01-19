@@ -36,18 +36,22 @@ class Game:
         self.asteroid_spawner = AsteroidSpawner()
    
     def new(self, seed=None):
-        self.tilemap =  MapBuilder.generate('configs/1.json', seed)
-        self.p1.set_pos(pygame.Vector2(self.tilemap.spawn_tile.pixel_pos))
+        #self.tilemap =  MapBuilder.generate('configs/1.json', seed)
+        self.tilemap = TileMap.load('maps/10x8/1_2/test', Assets.TILESET)
+        spawn_tile = self.tilemap.spawn_tile
+        if spawn_tile:
+            self.p1.set_pos(pygame.Vector2(spawn_tile.pixel_pos))
         self.p1.set_state(PlayerState.AIR)
 
         self.camera.move_to(self.p1.get_center(), instant=True)
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.get_rect())
         
-        self.asteroid_spawner.clear()
-        self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
-        self.asteroid_spawner.spawn(10)
-        self.camera.add(self.asteroid_spawner)
+        if False:
+            self.asteroid_spawner.clear()
+            self.asteroid_spawner.set_boundary(self.tilemap.get_rect())
+            self.asteroid_spawner.spawn(10)
+            self.camera.add(self.asteroid_spawner)
     
     def run(self):
         self.running = True
