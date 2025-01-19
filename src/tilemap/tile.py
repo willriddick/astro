@@ -8,7 +8,8 @@ class Tile:
         self.type = type
         self.variant = variant
         self.tile_pos = tile_pos
-        self.debug = True
+        self.collision = type.collision
+        self.debug = False
     
     def __str__(self):
         return f'{self.type.name}:{self.variant} {self.tile_pos}'
@@ -27,7 +28,8 @@ class Tile:
             self.tile_pos.y * self.tile_size.y
         ) 
     
-    def get_rect(self) -> pygame.Rect:
+    @property
+    def rect(self) -> pygame.Rect:
         return pygame.Rect(
             self.pixel_pos.x + self.type.collision_offset.x,
             self.pixel_pos.y + self.type.collision_offset.y,
@@ -39,7 +41,7 @@ class Tile:
         pos = (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
         display.blit(self.type.images[self.variant], pos)
 
-        if self.debug:
+        if self.debug and self.collision:
             size = self.type.size
             collision_display = pygame.Surface((size.x, size.y), pygame.SRCALPHA)
             collision_display.set_alpha(100)

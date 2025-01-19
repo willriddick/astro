@@ -44,6 +44,6 @@ class Assets:
             name='platform', 
             images=[test_tiles[2]],
             collision=True,
-            size=Vec2(16, 4),
+            size=Vec2(16, 2),
             autotile=False,
         ))

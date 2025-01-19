@@ -15,6 +15,7 @@ class PhysicsEntity(Entity):
         self.tiles_around = []
         self.falling = False
         self.on_ground = False
+        self.drop_down = False
         self.collision_enabled = True
         self.collisions = { 
             Direction.UP: False,
@@ -58,15 +59,25 @@ class PhysicsEntity(Entity):
         tile_pos = Vec2(self.pos.x // tilemap.tile_size.x, self.pos.y // tilemap.tile_size.y)
         self.tiles_around = tilemap.get_tiles_around(tile_pos)
 
+        # Handle platform collision
+        for platform in filter(lambda tile: tile.type.name == 'platform', self.tiles_around):
+            # If player is below platform, disable collision
+            if platform.rect.top < self.rect.bottom:
+                platform.collision = False
+            else:
+                if self.on_ground and self.drop_down:
+                    platform.collision = False
+                else:
+                    platform.collision = True
+
+        # Filter out collision tiles
+        collisions_around = list(filter(lambda tile: tile.collision, self.tiles_around))
+
         # Update y position
         self.pos.y += self.velocity.y
-        entity_rect = self.get_rect()
-        for tile in self.tiles_around:
-            # Skip non-collision tiles
-            if not tile.type.collision:
-                continue
-
-            rect = tile.get_rect()
+        entity_rect = self.rect
+        for tile in collisions_around:
+            rect = tile.rect
             if entity_rect.colliderect(rect):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
@@ -79,13 +90,9 @@ class PhysicsEntity(Entity):
 
         # Update x position
         self.pos.x += self.velocity.x
-        entity_rect = self.get_rect()
-        for tile in self.tiles_around:
-            # Skip non-collision tiles
-            if not tile.type.collision:
-                continue
-
-            rect = tile.get_rect()
+        entity_rect = self.rect
+        for tile in collisions_around:
+            rect = tile.rect
             if entity_rect.colliderect(rect):
                 if self.velocity.x > 0:
                     entity_rect.right = rect.left
@@ -108,12 +115,8 @@ class PhysicsEntity(Entity):
                               (entity_rect.right + 1, entity_rect.bottom - 1)],
         }
         for direction, points in points.items():
-            for tile in self.tiles_around:
-                # Skip non-collision tiles
-                if not tile.type.collision:
-                    continue
-
-                tile_rect = tile.get_rect()
+            for tile in collisions_around:
+                tile_rect = tile.rect
                 if any(tile_rect.collidepoint(point) for point in points):
                     self.collisions[direction] = True
                     break # No need to check further tiles for this direction
