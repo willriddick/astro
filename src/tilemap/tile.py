@@ -1,6 +1,6 @@
 import pygame
-from .tile_type import TileType
 from src.util import Vec2
+from .tile_type import TileType
 
 class Tile:
     def __init__(self, tilemap, type: TileType, variant: int, tile_pos: Vec2):
@@ -8,6 +8,8 @@ class Tile:
         self.type = type
         self.variant = variant
         self.tile_pos = tile_pos
+        self.collision = type.collision
+        self.debug = False
     
     def __str__(self):
         return f'{self.type.name}:{self.variant} {self.tile_pos}'
@@ -16,16 +18,21 @@ class Tile:
         return self.__str__()
     
     @property
+    def tile_size(self) -> Vec2:
+        return self.tilemap.tile_size
+    
+    @property
     def pixel_pos(self) -> Vec2:
         return Vec2(
-            self.tile_pos.x * self.type.size.x, 
-            self.tile_pos.y * self.type.size.y
+            self.tile_pos.x * self.tile_size.x,
+            self.tile_pos.y * self.tile_size.y
         ) 
     
-    def get_rect(self) -> pygame.Rect:
+    @property
+    def rect(self) -> pygame.Rect:
         return pygame.Rect(
-            self.pixel_pos.x,
-            self.pixel_pos.y,
+            self.pixel_pos.x + self.type.collision_offset.x,
+            self.pixel_pos.y + self.type.collision_offset.y,
             self.type.size.x,
             self.type.size.y
         )
@@ -33,3 +40,16 @@ class Tile:
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         pos = (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
         display.blit(self.type.images[self.variant], pos)
+
+        if self.debug and self.collision:
+            size = self.type.size
+            collision_display = pygame.Surface((size.x, size.y), pygame.SRCALPHA)
+            collision_display.set_alpha(100)
+            pygame.draw.rect(
+                collision_display, (255, 0, 255),
+                (0, 0, size.x, size.y), 1
+            )
+            display.blit(
+                collision_display, 
+                (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
+            )

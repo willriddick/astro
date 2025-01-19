@@ -1,6 +1,6 @@
-import pygame
 import os
 from typing import List
+import pygame
 from .load import load_image
 
 ASSET_PATH = 'assets/'

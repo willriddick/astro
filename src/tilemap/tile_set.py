@@ -1,14 +1,13 @@
-import pygame
-from .tile_type import TileType
 from src.util import Vec2
+from .tile_type import TileType
 
 class TileSet:
     def __init__(self, tile_size: Vec2):
         self.tileset: list[TileType] = []
         self.tile_size = tile_size
     
-    def add(self, name: str, images: list[pygame.Surface], autotile: bool = False):
-        self.tileset.append(TileType(name, images, autotile, self.tile_size))
+    def add(self, type: TileType):
+        self.tileset.append(type)
     
     def get_by(self, name: str) -> TileType:
         for tile in self.tileset:

@@ -133,6 +133,9 @@ class Player(PhysicsEntity):
             int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
         )
 
+        # drop through platforms
+        self.drop_down = self.move_dir.y == 1
+
         # update rotated field
         if self.move_dir.x != 0 and self.move_dir.x != self.last_facing_dir:
             self.rotated = True
