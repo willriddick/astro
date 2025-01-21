@@ -1,11 +1,12 @@
 import pygame
 from src.util import Vec2
 from .collider import Collider
+from .damage import DamageComponent
 
 class HealthComponent:
-    def __init__(self, max_health: int, collider: Collider, invulnerable_duration: int = 15):
+    def __init__(self, max_health: int, invulnerable_duration: int = 30):
         self.max_health = max_health
-        self.collider = collider
+        self.collider = None
         self.health = max_health
         self.invulnerable_duration = invulnerable_duration
         self.invulnerable_timer = 0
@@ -19,21 +20,30 @@ class HealthComponent:
         return self.invulnerable_timer > 0
     
     def update(self, pos: Vec2, colliders: list[Collider]):
-        self.collider.update(pos, colliders)
-        print(self.collider.nearest)
-
+        self.collider.update(pos)
         self.invulnerable_timer = max(0, self.invulnerable_timer - 1)
-    
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        self.collider.render(display, offset)
-    
+
+        if self.vulnerable and self.collider.get_nearest(
+            colliders, 
+            lambda c: type(c.owner) is DamageComponent
+        ):
+            self.take_damage(1)
+  
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)
         
     def take_damage(self, amount: int):
         if self.vulnerable:
             self.health = max(0, self.health - amount)
+            print(self.health)
             self.invulnerable_timer = self.invulnerable_duration
 
             if self.health == 0:
                 self.on_death()
+    
+    def on_death(self):
+        print("DEAD")
+        self.health = 3
+    
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        self.collider.render(display, offset)

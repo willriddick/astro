@@ -5,6 +5,7 @@ from src.util import Assets, CommandPrompt, Vec2
 from .player import Player, PlayerState
 from .camera import Camera
 from .collider import Collider
+from .damage import DamageComponent
 from .map_builder import MapBuilder
 from .asteroid import AsteroidSpawner
 
@@ -44,8 +45,10 @@ class Game:
         self.p1.set_pos(pygame.Vector2(16, 32))
 
         del self.colliders
-        test_collider = Collider(Vec2(16, 16), Vec2(0, 0))
-        test_collider.pos = pygame.Vector2(32, 32)
+        self.damage_test = DamageComponent()
+        test_collider = Collider(self.damage_test, Vec2(16, 16), Vec2(0, 0))
+        self.damage_test.collider = test_collider
+        self.damage_test.update(pygame.Vector2(32, 32))
         self.colliders = [test_collider]
 
         spawn_tile = self.tilemap.spawn_tile

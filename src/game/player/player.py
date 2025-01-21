@@ -82,7 +82,8 @@ class Player(PhysicsEntity):
             Ghost()
         ])
 
-        self.health_component = HealthComponent(1, Collider(Vec2(8, 8), Vec2(0, 5)))
+        self.health_component = HealthComponent(1)
+        self.health_component.collider = Collider(self.health_component, Vec2(8, 8), Vec2(0, 5))
     
     def update(self, tilemap, colliders: list[Collider]):
         self.handle_input()
