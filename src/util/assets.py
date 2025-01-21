@@ -47,3 +47,13 @@ class Assets:
             size=Vec2(16, 2),
             autotile=False,
         ))
+
+        spike = TileType(
+            name='spike', 
+            images=[test_tiles[3]],
+            collision=False,
+            collision_offset=Vec2(0, 14),
+            size=Vec2(16, 2),
+            autotile=False,
+        )
+        Assets.TILESET.add(spike)

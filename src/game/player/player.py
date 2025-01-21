@@ -1,7 +1,9 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, draw_rect
 from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
+from src.game.health import HealthComponent
+from src.game.collider import Collider
 from .player_state import PlayerState
 from .animation import Animation
 
@@ -79,12 +81,20 @@ class Player(PhysicsEntity):
             WallJump(),
             Ghost()
         ])
+
+        self.health_component = HealthComponent(1, Collider(Vec2(8, 8), Vec2(0, 5)))
     
-    def update(self, tilemap):
-        self.sprite.update(self.pos)
+    def update(self, tilemap, colliders: list[Collider]):
         self.handle_input()
+        self.sprite.update(self.pos)
+        self.health_component.update(self.pos, colliders)
         self.state_machine.update()
         self.handle_collision(tilemap)
+    
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        self.sprite.render(display, offset)
+        self.health_component.render(display, offset)
+        #draw_rect(display, offset, self.pos, self.rect_size)
     
     def set_state(self, state: PlayerState):
         self.state_machine.switch(state)

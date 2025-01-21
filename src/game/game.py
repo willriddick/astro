@@ -1,9 +1,10 @@
 import sys
 import pygame
 from src.tilemap import TileMap 
-from src.util import Assets, CommandPrompt
+from src.util import Assets, CommandPrompt, Vec2
 from .player import Player, PlayerState
 from .camera import Camera
+from .collider import Collider
 from .map_builder import MapBuilder
 from .asteroid import AsteroidSpawner
 
@@ -33,11 +34,20 @@ class Game:
         self.camera.add(self.p1)
         self.players = list[Player]
 
+        self.colliders = []        
+
         self.asteroid_spawner = AsteroidSpawner()
    
     def new(self, seed=None):
-        self.tilemap =  MapBuilder.generate('configs/1.json', seed)
-        #self.tilemap = TileMap.load('maps/10x8/1_2/test', Assets.TILESET)
+        #self.tilemap =  MapBuilder.generate('configs/1.json', seed)
+        self.tilemap = TileMap.load('maps/10x8/1_2/test', Assets.TILESET)
+        self.p1.set_pos(pygame.Vector2(16, 32))
+
+        del self.colliders
+        test_collider = Collider(Vec2(16, 16), Vec2(0, 0))
+        test_collider.pos = pygame.Vector2(32, 32)
+        self.colliders = [test_collider]
+
         spawn_tile = self.tilemap.spawn_tile
         if spawn_tile:
             self.p1.set_pos(pygame.Vector2(spawn_tile.pixel_pos))
@@ -46,7 +56,7 @@ class Game:
         self.camera.move_to(self.p1.get_center(), instant=True)
         self.camera.tilemap = self.tilemap
         self.camera.set_boundary(self.tilemap.rect)
-        
+
         if False:
             self.asteroid_spawner.clear()
             self.asteroid_spawner.set_boundary(self.tilemap.rect)
@@ -68,9 +78,12 @@ class Game:
                 self.camera.update()
                 self.debug_display()
                 
-                self.p1.update(self.tilemap)
+                self.p1.update(self.tilemap, self.colliders)
                 self.camera.move_to(self.p1.get_center())
                 self.asteroid_spawner.update()
+
+                for collider in self.colliders:
+                    collider.render(self.camera.display, self.camera.offset)
 
             # Draw command prompt
             self.command_prompt.render(self.camera.display)
