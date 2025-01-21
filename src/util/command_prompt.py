@@ -1,9 +1,10 @@
 import re
 import pygame
+from .vec2 import Vec2
 from .assets import Assets
-from .draw import draw_transparent_rect
+from .draw import draw_rect
 
-RECT_COLOR = (0, 40, 80)
+RECT_COLOR = (0, 40, 80, 100)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:
@@ -118,11 +119,12 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
-            draw_transparent_rect(
+            draw_rect(
                 display, 
-                rect=pygame.Rect(0, display.get_height() - 12, display.get_width(), 12),
-                color=RECT_COLOR, 
-                alpha=128
+                pos=pygame.Vector2(0, display.get_height() - 12),
+                size=Vec2(display.get_width(), 12),
+                fill_color=RECT_COLOR, 
+                outline_color=(255, 255, 255, 255),
             )
             text = f'/{self.input[:self.cursor_index]}_{self.input[self.cursor_index:]}'
             text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
