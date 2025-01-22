@@ -1,7 +1,8 @@
 import pygame
 import numpy as np
 from src.tilemap import TileMap
-from src.util import Assets, Vec2
+from src.game.level import Level
+from src.util import Vec2
 from .entity import Entity
 
 class Camera:
@@ -16,9 +17,7 @@ class Camera:
         self.offset = pygame.Vector2(0, 0)
         self.boundary: tuple[int, int, int, int] = None
 
-        # Entity management
-        self.entities: list[Entity] = []
-        self.tilemap: TileMap = None
+        self.level: Level = None
 
         self.fill_color = (24, 20, 37)
     
@@ -34,10 +33,10 @@ class Camera:
         )
 
         # Render the tilemap  
-        self.render_tilemap(self.tilemap)
+        self.render_tilemap(self.level.tilemap)
 
         # Render all entities relative to the offset
-        for entity in self.entities:
+        for entity in self.level.entities:
             entity.render(self.display, -self.offset)
 
     def render_tilemap(self, tilemap):
@@ -48,7 +47,7 @@ class Camera:
         x_start = int(-self.offset.x // tile_size.x)
         x_stop = int((self.offset.x + self.display.width) // tile_size.x + 1)
         y_start = int(-self.offset.y // tile_size.y)
-        y_stop = int((self.offset.y + self.height) // tile_size.y + 1)
+        y_stop = int((self.offset.y + self.display.height) // tile_size.y + 1)
         for x in range(x_start, x_stop):
             for y in range(y_start, y_stop):
                 tile = tilemap.get_tile(Vec2(x, y))

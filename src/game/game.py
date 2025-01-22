@@ -1,13 +1,10 @@
 import sys
 import pygame
 from src.tilemap import TileMap 
-from src.util import Assets, CommandPrompt, Vec2
+from src.util import Assets, CommandPrompt
+from .level import Level
 from .player import Player, PlayerState
 from .camera import Camera
-from .collider import Collider
-from .damage import DamageComponent
-from .map_builder import MapBuilder
-from .asteroid import AsteroidSpawner
 
 FPS = 60
 WINDOW_SCALE = 4
@@ -31,44 +28,18 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
-        self.p1 = Player()
-        self.camera.add(self.p1)
-        self.players = list[Player]
+        self.level = Level(map_path='maps/10x8/1_2/test')
+        self.camera.level = self.level
+        self.camera.set_boundary(self.level.tilemap.rect)
 
-        self.colliders = []        
+        self.player = Player(self.level)
+        self.player.spawn(self.level.spawn_pos)
+        self.camera.move_to(self.level.spawn_pos, instant=True)
 
-        self.asteroid_spawner = AsteroidSpawner()
-   
-    def new(self, seed=None):
-        #self.tilemap =  MapBuilder.generate('configs/1.json', seed)
-        self.tilemap = TileMap.load('maps/10x8/1_2/test', Assets.TILESET)
-        self.p1.set_pos(pygame.Vector2(16, 32))
-
-        del self.colliders
-        self.damage_test = DamageComponent()
-        test_collider = Collider(self.damage_test, Vec2(16, 16), Vec2(0, 0))
-        self.damage_test.collider = test_collider
-        self.damage_test.update(pygame.Vector2(32, 32))
-        self.colliders = [test_collider]
-
-        spawn_tile = self.tilemap.spawn_tile
-        if spawn_tile:
-            self.p1.set_pos(pygame.Vector2(spawn_tile.pixel_pos))
-        self.p1.set_state(PlayerState.AIR)
-
-        self.camera.move_to(self.p1.get_center(), instant=True)
-        self.camera.tilemap = self.tilemap
-        self.camera.set_boundary(self.tilemap.rect)
-
-        if False:
-            self.asteroid_spawner.clear()
-            self.asteroid_spawner.set_boundary(self.tilemap.rect)
-            self.asteroid_spawner.spawn(10)
-            self.camera.add(self.asteroid_spawner)
+        self.level.entities.append(self.player)
     
     def run(self):
         self.running = True
-        self.new()
        
         while self.running:
             for event in pygame.event.get():
@@ -79,17 +50,13 @@ class Game:
             
             if not self.command_prompt.enabled:
                 self.camera.update()
-                self.debug_display()
-                
-                self.p1.update(self.tilemap, self.colliders)
-                self.camera.move_to(self.p1.get_center())
-                self.asteroid_spawner.update()
-
-                for collider in self.colliders:
-                    collider.render(self.camera.display, self.camera.offset)
+                self.camera.move_to(self.player.center)
+                for entity in self.level.entities:
+                    entity.update()
 
             # Draw command prompt
             self.command_prompt.render(self.camera.display)
+            self.debug_display()
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -102,9 +69,9 @@ class Game:
         sys.exit()
     
     def debug_display(self):
-        text = f'{self.p1.state_machine.current_state.name}\n'
-        text += f'x: {int(self.p1.pos.x):04}, y:{int(self.p1.pos.y):04} \n'
-        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.p1.collisions.items())
+        text = f'{self.player.state_machine.current_state.name}\n'
+        text += f'x: {int(self.player.pos.x):04}, y:{int(self.player.pos.y):04} \n'
+        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.player.collisions.items())
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         self.camera.display.blit(text_surf, (0, 0))
 
@@ -117,21 +84,21 @@ class Game:
             case ['load', path]:
                 self.tilemap = TileMap.load(path, self.TYPES)
             case ['g']:
-                if self.p1.get_state() == PlayerState.GHOST:
-                    self.p1.set_state(PlayerState.AIR)
+                if self.player.get_state() == PlayerState.GHOST:
+                    self.player.set_state(PlayerState.AIR)
                 else:
-                    self.p1.set_state(PlayerState.GHOST)
+                    self.player.set_state(PlayerState.GHOST)
             case ['n']:
                 self.new()
             case ['n', seed]:
                 self.new(seed)
             case ['p', index]:
-                self.p1.load_sprite(int(index))
+                self.player.load_sprite(int(index))
             case ['tp', x, y]:
-                self.p1.pos = pygame.Vector2(int(x), int(y))
+                self.player.pos = pygame.Vector2(int(x), int(y))
             case ['jumps', amount]:
-                self.p1.max_jumps = int(amount)
-                self.p1.jumps_remaining = self.p1.max_jumps
+                self.player.max_jumps = int(amount)
+                self.player.jumps_remaining = self.player.max_jumps
             case ['q']:
                 self.running = False
             case _:

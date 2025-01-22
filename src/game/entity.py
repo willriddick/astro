@@ -19,9 +19,10 @@ class Entity(pygame.sprite.Sprite):
     def get_pos(self) -> pygame.Vector2:
         return self.pos
     
-    def get_center(self) -> pygame.Vector2:
+    @property
+    def center(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.center)
     
     @property
-    def rect(self):
+    def rect(self) -> pygame.FRect:
         return pygame.FRect(self.pos.x, self.pos.y, self.rect_size.x, self.rect_size.y)
