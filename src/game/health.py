@@ -28,6 +28,9 @@ class HealthComponent:
             lambda c: type(c.owner) is DamageComponent
         ):
             self.take_damage(1)
+    
+    def reset(self):
+        self.health = self.max_health
   
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)
@@ -35,15 +38,13 @@ class HealthComponent:
     def take_damage(self, amount: int):
         if self.vulnerable:
             self.health = max(0, self.health - amount)
-            print(self.health)
             self.invulnerable_timer = self.invulnerable_duration
 
             if self.health == 0:
                 self.on_death()
     
     def on_death(self):
-        print("DEAD")
-        self.health = 3
+        self.reset()
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         self.collider.render(display, offset)
