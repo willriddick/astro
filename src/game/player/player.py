@@ -42,9 +42,10 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, pos: pygame.Vector2=pygame.Vector2(0, 0), palette_index: int=1):
-        super().__init__(pos, Vec2(8, 13))
+    def __init__(self, level, palette_index: int=1):
+        super().__init__(pygame.Vector2(0, 0), Vec2(8, 13))
 
+        self.level = level
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
 
@@ -85,12 +86,18 @@ class Player(PhysicsEntity):
         self.health_component = HealthComponent(1)
         self.health_component.collider = Collider(self.health_component, Vec2(8, 8), Vec2(0, 5))
     
-    def update(self, tilemap, colliders: list[Collider]):
+    def spawn(self, pos: pygame.Vector2):
+        self.set_pos(pos)
+        self.velocity = pygame.Vector2(0, 0)
+        self.health_component.reset()
+        self.set_state(PlayerState.AIR)
+    
+    def update(self):
         self.handle_input()
         self.sprite.update(self.pos)
-        self.health_component.update(self.pos, colliders)
+        self.health_component.update(self.pos, self.level.colliders)
         self.state_machine.update()
-        self.handle_collision(tilemap)
+        self.handle_collision(self.level.tilemap)
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         self.sprite.render(display, offset)

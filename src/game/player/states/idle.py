@@ -4,6 +4,7 @@ from ..player import Player, PlayerState, Animation
 class Idle(State):
     def __init__(self):
         super().__init__(PlayerState.IDLE)
+        self.timer = 0
     
     def on_enter(self):
         self.timer = 0
