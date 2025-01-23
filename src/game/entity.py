@@ -3,11 +3,10 @@ from src.util import Vec2
 from .sprite import Sprite
 
 class Entity:
-    def __init__(self, level: 'Level', pos: pygame.Vector2, size: Vec2):
+    def __init__(self, level: 'Level', pos: pygame.Vector2):
         super().__init__()
         self.level = level
         self.pos = pos
-        self.size = size
         self.sprite: Sprite | None = None
     
     def update(self):
@@ -23,10 +22,3 @@ class Entity:
     def get_pos(self) -> pygame.Vector2:
         return self.pos
     
-    @property
-    def center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.rect.center)
-    
-    @property
-    def rect(self) -> pygame.FRect:
-        return pygame.FRect(self.pos.x, self.pos.y, self.size.x, self.size.y)

@@ -3,8 +3,10 @@ import pygame
 from src.util import Vec2, draw_rect
 
 class Collider:
-    def __init__(self, level, owner, size: Vec2, offset: Vec2):
-        level.register_collider(self)
+    def __init__(self, level: 'Level', owner, size: Vec2, offset: Vec2):
+        self.level = level
+        self.level.register_collider(self)
+
         self.owner = owner
         self.size = size
         self.offset = offset
@@ -24,20 +26,24 @@ class Collider:
     def center(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.center)
 
-    def get_overlap(self, colliders: list['Collider']) -> list['Collider']:
+    def get_overlap(self) -> list['Collider']:
         """Returns colliders overlapping with this collider."""
         if not self.enabled:
             return []
+
         return [
-            collider for collider in colliders
+            collider for collider in self.level.colliders
             if collider != self and self.rect.colliderect(collider.rect)
         ]
-    
-    def get_nearest(self, colliders: list['Collider'], filter_: Callable[['Collider'], bool]) -> 'Collider':
+   
+    def get_nearest(self, filter_: Callable[['Collider'], bool]) -> 'Collider':
         """Returns the nearest collider that passes the filter."""
+        if not self.enabled:
+            return None
+
         nearest = None
         distance = 99999
-        for collider in self.get_overlap(colliders):
+        for collider in self.get_overlap():
             if not filter_(collider):
                 continue
 
@@ -45,6 +51,7 @@ class Collider:
             if new_distance < distance:
                 nearest = collider
                 distance = new_distance
+            
         return nearest
     
     def update(self, pos: pygame.Vector2):

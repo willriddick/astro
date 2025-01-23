@@ -10,9 +10,11 @@ class Ghost(State):
     def on_enter(self):
         self.owner.velocity = pygame.Vector2(0, 0)
         self.owner.sprite.set_animation(Animations.RUN)
+        self.owner.health_component.disable()
         self.owner.collision_enabled = False
     
     def on_exit(self):
+        self.owner.health_component.enable()
         self.owner.collision_enabled = True
 
     def update(self):

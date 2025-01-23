@@ -1,4 +1,5 @@
 from enum import Enum
+import pygame
 from .vec2 import Vec2
 
 class Direction(Enum):
@@ -9,18 +10,18 @@ class Direction(Enum):
         mask (int): A bitmask value representing the direction.
         symbol (str): A string symbol representing the direction.
     """
-    NONE = (Vec2(0, 0), 0, ' ')
-    RIGHT = (Vec2(1,  0), 1, '→')
-    LEFT  = (Vec2(-1, 0), 2, '←')
-    DOWN  = (Vec2(0,  1), 4, '↓')
-    UP    = (Vec2(0, -1), 8, '↑')
-    UP_LEFT = (Vec2(-1, -1), 16, '↖')
-    UP_RIGHT = (Vec2(1, -1), 32, '↗')
-    DOWN_RIGHT = (Vec2(1, 1), 64, '↘')
-    DOWN_LEFT = (Vec2(-1, 1), 128, '↙')
+    NONE = ((0, 0), 0, ' ')
+    RIGHT = ((1,  0), 1, '→')
+    LEFT  = ((-1, 0), 2, '←')
+    DOWN  = ((0,  1), 4, '↓')
+    UP    = ((0, -1), 8, '↑')
+    UP_LEFT = ((-1, -1), 16, '↖')
+    UP_RIGHT = ((1, -1), 32, '↗')
+    DOWN_RIGHT = ((1, 1), 64, '↘')
+    DOWN_LEFT = ((-1, 1), 128, '↙')
 
-    def __init__(self, vector: Vec2, mask: int, symbol: str):
-        self.vector = vector
+    def __init__(self, vector: tuple[int, int], mask: int, symbol: str):
+        self.vector = pygame.Vector2(vector)
         self.mask = mask
         self.symbol = symbol
 

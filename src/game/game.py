@@ -82,7 +82,8 @@ class Game:
         self.level.entities.append(self.player)
 
     def debug_display(self):
-        text = f'{self.player.state_machine.current_state.name}\n'
+        text = f'{self.player.state_machine.current_state.name} \n'
+        text += f'hp: {self.player.health_component.health}\n'
         text += f'x: {int(self.player.pos.x):04}, y:{int(self.player.pos.y):04} \n'
         text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.player.collisions.items())
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))

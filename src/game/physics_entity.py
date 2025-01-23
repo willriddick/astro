@@ -5,8 +5,8 @@ from .entity import Entity
 
 class PhysicsEntity(Entity):
     def __init__(self, level: 'Level', pos: pygame.Vector2, size: Vec2):
-        super().__init__(level, pos, size)
-
+        super().__init__(level, pos)
+        self.size = size
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)
         self.gravity_multiplier = 1
@@ -23,6 +23,17 @@ class PhysicsEntity(Entity):
             Direction.RIGHT: False, 
             Direction.LEFT: False
         }
+    
+    @property
+    def center(self) -> pygame.Vector2:
+        return pygame.Vector2(self.rect.center)
+    
+    @property
+    def rect(self) -> pygame.FRect:
+        return pygame.FRect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+    
+    def apply_force(self, force: float, direction: Direction | pygame.Vector2):
+        self.velocity = force * (direction.vector if isinstance(direction, Direction) else direction)
     
     def accelerate_x(self, dir_: int, max_speed: float, acc: tuple[float, float]):
         self.velocity.x = self.accelerate_decelerate(self.velocity.x, max_speed, dir_, acc, self.velocity_multiplier.x)

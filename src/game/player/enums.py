@@ -20,3 +20,4 @@ class States(Enum):
     SLIDE = 4
     WALL_SLIDE = 5
     WALL_JUMP = 6
+    DEAD = 7

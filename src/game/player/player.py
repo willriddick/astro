@@ -69,37 +69,43 @@ class Player(PhysicsEntity):
         self.load_sprite(palette_index)
 
         # setup state machine
-        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
+        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Dead
         self.state_machine = StateMachine(self, [
-            Idle(),
-            Run(),
-            Jump(),
-            Air(),
-            Slide(),
-            WallSlide(),
-            WallJump(),
-            Ghost()
+            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), WallJump(), Ghost(), Dead(),
         ])
 
         self.health_component = HealthComponent(3)
-        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 8), Vec2(0, 5))
+        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
+        self.health_component.on_damaged = self.on_damage
+        self.health_component.on_death = self.on_death
     
+    def set_pos(self, pos: pygame.Vector2):
+        self.pos = pos
+        self.health_component.update(pos)
+
     def toggle_ghost(self):
-        if self.get_state == States.GHOST:
+        if self.get_state() == States.GHOST:
             self.set_state(States.AIR)
         else:
             self.set_state(States.GHOST)
     
+    def on_damage(self):
+        self.apply_force(3, Direction.UP)
+    
+    def on_death(self):
+        self.set_state(States.DEAD)
+    
     def spawn(self, pos: pygame.Vector2):
         self.set_pos(pos)
         self.velocity = pygame.Vector2(0, 0)
-        self.health_component.reset()
         self.set_state(States.AIR)
+        self.health_component.reset()
+        self.health_component.enable()
     
     def update(self):
         self.handle_input()
         self.sprite.update(self.pos)
-        self.health_component.update(self.pos, self.level.colliders)
+        self.health_component.update(self.pos)
         self.state_machine.update()
         self.handle_collision(self.level.tilemap)
     

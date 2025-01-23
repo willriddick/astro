@@ -6,3 +6,4 @@ from .slide import Slide
 from .wall_slide import WallSlide
 from .wall_jump import WallJump
 from .ghost import Ghost
+from .dead import Dead
