@@ -3,7 +3,7 @@ import pygame
 from src.util import Vec2
 
 class Sprite:
-    def __init__(self, pos: pygame.Vector2, image_offset: Vec2):
+    def __init__(self, pos: pygame.Vector2, image_offset = Vec2(0, 0)):
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
 
@@ -33,7 +33,7 @@ class Sprite:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
     
-    def add_animation(self, id_: Enum, frames: list[pygame.Surface], frame_rate: int, range_: tuple[int, int]=None):
+    def add_animation(self, id_: Enum, frames: list[pygame.Surface], frame_rate: int = 0, range_: tuple[int, int]=None):
         if range_:
             start, stop = range_
             if not (0 <= start < len(frames) and 0 < stop <= len(frames) and start < stop):

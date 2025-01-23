@@ -1,11 +1,12 @@
 import pygame
-from src.util import Assets, Vec2
+from src.util import Assets
 from src.tilemap import TileMap
-from src.game.collider import Collider
-from src.game.damage import DamageComponent
-from src.game.player import Player
-from src.game.map_builder import generate
-from src.game.entity import Entity
+from .collider import Collider
+from .damage import DamageComponent
+from .player import Player
+from .map_builder import generate
+from .entity import Entity
+from .spike import Spike
 
 class Level:
     def __init__(self, 
@@ -18,7 +19,7 @@ class Level:
             self.spawn_tile = None
         else:
             self.tilemap, self.spawn_tile = generate(config, seed)
-
+        
         if self.spawn_tile:
             self.spawn_pos = pygame.Vector2(self.spawn_tile.pixel_pos)
         else:
@@ -27,10 +28,9 @@ class Level:
         self.colliders: list[Collider] = []
         self.entities: list[Entity] = []
 
-        damage_test = DamageComponent()
-        test_collider = Collider(self, damage_test, Vec2(16, 16), Vec2(0, 0))
-        damage_test.collider = test_collider
-        damage_test.update(pygame.Vector2(32, 32))
+        for spike in self.tilemap.get_tiles_with('spike'):
+            Spike(self, spike.pos)
+            del spike
 
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)

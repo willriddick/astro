@@ -10,7 +10,7 @@ class Tile:
         self.tile_pos = tile_pos
         self.collision = self.tile_type.collision
         self.debug = False
-    
+
     def __str__(self):
         return f'{self.tile_type.name}:{self.variant} {self.tile_pos}'
     
@@ -22,8 +22,8 @@ class Tile:
         return self.tilemap.tile_size
     
     @property
-    def pixel_pos(self) -> Vec2:
-        return Vec2(
+    def pos(self) -> pygame.Vector2:
+        return pygame.Vector2(
             self.tile_pos.x * self.tile_size.x,
             self.tile_pos.y * self.tile_size.y
         ) 
@@ -31,14 +31,17 @@ class Tile:
     @property
     def rect(self) -> pygame.Rect:
         return pygame.Rect(
-            self.pixel_pos.x + self.tile_type.collision_offset.x,
-            self.pixel_pos.y + self.tile_type.collision_offset.y,
+            self.pos.x + self.tile_type.collision_offset.x,
+            self.pos.y + self.tile_type.collision_offset.y,
             self.tile_type.size.x,
             self.tile_type.size.y
         )
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        pos = (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
+        if len(self.tile_type.images) == 0:
+            return
+
+        pos = (self.pos.x - offset.x, self.pos.y - offset.y)
         display.blit(self.tile_type.images[self.variant], pos)
 
         if self.debug and self.collision:
@@ -51,5 +54,5 @@ class Tile:
             )
             display.blit(
                 collision_display, 
-                (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
+                (self.pos.x - offset.x, self.pos.y - offset.y)
             )

@@ -1,14 +1,18 @@
 import pygame
-from .sprite import Sprite
 from src.util import Vec2
+from .sprite import Sprite
 
 class Entity:
-    def __init__(self, pos: pygame.Vector2, size: Vec2):
+    def __init__(self, level: 'Level', pos: pygame.Vector2, size: Vec2):
         super().__init__()
+        self.level = level
         self.pos = pos
         self.size = size
         self.sprite: Sprite | None = None
     
+    def update(self):
+        pass
+
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         assert self.sprite, 'Sprite not set {self}'
         self.sprite.render(display, offset)

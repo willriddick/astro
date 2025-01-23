@@ -23,11 +23,13 @@ class HealthComponent:
         self.collider.update(pos)
         self.invulnerable_timer = max(0, self.invulnerable_timer - 1)
 
-        if self.vulnerable and self.collider.get_nearest(
-            colliders, 
-            lambda c: type(c.owner) is DamageComponent
-        ):
-            self.take_damage(1)
+        if self.vulnerable:
+            nearest = self.collider.get_nearest(
+                colliders, 
+                lambda c: type(c.owner) is DamageComponent
+            )
+            if nearest:
+                self.take_damage(nearest.owner.damage)
     
     def reset(self):
         self.health = self.max_health

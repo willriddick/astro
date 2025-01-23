@@ -4,8 +4,8 @@ from src.util import approach, Direction, Vec2
 from .entity import Entity
 
 class PhysicsEntity(Entity):
-    def __init__(self, pos: pygame.Vector2, size: Vec2):
-        super().__init__(pos, size)
+    def __init__(self, level: 'Level', pos: pygame.Vector2, size: Vec2):
+        super().__init__(level, pos, size)
 
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)

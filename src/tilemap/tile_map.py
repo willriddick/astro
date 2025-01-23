@@ -36,7 +36,7 @@ class TileMap:
         return self.map.get(Vec2.translate(tile_pos, offset))
     
     def get_tiles_with(self, tile_type: str) -> list[Tile]:
-        return list(filter(lambda x: x.type.name == tile_type, list(self.map.values())))
+        return list(filter(lambda x: x.tile_type.name == tile_type, list(self.map.values())))
     
     def get_tiles_around(self, tile_pos: Vec2) -> list[Tile]:
         return [tile for direction in Direction if (tile := self.get_tile(tile_pos, direction)) is not None]
