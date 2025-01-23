@@ -37,6 +37,10 @@ class Camera:
         # Render all entities relative to the offset
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
+        
+        # Render all colliders
+        for collider in self.level.colliders:
+            collider.render(self.display, -self.offset)
 
     def render_tilemap(self, tilemap):
         if not tilemap:

@@ -39,12 +39,12 @@ class HealthComponent:
         if self.vulnerable:
             self.health = max(0, self.health - amount)
             self.invulnerable_timer = self.invulnerable_duration
+            print(f"Health: {self.health}")
 
             if self.health == 0:
                 self.on_death()
     
     def on_death(self):
+        print("Player died!")
         self.reset()
     
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        self.collider.render(display, offset)

@@ -82,8 +82,8 @@ class Player(PhysicsEntity):
             Ghost()
         ])
 
-        self.health_component = HealthComponent(1)
-        self.health_component.collider = Collider(self.health_component, Vec2(8, 8), Vec2(0, 5))
+        self.health_component = HealthComponent(3)
+        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 8), Vec2(0, 5))
     
     def toggle_ghost(self):
         if self.get_state == States.GHOST:
@@ -106,8 +106,6 @@ class Player(PhysicsEntity):
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         self.sprite.render(display, offset)
-        self.health_component.render(display, offset)
-        #draw_rect(display, offset, self.pos, self.rect_size)
     
     def set_state(self, state: 'States'):
         self.state_machine.switch(state)

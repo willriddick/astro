@@ -3,7 +3,8 @@ import pygame
 from src.util import Vec2, draw_rect
 
 class Collider:
-    def __init__(self, owner, size: Vec2, offset: Vec2):
+    def __init__(self, level, owner, size: Vec2, offset: Vec2):
+        level.register_collider(self)
         self.owner = owner
         self.size = size
         self.offset = offset

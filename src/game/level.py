@@ -28,10 +28,9 @@ class Level:
         self.entities: list[Entity] = []
 
         damage_test = DamageComponent()
-        test_collider = Collider(damage_test, Vec2(16, 16), Vec2(0, 0))
+        test_collider = Collider(self, damage_test, Vec2(16, 16), Vec2(0, 0))
         damage_test.collider = test_collider
         damage_test.update(pygame.Vector2(32, 32))
-        self.register_collider(test_collider)
 
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
