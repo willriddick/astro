@@ -33,7 +33,7 @@ class TileMap:
             tile.render(surf, offset)
     
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
-        return self.map.get(Vec2.move(tile_pos, offset))
+        return self.map.get(Vec2.translate(tile_pos, offset))
     
     def get_tiles_with(self, tile_type: str) -> list[Tile]:
         return list(filter(lambda x: x.type.name == tile_type, list(self.map.values())))

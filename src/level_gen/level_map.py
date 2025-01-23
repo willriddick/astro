@@ -43,9 +43,7 @@ class LevelMap:
             position (Vec2): The position of the room to check for.
             direction (Direction, optional): An optional direction offset to apply.
         """
-        # Apply the offset, if provided
-        if direction is not None:
-            position = Vec2.move(position, direction)
+        position = Vec2.translate(position, direction)
 
         # If the position is out of bounds, return False
         if not (0 <= position.x < self.config.cols and 0 <= position.y < self.config.rows):

@@ -2,11 +2,11 @@ import pygame
 from .sprite import Sprite
 from src.util import Vec2
 
-class Entity(pygame.sprite.Sprite):
-    def __init__(self, pos: pygame.Vector2, rect_size: Vec2):
+class Entity:
+    def __init__(self, pos: pygame.Vector2, size: Vec2):
         super().__init__()
         self.pos = pos
-        self.rect_size = rect_size
+        self.size = size
         self.sprite: Sprite | None = None
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
@@ -25,4 +25,4 @@ class Entity(pygame.sprite.Sprite):
     
     @property
     def rect(self) -> pygame.FRect:
-        return pygame.FRect(self.pos.x, self.pos.y, self.rect_size.x, self.rect_size.y)
+        return pygame.FRect(self.pos.x, self.pos.y, self.size.x, self.size.y)
