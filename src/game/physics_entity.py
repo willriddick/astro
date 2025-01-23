@@ -116,13 +116,12 @@ class PhysicsEntity(Entity):
                               (entity_rect.right + 1, entity_rect.bottom - 1)],
         }
         for direction, points in points.items():
+            self.collisions[direction] = False
             for tile in collisions_around:
                 tile_rect = tile.rect
                 if any(tile_rect.collidepoint(point) for point in points):
                     self.collisions[direction] = True
                     break # No need to check further tiles for this direction
-                else:
-                    self.collisions[direction] = False
         
         # Update helper variables
         self.on_ground = self.collisions[Direction.DOWN]
