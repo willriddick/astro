@@ -11,8 +11,8 @@ class Collider:
         self.pos = pygame.Vector2(0, 0)
     
     @property
-    def rect(self) -> pygame.Rect:
-        return pygame.Rect(
+    def rect(self) -> pygame.FRect:
+        return pygame.FRect(
             self.pos.x + self.offset.x,
             self.pos.y + self.offset.y,
             self.size.x,

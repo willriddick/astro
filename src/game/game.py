@@ -58,16 +58,27 @@ class Game:
             self.command_prompt.render(self.camera.display)
             self.debug_display()
 
-            try:
-                self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
-                pygame.display.update()
-                self.clock.tick(FPS) 
-            except:
-                self.running = False
+            self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
+            pygame.display.update()
+            self.clock.tick(FPS)
 
         pygame.quit()
         sys.exit()
-    
+
+    def new(self, seed: int = None):
+        if seed:
+            self.level = Level(seed=seed)
+        else:
+            self.level = Level()
+        self.camera.level = self.level
+        self.camera.set_boundary(self.level.tilemap.rect)
+
+        self.player = Player(self.level)
+        self.player.spawn(self.level.spawn_pos)
+        self.camera.move_to(self.level.spawn_pos, instant=True)
+
+        self.level.entities.append(self.player)
+
     def debug_display(self):
         text = f'{self.player.state_machine.current_state.name}\n'
         text += f'x: {int(self.player.pos.x):04}, y:{int(self.player.pos.y):04} \n'
@@ -81,8 +92,6 @@ class Game:
             return
 
         match command.split():
-            case ['load', path]:
-                self.tilemap = TileMap.load(path, self.TYPES)
             case ['g']:
                 if self.player.get_state() == PlayerState.GHOST:
                     self.player.set_state(PlayerState.AIR)

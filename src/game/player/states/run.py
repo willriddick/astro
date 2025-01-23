@@ -1,10 +1,10 @@
-from random import choice
 from src.util import State
 from ..player import Player, PlayerState, Animation
 
 class Run(State):
     def __init__(self):
         super().__init__(PlayerState.RUN)
+        self.timer = 0
 
     def on_enter(self):
         self.timer = 0 # duration player has been in RUN state

@@ -1,12 +1,11 @@
 import pygame
-from src.util import Vec2
 from .collider import Collider
 
 class DamageComponent:
     def __init__(self):
-        self.collider = None
+        self.collider: Collider | None = None
     
-    def update(self, pos: Vec2):
+    def update(self, pos: pygame.Vector2):
         self.collider.update(pos)
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):

@@ -36,7 +36,8 @@ class PhysicsEntity(Entity):
             self.velocity.y + gravity * self.gravity_multiplier
         )
 
-    def accelerate_decelerate(self, value: float, target: float, dir_: int, acc: tuple[float, float], multiplier: float) -> float:
+    @staticmethod
+    def accelerate_decelerate(value: float, target: float, dir_: int, acc: tuple[float, float], multiplier: float) -> float:
         if dir_ == 0:
             return approach(
                 value=value,
@@ -49,18 +50,18 @@ class PhysicsEntity(Entity):
                 target=dir_ * target * multiplier,
                 step=acc[0] * multiplier
             )
-   
+
     def handle_collision(self, tilemap: TileMap):
         if not self.collision_enabled:
             self.pos += self.velocity
             return
 
         # Update tile position
-        tile_pos = Vec2(self.pos.x // tilemap.tile_size.x, self.pos.y // tilemap.tile_size.y)
+        tile_pos = Vec2(int(self.pos.x) // tilemap.tile_size.x, int(self.pos.y) // tilemap.tile_size.y)
         self.tiles_around = tilemap.get_tiles_around(tile_pos)
 
         # Handle platform collision
-        for platform in filter(lambda tile: tile.type.name == 'platform', self.tiles_around):
+        for platform in filter(lambda _tile: _tile.tile_type.name == 'platform', self.tiles_around):
             # If player is below platform, disable collision
             if platform.rect.top < self.rect.bottom:
                 platform.collision = False
@@ -71,7 +72,7 @@ class PhysicsEntity(Entity):
                     platform.collision = True
 
         # Filter out collision tiles
-        collisions_around = list(filter(lambda tile: tile.collision, self.tiles_around))
+        collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position
         self.pos.y += self.velocity.y

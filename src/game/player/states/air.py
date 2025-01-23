@@ -1,4 +1,3 @@
-from random import choice
 from src.util import State
 from ..player import Player, Animation, PlayerState
 

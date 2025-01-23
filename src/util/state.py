@@ -1,9 +1,11 @@
+import enum
+
 class State:
-    def __init__(self, _id: int):
+    def __init__(self, _id: enum):
         self.id = _id
         self.state_machine = None
     
-    def switch(self, _id: int):
+    def switch(self, _id: enum):
         if self.state_machine is None:
             raise ValueError('State machine is not set.')
         self.state_machine.switch(_id)

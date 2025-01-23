@@ -6,8 +6,8 @@ class TileSet:
         self.tileset: list[TileType] = []
         self.tile_size = tile_size
     
-    def add(self, type: TileType):
-        self.tileset.append(type)
+    def add(self, tile_type: TileType):
+        self.tileset.append(tile_type)
     
     def get_by(self, name: str) -> TileType:
         for tile in self.tileset:

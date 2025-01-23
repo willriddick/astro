@@ -7,8 +7,8 @@ def draw_rect(
         pos = pygame.Vector2(0, 0),
         size = Vec2(0, 0),
         line_width = 1,
-        outline_color: pygame.Color = (0, 0, 0, 127),
-        fill_color: pygame.Color = (255, 255, 255, 127),
+        outline_color = pygame.Color(0, 0, 0, 127),
+        fill_color = pygame.Color(255, 255, 255, 127),
     ):
     surface = pygame.Surface((size.x, size.y), pygame.SRCALPHA)
     surface.fill(fill_color) 

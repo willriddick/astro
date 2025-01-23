@@ -6,7 +6,7 @@ from .damage import DamageComponent
 class HealthComponent:
     def __init__(self, max_health: int, invulnerable_duration: int = 30):
         self.max_health = max_health
-        self.collider = None
+        self.collider: Collider | None = None
         self.health = max_health
         self.invulnerable_duration = invulnerable_duration
         self.invulnerable_timer = 0
@@ -19,7 +19,7 @@ class HealthComponent:
     def invulnerable(self):
         return self.invulnerable_timer > 0
     
-    def update(self, pos: Vec2, colliders: list[Collider]):
+    def update(self, pos: pygame.Vector2, colliders: list[Collider]):
         self.collider.update(pos)
         self.invulnerable_timer = max(0, self.invulnerable_timer - 1)
 

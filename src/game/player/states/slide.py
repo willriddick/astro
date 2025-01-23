@@ -4,7 +4,9 @@ from ..player import Player, PlayerState, Animation
 class Slide(State):
     def __init__(self):
         super().__init__(PlayerState.SLIDE)
-    
+        self.entry_speed = 0.0
+        self.timer = 0
+
     def on_enter(self):
         self.owner.sprite.set_animation(Animation.SLIDE)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1

@@ -15,13 +15,14 @@ class Level:
     ):
         if map_path:
             self.tilemap = TileMap.load(map_path, Assets.TILESET)
+            self.spawn_tile = None
         else:
-            self.tilemap = generate(config, seed)
+            self.tilemap, self.spawn_tile = generate(config, seed)
 
-        self.spawn_pos = pygame.Vector2(32, 32)
-        spawn_tile = self.tilemap.spawn_tile
-        if spawn_tile:
-            self.spawn_pos = pygame.Vector2(spawn_tile.pixel_pos)
+        if self.spawn_tile:
+            self.spawn_pos = pygame.Vector2(self.spawn_tile.pixel_pos)
+        else:
+            self.spawn_pos = pygame.Vector2(32, 32)
 
         self.colliders: list[Collider] = []
         self.entities: list[Entity] = []

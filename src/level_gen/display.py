@@ -20,7 +20,6 @@ class Display:
         room_cols (int): Number of columns for each room
         rows (int): Number of rows in the level map.
         cols (int): Number of columns in the level map.
-        room_size (int): Size of each room in the grid, in characters.
         display (list[list[str]]): 2D array representing the ASCII display of the map.
     """
     def __init__(self, level: LevelMap):
@@ -46,8 +45,9 @@ class Display:
         self._update_display()
         # Flip the array vertically to correct for filling the array top to bottom
         return '\n'.join([''.join(row) for row in self.display if not self._is_empty_row(row)])
-    
-    def _is_empty_row(self, row: np.ndarray) -> bool:
+
+    @staticmethod
+    def _is_empty_row(row: np.ndarray) -> bool:
         """Check if a row is empty (contains only spaces)."""
         return np.all(row == ' ')
     

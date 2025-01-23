@@ -7,7 +7,7 @@ class Entity(pygame.sprite.Sprite):
         super().__init__()
         self.pos = pos
         self.rect_size = rect_size
-        self.sprite: Sprite = None
+        self.sprite: Sprite | None = None
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         assert self.sprite, 'Sprite not set {self}'

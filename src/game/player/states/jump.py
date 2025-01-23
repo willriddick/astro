@@ -1,5 +1,5 @@
 from src.util import State
-from ..player import Player, PlayerState, Animation
+from ..player import Player, PlayerState
 
 class Jump(State):
     def __init__(self):
@@ -13,7 +13,7 @@ class Jump(State):
         ):
             self.owner.jumps_remaining -= 1
         
-        # upddate velocity and jump count
+        # update velocity and jump count
         if self.owner.jumps_remaining:
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
 

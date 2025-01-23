@@ -1,6 +1,5 @@
 import pygame
 import numpy as np
-from src.tilemap import TileMap
 from src.game.level import Level
 from src.util import Vec2
 from .entity import Entity
@@ -15,9 +14,9 @@ class Camera:
         self.position = pygame.Vector2(0, 0)
         self.target_position = pygame.Vector2(0, 0)
         self.offset = pygame.Vector2(0, 0)
-        self.boundary: tuple[int, int, int, int] = None
+        self.boundary: pygame.Rect | None = None
 
-        self.level: Level = None
+        self.level: Level | None = None
 
         self.fill_color = (24, 20, 37)
     
@@ -76,25 +75,17 @@ class Camera:
         if self.boundary:
             clamped_x = max(
                 self.boundary.left + self.width // 2,
-                min(self.position.x, self.boundary.right - self.width // 2)
+                min(int(self.position.x), self.boundary.right - (self.width // 2))
             )
             clamped_y = max(
                 self.boundary.top + self.height // 2,
-                min(self.position.y, self.boundary.bottom - self.height // 2)
+                min(int(self.position.y), self.boundary.bottom - (self.height // 2))
             )
             self.position = pygame.Vector2(clamped_x, clamped_y)
     
     def set_boundary(self, boundary: pygame.Rect):
         """Set a boundary for the camera to stay within."""
         self.boundary = boundary
-
-    def add(self, entity: Entity):
-        """Add an entity to be managed by the camera."""
-        self.entities.append(entity)
-   
-    def remove(self, entity: Entity):
-        """Remove an entity from the camera."""
-        self.entities.remove(entity)
 
     def draw_debug(self):
         camera_marker = pygame.Rect(self.width // 2 - 2, self.height // 2 - 2, 4, 4)

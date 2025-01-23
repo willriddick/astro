@@ -4,7 +4,7 @@ from .vec2 import Vec2
 from .assets import Assets
 from .draw import draw_rect
 
-RECT_COLOR = (0, 40, 80, 100)
+RECT_COLOR = pygame.Color(0, 40, 80, 100)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:
@@ -124,7 +124,7 @@ class CommandPrompt:
                 pos=pygame.Vector2(0, display.get_height() - 12),
                 size=Vec2(display.get_width(), 12),
                 fill_color=RECT_COLOR, 
-                outline_color=(255, 255, 255, 255),
+                outline_color=pygame.Color(255, 255, 255, 255),
             )
             text = f'/{self.input[:self.cursor_index]}_{self.input[self.cursor_index:]}'
             text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
