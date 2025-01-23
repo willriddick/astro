@@ -1,16 +1,17 @@
 from src.util import State
-from ..player import Player, PlayerState, Animation
+from ..player import Player
+from ..enums import Animations, States
 
 class Run(State):
     def __init__(self):
-        super().__init__(PlayerState.RUN)
+        super().__init__(States.RUN)
         self.timer = 0
 
     def on_enter(self):
         self.timer = 0 # duration player has been in RUN state
-        self.owner.sprite.set_next(Animation.RUN)
+        self.owner.sprite.set_next(Animations.RUN)
         if self.owner.rotated:
-            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
+            self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
         
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
@@ -19,7 +20,7 @@ class Run(State):
 
         # animate player
         if self.owner.rotated:
-            self.owner.sprite.set_animation_duration(Animation.FRONT, Player.ROTATE_DURATION, Animation.RUN)
+            self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
         
         if self.owner.move_dir.x != 0:
             self.owner.sprite.flip = self.owner.move_dir.x == -1
@@ -29,14 +30,14 @@ class Run(State):
         if self.timer < Player.SLIDE_BUFFER:
             if (
                 self.owner.slide_input_timer
-                and self.owner.state_machine.previous_state.id == PlayerState.AIR
+                and self.owner.state_machine.previous_state.id == States.AIR
             ):
-                self.switch(PlayerState.SLIDE)
+                self.switch(States.SLIDE)
         
         # switch states
         if self.owner.velocity.x == 0:
-            self.switch(PlayerState.IDLE)
+            self.switch(States.IDLE)
         
         if not self.owner.on_ground:
-            self.switch(PlayerState.AIR)
+            self.switch(States.AIR)
         

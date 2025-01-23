@@ -1,10 +1,9 @@
 import sys
 import pygame
-from src.tilemap import TileMap 
 from src.util import Assets, CommandPrompt
 from .level import Level
-from .player import Player, PlayerState
 from .camera import Camera
+from .player import Player 
 
 FPS = 60
 WINDOW_SCALE = 4
@@ -58,9 +57,12 @@ class Game:
             self.command_prompt.render(self.camera.display)
             self.debug_display()
 
-            self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
-            pygame.display.update()
-            self.clock.tick(FPS)
+            try:
+                self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
+                pygame.display.update()
+                self.clock.tick(FPS)
+            except KeyboardInterrupt:
+                self.running = False
 
         pygame.quit()
         sys.exit()
@@ -93,10 +95,7 @@ class Game:
 
         match command.split():
             case ['g']:
-                if self.player.get_state() == PlayerState.GHOST:
-                    self.player.set_state(PlayerState.AIR)
-                else:
-                    self.player.set_state(PlayerState.GHOST)
+                self.player.toggle_ghost()
             case ['n']:
                 self.new()
             case ['n', seed]:

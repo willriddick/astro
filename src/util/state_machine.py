@@ -1,10 +1,10 @@
-import enum
+from enum import Enum
 from .state import State
 
 class StateMachine:
     def __init__(self, owner: object, states: list[State]):
         self.owner = owner
-        self.states: dict[enum, State] = {}
+        self.states: dict[Enum, State] = {}
         self.add_states(states)
         self.current_state: State = states[0]
         self.previous_state: State = self.current_state
@@ -13,7 +13,7 @@ class StateMachine:
         if self.current_state is not None:
             self.current_state.update()
     
-    def switch(self, _id: enum):
+    def switch(self, _id: Enum):
         if _id not in self.states:
             raise ValueError(f'State with ID {_id} does not exist.')
 
@@ -35,12 +35,12 @@ class StateMachine:
         self.states[state.id] = state
         state.state_machine = self
     
-    def remove_state(self, _id: enum):
+    def remove_state(self, _id: Enum):
         if _id not in self.states:
             raise ValueError(f'State with ID {_id} does not exist.')
         del self.states[_id]
     
-    def get_state(self, _id: enum) -> State:
+    def get_state(self, _id: Enum) -> State:
         return self.states[_id]
     
     def get_states(self):

@@ -1,14 +1,15 @@
 from src.util import State 
-from ..player import Player, PlayerState, Animation
+from ..player import Player
+from ..enums import Animations, States
 
 class WallJump(State):
     def __init__(self):
-        super().__init__(PlayerState.WALL_JUMP)
+        super().__init__(States.WALL_JUMP)
         self.timer = 0
     
     def on_enter(self):
         self.timer = Player.WALL_JUMP_DURATION
-        self.owner.sprite.set_animation(Animation.AIR_UP)
+        self.owner.sprite.set_animation(Animations.AIR_UP)
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
         self.owner.velocity.x = Player.WALL_JUMP_SPEED.x * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
         self.owner.velocity.y = -Player.WALL_JUMP_SPEED.y * self.owner.velocity_multiplier.y
@@ -32,9 +33,9 @@ class WallJump(State):
 
         if self.owner.on_ground:
             if self.owner.velocity.x == 0:
-                self.switch(PlayerState.IDLE)
+                self.switch(States.IDLE)
             else:
-                self.switch(PlayerState.RUN)
+                self.switch(States.RUN)
         elif self.timer == 0:
-            self.switch(PlayerState.AIR)
+            self.switch(States.AIR)
     

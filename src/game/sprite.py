@@ -1,4 +1,4 @@
-import enum
+from enum import Enum
 import pygame
 from src.util import Vec2
 
@@ -33,7 +33,7 @@ class Sprite:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
     
-    def add_animation(self, id_: enum, frames: list[pygame.Surface], frame_rate: int, range_: tuple[int, int]=None):
+    def add_animation(self, id_: Enum, frames: list[pygame.Surface], frame_rate: int, range_: tuple[int, int]=None):
         if range_:
             start, stop = range_
             if not (0 <= start < len(frames) and 0 < stop <= len(frames) and start < stop):
@@ -42,7 +42,7 @@ class Sprite:
         else:
             self.animations[id_] = (frames, frame_rate)
     
-    def set_animation(self, id_: enum, frame: int = 0):
+    def set_animation(self, id_: Enum, frame: int = 0):
         assert id_ in self.animations, f'Animation {id_} not found'
         if self.current != id_:
             self.current = id_
@@ -56,13 +56,13 @@ class Sprite:
     def get_animation(self) -> tuple[list[pygame.Surface], int]:
         return self.animations.get(self.current)
     
-    def set_animation_duration(self, id_: enum, duration: int, next_id: int=None):
+    def set_animation_duration(self, id_: Enum, duration: int, next_id: int=None):
         self.set_animation(id_)
         self.next_timer = duration + 1
         if next_id:
             self.next_animation = next_id
     
-    def set_next(self, id_: enum):
+    def set_next(self, id_: Enum):
         if self.next_timer:
             self.next_animation = id_
         else:

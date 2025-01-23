@@ -1,13 +1,14 @@
 from src.util import State, Direction
-from ..player import Player, PlayerState, Animation
+from ..player import Player
+from ..enums import Animations, States
 
 class WallSlide(State):
     def __init__(self):
-        super().__init__(PlayerState.WALL_SLIDE)
+        super().__init__(States.WALL_SLIDE)
 
     def on_enter(self):
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
-        self.owner.sprite.set_animation(Animation.WALL_SLIDE)
+        self.owner.sprite.set_animation(Animations.WALL_SLIDE)
     
     def on_exit(self):
         self.owner.last_rotate_dir = -self.owner.wall_slide_dir
@@ -21,11 +22,11 @@ class WallSlide(State):
         else:
             # apply wall slide gravity and animation
             self.owner.apply_gravity(Player.WALL_SLIDE_GRAVITY, Player.WALL_SLIDE_SPEED)
-            self.owner.sprite.set_animation(Animation.WALL_SLIDE)
+            self.owner.sprite.set_animation(Animations.WALL_SLIDE)
         
         # use AIR animation if not wall sliding
         if self.owner.move_dir.x != self.owner.wall_slide_dir:
-            self.owner.sprite.set_animation(Animation.AIR_DOWN if self.owner.falling else Animation.AIR_UP)
+            self.owner.sprite.set_animation(Animations.AIR_DOWN if self.owner.falling else Animations.AIR_UP)
         
         # update velocity
         self.owner.accelerate_x(self.owner.move_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
@@ -33,12 +34,12 @@ class WallSlide(State):
 
         # switch to IDLE or RUN state
         if self.owner.on_ground:
-            self.switch(PlayerState.IDLE if self.owner.velocity.x == 0 else PlayerState.RUN)
+            self.switch(States.IDLE if self.owner.velocity.x == 0 else States.RUN)
         
         # switch to AIR state 
         if (
             (self.owner.wall_slide_dir == -1 and not self.owner.collisions[Direction.LEFT])
             or (self.owner.wall_slide_dir == 1 and not self.owner.collisions[Direction.RIGHT])
         ):
-            self.switch(PlayerState.AIR)
+            self.switch(States.AIR)
         
