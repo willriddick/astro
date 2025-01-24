@@ -9,17 +9,16 @@ class Camera:
         self.display = pygame.Surface(size)
         self.fill_color = (24, 20, 37)
 
-        # In-game positions
         self.pos = pygame.Vector2(0, 0)
         self.offset = pygame.Vector2(0, 0)
         self.boundary: pygame.Rect | None = None
-
-        self.level: Level | None = None
 
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
         self.screenshake_step = 0
+
+        self.level: Level | None = None
     
     def update(self):
         """Update the camera and render the display surface."""
@@ -85,9 +84,10 @@ class Camera:
     def rect(self):
         """Get the camera's current rectangle in the game world."""
         return pygame.Rect(
-            self.pos.x - self.width // 2,
-            self.pos.y - self.height // 2,
-            self.width, self.height
+            self.pos.x - self.size.x // 2,
+            self.pos.y - self.size.y // 2,
+            self.size.x, 
+            self.size.y,
         )
 
     def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2, instant: bool = False):
@@ -98,18 +98,16 @@ class Camera:
             cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
             self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
 
-        # Clamp the camera's position to the boundary if defined
-        if self.boundary:
-            clamped_x = max(
-                self.boundary.left + self.size.x // 2,
-                min(int(self.pos.x), self.boundary.right - (self.size.x // 2))
+        self.pos = self.clamp(self.pos, self.size, self.boundary)
+        
+    def clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
+        clamped = pos
+        if boundary:
+            h_width = size.x // 2
+            h_height = size.y // 2
+            clamped = pygame.Vector2(
+                max(boundary.left + h_width, min(int(pos.x), boundary.right - h_width)),
+                max(boundary.top + h_height, min(int(pos.y), boundary.bottom - h_height))
             )
-            clamped_y = max(
-                self.boundary.top + self.size.y // 2,
-                min(int(self.pos.y), self.boundary.bottom - (self.size.y // 2))
-            )
-            self.pos = pygame.Vector2(clamped_x, clamped_y)
-    
-    def clamp(self, pos: pygame.Vector2, boundary: pygame.Rect) -> pygame.Vector2:
-        pass
+        return clamped
     
