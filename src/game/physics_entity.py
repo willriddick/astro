@@ -23,7 +23,7 @@ class PhysicsEntity(Entity):
             Direction.RIGHT: False, 
             Direction.LEFT: False
         }
-    
+   
     @property
     def center(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.center)

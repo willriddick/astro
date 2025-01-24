@@ -72,7 +72,7 @@ class Player(PhysicsEntity):
             Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), WallJump(), Ghost(), Dead(),
         ])
 
-        self.health_component = HealthComponent(3)
+        self.health_component = HealthComponent(3, 60)
         self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
@@ -81,18 +81,6 @@ class Player(PhysicsEntity):
         self.pos = pos
         self.health_component.update(pos)
 
-    def toggle_ghost(self):
-        if self.get_state() == States.GHOST:
-            self.set_state(States.AIR)
-        else:
-            self.set_state(States.GHOST)
-    
-    def on_damage(self):
-        self.apply_force(3, Direction.UP)
-    
-    def on_death(self):
-        self.set_state(States.DEAD)
-    
     def spawn(self, pos: pygame.Vector2):
         self.set_pos(pos)
         self.velocity = pygame.Vector2(0, 0)
@@ -107,14 +95,25 @@ class Player(PhysicsEntity):
         self.state_machine.update()
         self.handle_collision(self.level.tilemap)
     
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        self.sprite.render(display, offset)
+    def on_damage(self):
+        self.apply_force(2, Direction.UP)
+        self.sprite.flash(5, pygame.Color(255, 255, 255))
+        self.sprite.oscillate_alpha(self.health_component.invulnerable_duration, 2)
+    
+    def on_death(self):
+        self.set_state(States.DEAD)
     
     def set_state(self, state: 'States'):
         self.state_machine.switch(state)
 
     def get_state(self) -> 'States':
         return self.state_machine.current_state.id
+    
+    def toggle_ghost(self):
+        if self.get_state() == States.GHOST:
+            self.set_state(States.AIR)
+        else:
+            self.set_state(States.GHOST)
     
     def handle_jump(self):
         self.coyote_timer = max(0, self.coyote_timer - 1)

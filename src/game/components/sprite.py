@@ -1,4 +1,5 @@
 from enum import Enum
+import math
 import pygame
 from src.util import Vec2
 
@@ -14,13 +15,21 @@ class Sprite:
 
         self.next_timer = 0
         self.next_animation = None
-
         self.last_update_time = pygame.time.get_ticks()
+
+        self.flash_timer = 0
+        self.flash_color = pygame.Color(255, 255, 255)
+        self.alpha_timer = 0
+        self.alpha_speed = 0
+        self.alpha_range = (0, 255)
     
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
 
+        self.flash_timer = max(0, self.flash_timer - 1)
+        self.alpha_timer = max(0, self.alpha_timer - 1)
         self.next_timer = max(0, self.next_timer - 1)
+        
         if self.next_timer == 1 and self.next_animation:
             self.set_animation(self.next_animation)
             self.next_animation = None
@@ -68,12 +77,37 @@ class Sprite:
         else:
             self.set_animation(id_)
     
+    def flash(self, duration: int, color: pygame.Color):
+        """Flashes the sprite with a given color for the specified duration in frames."""
+        self.flash_timer = duration
+        self.flash_color = color
+    
+    def oscillate_alpha(self, duration: int, speed = 1, alpha_range = (0, 255)):
+        """Oscillates the alpha value of the sprite quickly for a duration."""
+        self.alpha_timer = duration
+        self.alpha_speed = speed
+        self.alpha_range = alpha_range
+    
     def get_surface(self) -> pygame.Surface:
-        return pygame.transform.flip(
-            self.get_animation()[0][self.frame],
-            self.flip, 
-            False
-        )
+        surface = self.get_animation()[0][self.frame]
+        if self.flip:
+            surface = pygame.transform.flip(surface, True, False)
+
+        if self.flash_timer > 0 and self.flash_color:
+            surface = surface.copy()
+            surface.fill(self.flash_color, special_flags=pygame.BLEND_RGB_ADD)
+        
+        if self.alpha_timer > 0 and self.flash_timer == 0:
+            time_factor = pygame.time.get_ticks() / 100
+            alpha = int(
+                (math.sin(time_factor * self.alpha_speed) * 0.5 + 0.5) 
+                * (self.alpha_range[1] - self.alpha_range[0]) + self.alpha_range[0]
+            ) 
+            surface.set_alpha(alpha)
+        else:
+            surface.set_alpha(255)  # Reset to full opacity
+        
+        return surface
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         display.blit( 
