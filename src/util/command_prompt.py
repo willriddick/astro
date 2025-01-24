@@ -119,10 +119,11 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
+            rect = pygame.Rect(0, display.get_height() - 12, display.get_width(), 12)
             draw_rect(
                 display, 
-                pos=pygame.Vector2(0, display.get_height() - 12),
-                size=Vec2(display.get_width(), 12),
+                offset=pygame.Vector2(0, 0),
+                rect=rect,
                 fill_color=RECT_COLOR, 
                 outline_color=pygame.Color(255, 255, 255, 255),
             )

@@ -19,6 +19,8 @@ class Camera:
         self.screenshake_step = 0
 
         self.level: Level | None = None
+
+        self.debug = False
     
     def update(self):
         """Update the camera and render the display surface."""
@@ -26,7 +28,7 @@ class Camera:
         self.display.fill(self.fill_color)
 
         # Update screenshake effect
-        self.handle_screenshake()
+        self._handle_screenshake()
 
         # Calculate the offset from the in-game position
         self.offset = pygame.Vector2(
@@ -35,17 +37,18 @@ class Camera:
         ) + self.screenshake_offset
 
         # Render the tilemap  
-        self.render_tilemap(self.level.tilemap)
+        self._render_tilemap(self.level.tilemap)
 
         # Render all entities relative to the offset
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
         
-        # Render all colliders
-        #for collider in self.level.colliders:
-        #    collider.render(self.display, -self.offset)
+        if self.debug:
+            # Render all colliders
+            for collider in self.level.colliders:
+                collider.render(self.display, -self.offset)
 
-    def render_tilemap(self, tilemap):
+    def _render_tilemap(self, tilemap):
         if not tilemap:
             return
 
@@ -65,7 +68,7 @@ class Camera:
         self.screenshake_intensity = intensity
         self.screenshake_step = intensity / duration
     
-    def handle_screenshake(self):
+    def _handle_screenshake(self):
         self.screenshake_timer = max(0, self.screenshake_timer - 1)
         if self.screenshake_timer > 0:
             self.screenshake_offset = pygame.Vector2(
@@ -87,9 +90,9 @@ class Camera:
             self.pos.x - self.size.x // 2,
             self.pos.y - self.size.y // 2,
             self.size.x, 
-            self.size.y,
+            self.size.y
         )
-
+    
     def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2, instant: bool = False):
         """Move the camera smoothly towards a target position."""
         if instant:
@@ -98,9 +101,9 @@ class Camera:
             cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
             self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
 
-        self.pos = self.clamp(self.pos, self.size, self.boundary)
+        self.pos = self._clamp(self.pos, self.size, self.boundary)
         
-    def clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
+    def _clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
         clamped = pos
         if boundary:
             h_width = size.x // 2
