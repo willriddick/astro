@@ -63,11 +63,12 @@ class Game:
     def new(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.camera.level = self.level
-        self.camera.set_boundary(self.level.tilemap.rect)
 
         self.player = Player(self.level, self.camera)
         self.player.spawn(self.level.spawn_pos)
-        self.camera.move_to(self.level.spawn_pos, instant=True)
+
+        self.camera.boundary = self.level.tilemap.rect
+        self.camera.set_pos(self.level.spawn_pos)
 
         self.level.entities.append(self.player)
 

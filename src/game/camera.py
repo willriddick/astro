@@ -22,17 +22,6 @@ class Camera:
 
         self.level: Level | None = None
 
-        # Define dead zone in the center of the screen
-        dead_zone_fraction = 0.2
-        dz_width = int(self.size.x * dead_zone_fraction)
-        dz_height = int(self.size.y * dead_zone_fraction)
-        self.dead_zone = pygame.Rect(
-            self.size.x // 2 - dz_width // 2,
-            self.size.y // 2 - dz_height // 2,
-            dz_width,
-            dz_height
-        )
-    
     def update(self):
         """Update the camera and render the display surface."""
         # Clear display surface
@@ -54,16 +43,7 @@ class Camera:
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
         
-        
-        
         if self.debug:
-            draw_rect(
-                self.display, 
-                rect=self.dead_zone, 
-                outline_color=(255, 0, 0, 100)
-            )
-
-            # Render all colliders
             for collider in self.level.colliders:
                 collider.render(self.display, -self.offset)
 
@@ -98,10 +78,6 @@ class Camera:
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     
-    def set_boundary(self, boundary: pygame.Rect):
-        """Set a boundary for the camera to stay within."""
-        self.boundary = boundary
-
     @property
     def rect(self):
         """Get the camera's current rectangle in the game world."""
@@ -112,22 +88,14 @@ class Camera:
             self.size.y
         )
     
-    def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2, instant: bool = False):
+    def set_pos(self, target_pos: pygame.Vector2):
+        """Set the camera's position to a target position."""
+        self.pos = self._clamp(target_pos, self.size, self.boundary)
+    
+    def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2):
         """Move the camera smoothly towards a target position only if it moves outside the dead zone."""
-        # Convert to camera space
-        relative_x = target_pos.x - (self.pos.x - self.size.x // 2)
-        relative_y = target_pos.y - (self.pos.y - self.size.y // 2)
-
-        if self.dead_zone.collidepoint(relative_x, relative_y):
-            return  # Do nothing if inside dead zone
-        
-        # Move camera only when the target leaves the dead zone
-        if instant:
-            self.pos = target_pos
-        else:
-            cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
-            self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
-
+        cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
+        self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
         self.pos = self._clamp(self.pos, self.size, self.boundary)
         
     def _clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
