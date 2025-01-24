@@ -92,12 +92,14 @@ class Camera:
         """Set the camera's position to a target position."""
         self.pos = self._clamp(target_pos, self.size, self.boundary)
     
-    def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2):
+    def move_to(self, target_pos: pygame.Vector2, smoothing = 0.2, buffer = 64):
         """Move the camera smoothly towards a target position only if it moves outside the dead zone."""
+        distance_to = target_pos.distance_to(self.pos)
+        smoothing *= (distance_to / buffer)
         cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
         self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
         self.pos = self._clamp(self.pos, self.size, self.boundary)
-        
+
     def _clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
         clamped = pos
         if boundary:
