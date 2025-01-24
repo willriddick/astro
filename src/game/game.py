@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.util import Assets, CommandPrompt
+from src.util import Assets, CommandPrompt, Vec2
 from .level import Level
 from .camera import Camera
 from .player import Player 
@@ -23,7 +23,7 @@ class Game:
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE
         )
-        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.fullscreen = False
         Assets.load_assets()
 
