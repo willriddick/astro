@@ -3,7 +3,7 @@ import pygame
 from src.util import Assets, randf, Vec2
 from .entity import Entity
 from .physics_entity import PhysicsEntity
-from .sprite import Sprite
+from .components import Sprite
 
 class AsteroidSpawner(Entity):
     def __init__(self):

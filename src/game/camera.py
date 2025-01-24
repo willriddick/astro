@@ -17,7 +17,6 @@ class Camera:
         self.boundary: pygame.Rect | None = None
 
         self.level: Level | None = None
-
         self.fill_color = (24, 20, 37)
     
     def update(self):
@@ -39,8 +38,8 @@ class Camera:
             entity.render(self.display, -self.offset)
         
         # Render all colliders
-        for collider in self.level.colliders:
-            collider.render(self.display, -self.offset)
+        #for collider in self.level.colliders:
+        #    collider.render(self.display, -self.offset)
 
     def render_tilemap(self, tilemap):
         if not tilemap:

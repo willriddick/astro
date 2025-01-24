@@ -117,7 +117,7 @@ def _create_path(level: LevelMap, start_room: Room, length: int, weights: dict[D
     level.paths.append(path)
 
     room = start_room
-    direction: Direction = None
+    direction = Direction.NONE
     position = room.position
 
     for _ in range(length):

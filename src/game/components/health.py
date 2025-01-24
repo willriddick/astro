@@ -47,5 +47,3 @@ class HealthComponent:
 
             if self.health == 0:
                 self.on_death()
-    
-    

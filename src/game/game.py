@@ -68,10 +68,7 @@ class Game:
         sys.exit()
 
     def new(self, seed: int = None):
-        if seed:
-            self.level = Level(seed=seed)
-        else:
-            self.level = Level()
+        self.level = Level(seed=seed)
         self.camera.level = self.level
         self.camera.set_boundary(self.level.tilemap.rect)
 

@@ -1,6 +1,5 @@
 import pygame
-from src.util import Vec2
-from .sprite import Sprite
+from .components.sprite import Sprite
 
 class Entity:
     def __init__(self, level: 'Level', pos: pygame.Vector2):

@@ -1,12 +1,11 @@
 import pygame
 from src.util import Assets
 from src.tilemap import TileMap
-from .collider import Collider
-from .damage import DamageComponent
 from .player import Player
 from .map_builder import generate
 from .entity import Entity
 from .spike import Spike
+from .components import Collider, DamageComponent
 
 class Level:
     def __init__(self, 
@@ -20,10 +19,9 @@ class Level:
         else:
             self.tilemap, self.spawn_tile = generate(config, seed)
         
+        self.spawn_pos = pygame.Vector2(32, 32)
         if self.spawn_tile:
-            self.spawn_pos = pygame.Vector2(self.spawn_tile.pixel_pos)
-        else:
-            self.spawn_pos = pygame.Vector2(32, 32)
+            self.spawn_pos = pygame.Vector2(self.spawn_tile.pos)
 
         self.colliders: list[Collider] = []
         self.entities: list[Entity] = []

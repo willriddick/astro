@@ -1,6 +1,5 @@
 import pygame
 from src.util import Vec2
-from src.game.damage import DamageComponent
 
 class TileType:
     """

@@ -32,7 +32,7 @@ class LevelMap:
         """Returns a list of the rooms."""
         return list(self.map.values())
 
-    def get_room_at(self, position: Vec2, direction: Direction = None) -> Room | None | bool:
+    def get_room_at(self, position: Vec2, direction = Direction.NONE) -> Room | None | bool:
         """
         Retrieves the room at a specific position, applying an optional offset. 
         Returns:

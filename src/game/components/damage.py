@@ -4,7 +4,7 @@ from .health import HealthComponent
 
 class DamageComponent:
     def __init__(self, damage: int):
-        self.collider: Collider = None
+        self.collider: Collider | None = None
         self.damage = damage
         self.nearest = None
         self.enabled = True

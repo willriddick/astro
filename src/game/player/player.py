@@ -1,9 +1,7 @@
 import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2
-from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
-from src.game.health import HealthComponent
-from src.game.collider import Collider
+from src.game.components import Collider, HealthComponent, Sprite
 from .enums import Animations, States
 
 class Player(PhysicsEntity):

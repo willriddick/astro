@@ -7,7 +7,7 @@ class Sprite:
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
 
-        self.animations: dict[int, tuple[list[pygame.Surface], int]] = {} # id: (frames, frame_rate)
+        self.animations: dict[Enum, tuple[list[pygame.Surface], int]] = {} # id: (frames, frame_rate)
         self.current = 0
         self.frame = 0
         self.flip = False

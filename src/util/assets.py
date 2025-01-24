@@ -12,6 +12,7 @@ class Assets:
     PLAYER_SHEET: pygame.Surface = None
     PLAYER_PALETTES: list[Palette] = None
     ASTEROIDS: list[pygame.Surface] = None
+    SPIKE: pygame.Surface = None
 
     @staticmethod
     def load_assets():

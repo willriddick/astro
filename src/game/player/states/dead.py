@@ -21,4 +21,4 @@ class Dead(State):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
 
         if self.timer == 0:
-            self.owner.spawn(pygame.Vector2(32, 32))
+            self.owner.spawn(self.owner.level.spawn_pos)

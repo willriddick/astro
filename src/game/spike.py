@@ -1,10 +1,7 @@
 import pygame
 from src.util import Assets, Vec2
-from .entity import Entity
-from .damage import DamageComponent
-from .collider import Collider
-from .sprite import Sprite
-from .health import HealthComponent
+from src.game.components import Sprite, DamageComponent, Collider
+from src.game.entity import Entity
 
 class Spike(Entity):
     def __init__(self, level: 'Level', pos: pygame.Vector2):
