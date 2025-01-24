@@ -1,10 +1,12 @@
 import numpy as np
 import pygame
 from src.game.level import Level
-from src.util import Vec2, randf
+from src.util import Vec2, randf, draw_rect
 
 class Camera:
     def __init__(self, size: Vec2):
+        self.debug = True
+
         self.size = size
         self.display = pygame.Surface(size)
         self.fill_color = (24, 20, 37)
@@ -20,7 +22,16 @@ class Camera:
 
         self.level: Level | None = None
 
-        self.debug = False
+        # Define dead zone in the center of the screen
+        dead_zone_fraction = 0.2
+        dz_width = int(self.size.x * dead_zone_fraction)
+        dz_height = int(self.size.y * dead_zone_fraction)
+        self.dead_zone = pygame.Rect(
+            self.size.x // 2 - dz_width // 2,
+            self.size.y // 2 - dz_height // 2,
+            dz_width,
+            dz_height
+        )
     
     def update(self):
         """Update the camera and render the display surface."""
@@ -43,7 +54,15 @@ class Camera:
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
         
+        
+        
         if self.debug:
+            draw_rect(
+                self.display, 
+                rect=self.dead_zone, 
+                outline_color=(255, 0, 0, 100)
+            )
+
             # Render all colliders
             for collider in self.level.colliders:
                 collider.render(self.display, -self.offset)
@@ -94,7 +113,15 @@ class Camera:
         )
     
     def move_to(self, target_pos: pygame.Vector2, smoothing: float = 0.2, instant: bool = False):
-        """Move the camera smoothly towards a target position."""
+        """Move the camera smoothly towards a target position only if it moves outside the dead zone."""
+        # Convert to camera space
+        relative_x = target_pos.x - (self.pos.x - self.size.x // 2)
+        relative_y = target_pos.y - (self.pos.y - self.size.y // 2)
+
+        if self.dead_zone.collidepoint(relative_x, relative_y):
+            return  # Do nothing if inside dead zone
+        
+        # Move camera only when the target leaves the dead zone
         if instant:
             self.pos = target_pos
         else:
