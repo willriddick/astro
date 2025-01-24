@@ -19,6 +19,8 @@ class Sprite:
 
         self.flash_timer = 0
         self.flash_color = pygame.Color(255, 255, 255)
+        self.flash_blend = pygame.BLEND_RGB_ADD
+
         self.alpha_timer = 0
         self.alpha_speed = 0
         self.alpha_range = (0, 255)
@@ -82,10 +84,11 @@ class Sprite:
         else:
             self.set_animation(id_)
     
-    def flash(self, duration: int, color = pygame.Color(255, 255, 255)):
+    def flash(self, duration: int, color = pygame.Color(255, 255, 255), blend = pygame.BLEND_RGB_ADD):
         """Flashes the sprite with a given color for the specified duration in frames."""
         self.flash_timer = duration
         self.flash_color = color
+        self.flash_blend = blend
     
     def oscillate_alpha(self, duration: int, speed = 1, alpha_range = (0, 255)):
         """Oscillates the alpha value of the sprite quickly for a duration."""
@@ -100,7 +103,7 @@ class Sprite:
 
         if self.flash_timer > 0 and self.flash_color:
             surface = surface.copy()
-            surface.fill(self.flash_color, special_flags=pygame.BLEND_RGB_ADD)
+            surface.fill(self.flash_color, special_flags=self.flash_blend)
         
         if self.alpha_timer > 0 and self.flash_timer == 0:
             time_factor = pygame.time.get_ticks() / 100
