@@ -1,12 +1,15 @@
 from src.util import State
-from ..player import Player, PlayerState, Animation
+from ..player import Player
+from ..enums import Animations, States
 
 class Slide(State):
     def __init__(self):
-        super().__init__(PlayerState.SLIDE)
-    
+        super().__init__(States.SLIDE)
+        self.entry_speed = 0.0
+        self.timer = 0
+
     def on_enter(self):
-        self.owner.sprite.set_animation(Animation.SLIDE)
+        self.owner.sprite.set_animation(Animations.SLIDE)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
         self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
         self.entry_speed = abs(self.owner.velocity.x)
@@ -30,7 +33,7 @@ class Slide(State):
             self.owner.velocity.x == Player.GROUND_MOVE_SPEED
             or self.owner.move_dir.y != 1
         ):
-            self.switch(PlayerState.RUN)
+            self.switch(States.RUN)
         
         if not self.owner.on_ground and self.timer == 0:
-            self.switch(PlayerState.AIR)
+            self.switch(States.AIR)

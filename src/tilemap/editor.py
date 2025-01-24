@@ -1,5 +1,4 @@
 import sys
-import argparse
 import pygame
 from src.util import Assets, Vec2, CommandPrompt
 from .tile_map import TileMap
@@ -86,8 +85,8 @@ class Editor:
     def handle_editing(self):
         # Calculate mouse position
         self.mouse_pos = Vec2(
-            pygame.mouse.get_pos()[0] / RENDER_SCALE, 
-            pygame.mouse.get_pos()[1] / RENDER_SCALE
+            pygame.mouse.get_pos()[0] // RENDER_SCALE,
+            pygame.mouse.get_pos()[1] // RENDER_SCALE
         )
 
         # Calculate selected tile position
@@ -145,9 +144,6 @@ class Editor:
                 print(f'Tilemap cleared')
             case ['size' | 'z', width, height]:
                 self.tilemap.set_size(Vec2(int(width), int(height)))
-            case ['place', path, x, y, flip]:
-                room = TileMap.load(path, Assets.TILESET)
-                self.tilemap.place(room, (int(x), int(y)), flip.lower().startswith('t'))
             case ['quit' | 'q']:
                 self.running = False
             case _:
@@ -220,10 +216,5 @@ class Editor:
             elif event.button == 3:
                 self.right_click = False
 
-def parse_tuple(s):
-    try:
-        return Vec2(map(int, s.split(',')))
-    except ValueError:
-        raise argparse.ArgumentTypeError("Tuple must be in the form \"int,int\"")
-
-Editor().run()
+if __name__ == '__main__':
+    Editor().run()

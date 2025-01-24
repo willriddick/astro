@@ -1,13 +1,18 @@
 import pygame
-from src.util import Vec2
+from .collider import Collider
 
 class HealthComponent:
-    def __init__(self, max_health: int, rect_size: Vec2, invulnerable_duration: int = 15):
+    def __init__(self, max_health: int, invulnerable_duration: int = 30):
         self.max_health = max_health
+        self.collider: Collider | None = None
         self.health = max_health
         self.invulnerable_duration = invulnerable_duration
         self.invulnerable_timer = 0
-        self.rect = pygame.Rect(0, 0, rect_size.x, rect_size.y)
+
+        self.enabled = True
+
+        self.on_death = lambda: None
+        self.on_damaged = lambda: None
     
     @property
     def vulnerable(self):
@@ -16,15 +21,21 @@ class HealthComponent:
     @property
     def invulnerable(self):
         return self.invulnerable_timer > 0
-    
-    def update(self, pos: Vec2, colliders: list):
-        self.rect.topleft = pos
 
+    def enable(self):
+        self.enabled = True
+    
+    def disable(self):
+        self.enabled = False
+    
+    def update(self, pos: pygame.Vector2):
+        self.collider.update(pos)
         self.invulnerable_timer = max(0, self.invulnerable_timer - 1)
+        self.collider.enabled = self.enabled
 
-        if self.rect.collidelist(colliders):
-            self.take_damage(colliders[0].damage)
-    
+    def reset(self):
+        self.health = self.max_health
+  
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)
         
@@ -32,6 +43,7 @@ class HealthComponent:
         if self.vulnerable:
             self.health = max(0, self.health - amount)
             self.invulnerable_timer = self.invulnerable_duration
+            self.on_damaged()
 
             if self.health == 0:
                 self.on_death()

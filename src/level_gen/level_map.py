@@ -9,7 +9,6 @@ class LevelMap:
     Attributes:
         config (Config): The config instance used to generate this level.
         map (dict[pygame.Vector2, Room]): A dictionary representing the map of rooms.
-        weights (dict[Direction, int]): A dictionary of directions and their associated weights for path generation.
         index (int): Stores a unique index for the next room generated.
     """
     def __init__(self, config: Config):
@@ -19,10 +18,10 @@ class LevelMap:
         self.index = 0
     
     def __str__(self) -> str:
-        def print_rooms(self) -> str:
+        def print_rooms() -> str:
             return ''.join(f'{repr(room)}\n' for room in self.map.values()) + '\n'
         
-        def print_paths(self) -> str:
+        def print_paths() -> str:
             return ''.join(f'{path}\n' for path in self.paths) + '\n'
    
         return (f'Config: \n{self.config}'
@@ -31,9 +30,9 @@ class LevelMap:
   
     def get_rooms(self) -> list[Room]:
         """Returns a list of the rooms."""
-        return self.map.values()
+        return list(self.map.values())
 
-    def get_room_at(self, position: Vec2, direction: Direction = None) -> Room | None | bool:
+    def get_room_at(self, position: Vec2, direction = Direction.NONE) -> Room | None | bool:
         """
         Retrieves the room at a specific position, applying an optional offset. 
         Returns:
@@ -44,9 +43,7 @@ class LevelMap:
             position (Vec2): The position of the room to check for.
             direction (Direction, optional): An optional direction offset to apply.
         """
-        # Apply the offset, if provided
-        if direction is not None:
-            position = Vec2.move(position, direction)
+        position = Vec2.translate(position, direction)
 
         # If the position is out of bounds, return False
         if not (0 <= position.x < self.config.cols and 0 <= position.y < self.config.rows):

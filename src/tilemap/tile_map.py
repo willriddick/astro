@@ -1,6 +1,4 @@
 import json
-import struct
-from typing import Callable
 import pygame
 from src.util import Direction, Vec2
 from .tile_set import TileSet
@@ -15,8 +13,7 @@ class TileMap:
         self.tileset = tileset
         self.size = size
         self.map: dict[Vec2, Tile] = {}
-        self.spawn_tile = None
-    
+
     @property
     def tile_size(self) -> Vec2:
         return self.tileset.tile_size
@@ -36,18 +33,18 @@ class TileMap:
             tile.render(surf, offset)
     
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
-        return self.map.get(Vec2.move(tile_pos, offset))
+        return self.map.get(Vec2.translate(tile_pos, offset))
     
-    def get_tiles_with(self, type: str) -> list[Tile]:
-        return list(filter(lambda x: x.type.name == type, self.map.values))
+    def get_tiles_with(self, tile_type: str) -> list[Tile]:
+        return list(filter(lambda x: x.tile_type.name == tile_type, list(self.map.values())))
     
     def get_tiles_around(self, tile_pos: Vec2) -> list[Tile]:
         return [tile for direction in Direction if (tile := self.get_tile(tile_pos, direction)) is not None]
     
-    def create_tile(self, type: TileType, variant: int, tile_pos: Vec2) -> Tile:
+    def create_tile(self, tile_type: TileType, variant: int, tile_pos: Vec2) -> Tile:
         if tile_pos in self.map:
             self.remove_tile(tile_pos)
-        new_tile = Tile(self, type, variant, tile_pos)
+        new_tile = Tile(self, tile_type, variant, tile_pos)
         self.map[tile_pos] = new_tile
         self._update_autotiles_around(tile_pos)
 
@@ -69,13 +66,12 @@ class TileMap:
     def get_valid_floor(self, filter_: list[str]) -> list[Tile]:
         output = []
         for tile in self.map.values():
-            if tile.type.name in filter_:
+            if tile.tile_type.name in filter_:
                 x, y = tile.tile_pos
                 if (
-                    self.get_tile(Vec2(x, y - 1)) is None 
+                    self.get_tile(Vec2(x, y - 1)) is None
                     and y - 1 >= 0
-                    and x > 0 
-                    and x < self.size.x - 1
+                    and 0 < x < self.size.x - 1
                 ):
                     output.append(tile)
         return output
@@ -83,7 +79,7 @@ class TileMap:
     def place_tile(self, tile: Tile, new_pos: Vec2):
         tile.tile_pos = new_pos
         self.map[new_pos] = tile
-        if tile.type.autotile:
+        if tile.tile_type.autotile:
             self._update_autotiles_around(new_pos)
     
     def place_tilemap(self, tilemap: 'Tilemap', offset: Vec2, flip: bool):
@@ -104,12 +100,12 @@ class TileMap:
     def _update_autotiles_around(self, tile_pos: Vec2):
         for direction in Direction:
             tile = self.get_tile(tile_pos, direction)
-            if tile and tile.type.autotile:
+            if tile and tile.tile_type.autotile:
                 self._autotile(tile)
 
     def _autotile(self, tile: Tile):
         pos = tile.tile_pos
-        name = tile.type.name
+        name = tile.tile_type.name
 
         # Get surrounding tiles
         tile_up = self.get_tile(pos, Direction.UP)
@@ -122,16 +118,16 @@ class TileMap:
         tile_down_left = self.get_tile(pos, Direction.DOWN_LEFT)
 
         # Edge detection
-        u = int(tile_up is not None and tile_up.type.name == name)
-        r = int(tile_right is not None and tile_right.type.name == name)
-        d = int(tile_down is not None and tile_down.type.name == name)
-        l = int(tile_left is not None and tile_left.type.name == name)
+        u = int(tile_up is not None and tile_up.tile_type.name == name)
+        r = int(tile_right is not None and tile_right.tile_type.name == name)
+        d = int(tile_down is not None and tile_down.tile_type.name == name)
+        l = int(tile_left is not None and tile_left.tile_type.name == name)
 
         # Corner detection
-        ul = int(u and l and tile_up_left is not None and tile_up_left.type.name == name)
-        ur = int(u and r and tile_up_right is not None and tile_up_right.type.name == name)
-        dr = int(d and r and tile_down_right is not None and tile_down_right.type.name == name)
-        dl = int(d and l and tile_down_left is not None and tile_down_left.type.name == name)
+        ul = int(u and l and tile_up_left is not None and tile_up_left.tile_type.name == name)
+        ur = int(u and r and tile_up_right is not None and tile_up_right.tile_type.name == name)
+        dr = int(d and r and tile_down_right is not None and tile_down_right.tile_type.name == name)
+        dl = int(d and l and tile_down_left is not None and tile_down_left.tile_type.name == name)
 
         # Calculate bitmasks
         edges = u | (r << 1) | (d << 2) | (l << 3)
@@ -193,10 +189,10 @@ class TileMap:
             for tile_data in tilemap_data['tiles']:
                 tile_type = tileset.get_by(tile_data['t'])
                 pos_data = tile_data['p']
-                if isinstance(pos_data, dict):
-                    tile_pos = Vec2(pos_data['x'], pos_data['y'])
-                elif isinstance(pos_data, list):
+                if isinstance(pos_data, list):
                     tile_pos = Vec2(pos_data[0], pos_data[1])
+                else:
+                    tile_pos = Vec2(pos_data['x'], pos_data['y'])
                 tilemap.create_tile(tile_type, tile_data['v'], tile_pos)
 
             return tilemap

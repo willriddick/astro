@@ -1,3 +1,4 @@
+from typing import Optional
 from src.util import Direction, Vec2
 from .status import Status
 from .attribute import Attribute
@@ -5,7 +6,7 @@ from .attribute import Attribute
 class Room:
     """
     Represents a room in the level with a unique index, position, set of attributes, 
-    and dicitonary for adjacent directions.
+    and dictionary for adjacent directions.
     Attributes:
         index (int): Unique identifier.
         position (Vec2): The position object.
@@ -52,7 +53,7 @@ class Room:
     
     def get_statuses(self) -> list[Status]:
         """Returns all Adjacent directions."""
-        return self.adjacents.values()
+        return list(self.adjacents.values())
     
     def has_status(self, status: Status) -> bool:
         """Returns whether the provided status exists within adjacents."""
@@ -118,7 +119,7 @@ class Room:
         if not room.has_status(Status.EMPTY):
             return False
         # Ensure the room does not have restricted attributes 
-        if room.has_attributes({Attribute.EXIT, Attribute.BRANCH}):
+        if room.has_attributes([Attribute.EXIT, Attribute.BRANCH]):
             return False
         return True
      
@@ -135,17 +136,17 @@ class Room:
         if not room.has_status(Status.UNLINKED):
             return False
         # Ensure the room does not have restricted attributes 
-        if room.has_attributes({Attribute.EXIT, Attribute.BRIDGE, Attribute.BRANCH}):
+        if room.has_attributes([Attribute.EXIT, Attribute.BRIDGE, Attribute.BRANCH]):
             return False
         return True
     
     @staticmethod
     def is_itemable(room: 'Room') -> bool:
         """Determine if the given room is eligible for the ITEM attribute. Useful for filter function."""
-        return not room.has_attributes({Attribute.ENTRANCE, Attribute.EXIT})
+        return not room.has_attributes([Attribute.ENTRANCE, Attribute.EXIT])
     
     @staticmethod
-    def connect(room1: 'Room', room2: 'Room', direction: Direction, status: Status):
+    def connect(room1: 'Room', room2: Optional['Room'], direction: Direction, status: Status):
         """
         Connects room1 to room2 in the provided direction with a status.
         Args:

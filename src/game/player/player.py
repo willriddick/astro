@@ -1,9 +1,8 @@
 import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2
-from src.game.sprite import Sprite
 from src.game.physics_entity import PhysicsEntity
-from .player_state import PlayerState
-from .animation import Animation
+from src.game.components import Collider, HealthComponent, Sprite
+from .enums import Animations, States
 
 class Player(PhysicsEntity):
     GROUND_MOVE_SPEED = 1.15
@@ -31,7 +30,7 @@ class Player(PhysicsEntity):
     SLIDE_BUFFER = 10 # time after landing to allow slide
 
     WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = Vec2(2.1, 2.6)
+    WALL_JUMP_SPEED = pygame.Vector2(2.1, 2.6)
     WALL_JUMP_ACC = (0.13, 0.13)
     WALL_SLIDE_SPEED = 0.5
     WALL_SLIDE_GRAVITY = 0.05
@@ -40,8 +39,8 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, pos: pygame.Vector2=pygame.Vector2(0, 0), palette_index: int=1):
-        super().__init__(pos, Vec2(8, 13))
+    def __init__(self, level, palette_index: int=1):
+        super().__init__(level, pygame.Vector2(0, 0), Vec2(8, 13))
 
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
@@ -68,29 +67,52 @@ class Player(PhysicsEntity):
         self.load_sprite(palette_index)
 
         # setup state machine
-        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide
+        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Hurt, Dead
         self.state_machine = StateMachine(self, [
-            Idle(),
-            Run(),
-            Jump(),
-            Air(),
-            Slide(),
-            WallSlide(),
-            WallJump(),
-            Ghost()
+            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
+            WallJump(), Ghost(), Hurt(), Dead(),
         ])
+
+        self.health_component = HealthComponent(3, 60)
+        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
+        self.health_component.on_damaged = self.on_damage
+        self.health_component.on_death = self.on_death
     
-    def update(self, tilemap):
-        self.sprite.update(self.pos)
+    def set_pos(self, pos: pygame.Vector2):
+        self.pos = pos
+        self.health_component.update(pos)
+
+    def spawn(self, pos: pygame.Vector2):
+        self.set_pos(pos)
+        self.velocity = pygame.Vector2(0, 0)
+        self.set_state(States.AIR)
+        self.health_component.reset()
+        self.health_component.enable()
+    
+    def update(self):
         self.handle_input()
+        self.sprite.update(self.pos)
+        self.health_component.update(self.pos)
         self.state_machine.update()
-        self.handle_collision(tilemap)
+        self.handle_collision(self.level.tilemap)
     
-    def set_state(self, state: PlayerState):
+    def on_damage(self):
+        self.set_state(States.HURT)
+    
+    def on_death(self):
+        self.set_state(States.DEAD)
+    
+    def set_state(self, state: 'States'):
         self.state_machine.switch(state)
 
-    def get_state(self) -> PlayerState:
+    def get_state(self) -> 'States':
         return self.state_machine.current_state.id
+    
+    def toggle_ghost(self):
+        if self.get_state() == States.GHOST:
+            self.set_state(States.AIR)
+        else:
+            self.set_state(States.GHOST)
     
     def handle_jump(self):
         self.coyote_timer = max(0, self.coyote_timer - 1)
@@ -100,7 +122,7 @@ class Player(PhysicsEntity):
             self.jumps_remaining = Player.MAX_JUMPS
        
         if self.jump_input_timer > 0 and self.jumps_remaining:
-            self.state_machine.switch(PlayerState.JUMP)
+            self.state_machine.switch(States.JUMP)
        
         self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
         if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
@@ -121,7 +143,7 @@ class Player(PhysicsEntity):
             self.wall_slide_timer = 0
         
         if self.jump_input_timer > 0 and self.wall_slide_timer:
-            self.state_machine.switch(PlayerState.WALL_JUMP)
+            self.state_machine.switch(States.WALL_JUMP)
 
     def handle_input(self):
         pressed = pygame.key.get_pressed()
@@ -175,15 +197,15 @@ class Player(PhysicsEntity):
             Assets.PLAYER_PALETTES[self.palette_index],
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
-
+        
         self.sprite = Sprite(self.pos, image_offset=Vec2(4, 5))
-        self.sprite.add_animation(Animation.IDLE_A, image_list, 0, range_=(0,1))
-        self.sprite.add_animation(Animation.IDLE_B, image_list, 5, range_=(0,4))
-        self.sprite.add_animation(Animation.RUN, image_list, 10, range_=(4,10))
-        self.sprite.add_animation(Animation.AIR_UP, image_list, 0, range_=(10,11))
-        self.sprite.add_animation(Animation.AIR_DOWN, image_list, 0, range_=(11,12))
-        self.sprite.add_animation(Animation.FRONT, image_list, 0, range_=(12,13))
-        self.sprite.add_animation(Animation.BACK, image_list, 0, range_=(13,14))
-        self.sprite.add_animation(Animation.WALL_SLIDE, image_list, 0, range_=(14,15))
-        self.sprite.add_animation(Animation.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.set_animation(Animation.IDLE_B)
+        self.sprite.add_animation(Animations.IDLE_A, image_list, 0, range_=(0,1))
+        self.sprite.add_animation(Animations.IDLE_B, image_list, 5, range_=(0,4))
+        self.sprite.add_animation(Animations.RUN, image_list, 10, range_=(4,10))
+        self.sprite.add_animation(Animations.AIR_UP, image_list, 0, range_=(10,11))
+        self.sprite.add_animation(Animations.AIR_DOWN, image_list, 0, range_=(11,12))
+        self.sprite.add_animation(Animations.FRONT, image_list, 0, range_=(12,13))
+        self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
+        self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
+        self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
+        self.sprite.set_animation(Animations.IDLE_B)

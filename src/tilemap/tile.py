@@ -3,27 +3,27 @@ from src.util import Vec2
 from .tile_type import TileType
 
 class Tile:
-    def __init__(self, tilemap, type: TileType, variant: int, tile_pos: Vec2):
+    def __init__(self, tilemap, tile_type: TileType, variant: int, tile_pos: Vec2):
         self.tilemap = tilemap 
-        self.type = type
+        self.tile_type = tile_type
         self.variant = variant
         self.tile_pos = tile_pos
-        self.collision = type.collision
+        self.collision = self.tile_type.collision
         self.debug = False
-    
+
     def __str__(self):
-        return f'{self.type.name}:{self.variant} {self.tile_pos}'
+        return f'{self.tile_type.name}:{self.variant} {self.tile_pos}'
     
     def __repr__(self):
         return self.__str__()
-    
+
     @property
     def tile_size(self) -> Vec2:
         return self.tilemap.tile_size
     
     @property
-    def pixel_pos(self) -> Vec2:
-        return Vec2(
+    def pos(self) -> pygame.Vector2:
+        return pygame.Vector2(
             self.tile_pos.x * self.tile_size.x,
             self.tile_pos.y * self.tile_size.y
         ) 
@@ -31,18 +31,21 @@ class Tile:
     @property
     def rect(self) -> pygame.Rect:
         return pygame.Rect(
-            self.pixel_pos.x + self.type.collision_offset.x,
-            self.pixel_pos.y + self.type.collision_offset.y,
-            self.type.size.x,
-            self.type.size.y
+            self.pos.x + self.tile_type.collision_offset.x,
+            self.pos.y + self.tile_type.collision_offset.y,
+            self.tile_type.size.x,
+            self.tile_type.size.y
         )
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        pos = (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
-        display.blit(self.type.images[self.variant], pos)
+        if len(self.tile_type.images) == 0:
+            return
+
+        pos = (self.pos.x - offset.x, self.pos.y - offset.y)
+        display.blit(self.tile_type.images[self.variant], pos)
 
         if self.debug and self.collision:
-            size = self.type.size
+            size = self.tile_type.size
             collision_display = pygame.Surface((size.x, size.y), pygame.SRCALPHA)
             collision_display.set_alpha(100)
             pygame.draw.rect(
@@ -51,5 +54,5 @@ class Tile:
             )
             display.blit(
                 collision_display, 
-                (self.pixel_pos.x - offset.x, self.pixel_pos.y - offset.y)
+                (self.pos.x - offset.x, self.pos.y - offset.y)
             )
