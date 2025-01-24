@@ -67,9 +67,10 @@ class Player(PhysicsEntity):
         self.load_sprite(palette_index)
 
         # setup state machine
-        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Dead
+        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Hurt, Dead
         self.state_machine = StateMachine(self, [
-            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), WallJump(), Ghost(), Dead(),
+            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
+            WallJump(), Ghost(), Hurt(), Dead(),
         ])
 
         self.health_component = HealthComponent(3, 60)
@@ -96,9 +97,7 @@ class Player(PhysicsEntity):
         self.handle_collision(self.level.tilemap)
     
     def on_damage(self):
-        self.apply_force(2, Direction.UP)
-        self.sprite.flash(5, pygame.Color(255, 255, 255))
-        self.sprite.oscillate_alpha(self.health_component.invulnerable_duration, 2)
+        self.set_state(States.HURT)
     
     def on_death(self):
         self.set_state(States.DEAD)

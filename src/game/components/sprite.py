@@ -23,6 +23,11 @@ class Sprite:
         self.alpha_speed = 0
         self.alpha_range = (0, 255)
     
+    def reset(self):
+        self.next_timer = 0
+        self.flash_timer = 0
+        self.alpha_timer = 0
+    
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
 
@@ -77,7 +82,7 @@ class Sprite:
         else:
             self.set_animation(id_)
     
-    def flash(self, duration: int, color: pygame.Color):
+    def flash(self, duration: int, color = pygame.Color(255, 255, 255)):
         """Flashes the sprite with a given color for the specified duration in frames."""
         self.flash_timer = duration
         self.flash_color = color
@@ -105,7 +110,7 @@ class Sprite:
             ) 
             surface.set_alpha(alpha)
         else:
-            surface.set_alpha(255)  # Reset to full opacity
+            surface.set_alpha(255)
         
         return surface
 

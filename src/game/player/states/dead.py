@@ -10,6 +10,8 @@ class Dead(State):
     
     def on_enter(self):
         self.timer = 60
+        self.owner.sprite.reset()
+        self.owner.sprite.flash(self.timer, pygame.Color(255, 0, 0))
         self.owner.sprite.set_animation(Animations.IDLE_A)
         self.owner.apply_force(2, Direction.UP)
         self.owner.health_component.disable()
