@@ -39,8 +39,10 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 11 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 15
 
-    def __init__(self, level, palette_index: int=1):
+    def __init__(self, level, camera, palette_index: int=1):
         super().__init__(level, pygame.Vector2(0, 0), Vec2(8, 13))
+
+        self.camera = camera
 
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0

@@ -1,8 +1,7 @@
-import pygame
 import numpy as np
+import pygame
 from src.game.level import Level
-from src.util import Vec2
-from .entity import Entity
+from src.util import Vec2, randf
 
 class Camera:
     def __init__(self, width: int, height: int):
@@ -18,17 +17,26 @@ class Camera:
 
         self.level: Level | None = None
         self.fill_color = (24, 20, 37)
+
+        self.screenshake_offset = pygame.Vector2(0, 0)
+        self.screenshake_duration = 0
+        self.screenshake_intensity = 0
+        self.screenshake_timer = 0
+        self.screenshake_remaining = 0
     
     def update(self):
         """Update the camera and render the display surface."""
         # Clear display surface
         self.display.fill(self.fill_color)
 
+        # Update screenshake effect
+        self.handle_screenshake()
+
         # Calculate the offset from the in-game position
         self.offset = pygame.Vector2(
             self.position.x - self.width // 2,
             self.position.y - self.height // 2
-        )
+        ) + self.screenshake_offset
 
         # Render the tilemap  
         self.render_tilemap(self.level.tilemap)
@@ -55,8 +63,26 @@ class Camera:
                 tile = tilemap.get_tile(Vec2(x, y))
                 if tile:
                     tile.render(self.display, self.offset)
-        
-    def get_rect(self):
+    
+    def screenshake(self, duration: int, intensity: int):
+        self.screenshake_duration = duration
+        self.screenshake_timer = duration
+        self.screenshake_intensity = intensity
+        self.screenshake_remaining = intensity
+    
+    def handle_screenshake(self):
+        self.screenshake_timer = max(0, self.screenshake_timer - 1)
+        if self.screenshake_timer > 0:
+            self.screenshake_offset = pygame.Vector2(
+                randf(-self.screenshake_remaining, self.screenshake_remaining, 0.1),
+                randf(-self.screenshake_remaining, self.screenshake_remaining, 0.1),
+            )
+            self.screenshake_remaining -= (self.screenshake_intensity / self.screenshake_duration)
+        else:
+            self.screenshake_offset = pygame.Vector2(0, 0)
+
+    @property
+    def rect(self):
         """Get the camera's current rectangle in the game world."""
         return pygame.Rect(
             self.position.x - self.width // 2,

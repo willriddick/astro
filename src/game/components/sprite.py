@@ -90,7 +90,7 @@ class Sprite:
         self.flash_color = color
         self.flash_blend = blend
     
-    def oscillate_alpha(self, duration: int, speed = 1, alpha_range = (0, 255)):
+    def oscillate_alpha(self, duration: int, speed = 1, alpha_range = (50, 255)):
         """Oscillates the alpha value of the sprite quickly for a duration."""
         self.alpha_timer = duration
         self.alpha_speed = speed
