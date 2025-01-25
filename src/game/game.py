@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.util import Assets, CommandPrompt
+from src.util import Assets, CommandPrompt, Vec2
 from .level import Level
 from .camera import Camera
 from .player import Player 
@@ -23,19 +23,12 @@ class Game:
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
             pygame.RESIZABLE
         )
-        self.camera = Camera(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.fullscreen = False
         Assets.load_assets()
 
-        self.level = Level(map_path='maps/10x8/1_2/test')
-        self.camera.level = self.level
-        self.camera.set_boundary(self.level.tilemap.rect)
-
-        self.player = Player(self.level)
-        self.player.spawn(self.level.spawn_pos)
-        self.camera.move_to(self.level.spawn_pos, instant=True)
-
-        self.level.entities.append(self.player)
+        self.level = None
+        self.new('maps/10x8/1_2/test')
     
     def run(self):
         self.running = True
@@ -67,14 +60,15 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def new(self, seed: int = None):
-        self.level = Level(seed=seed)
+    def new(self, map_path: str = None, seed: int = None):
+        self.level = Level(map_path=map_path, seed=seed)
         self.camera.level = self.level
-        self.camera.set_boundary(self.level.tilemap.rect)
 
-        self.player = Player(self.level)
+        self.player = Player(self.level, self.camera)
         self.player.spawn(self.level.spawn_pos)
-        self.camera.move_to(self.level.spawn_pos, instant=True)
+
+        self.camera.boundary = self.level.tilemap.rect
+        self.camera.set_pos(self.level.spawn_pos)
 
         self.level.entities.append(self.player)
 

@@ -5,6 +5,7 @@ from .assets import Assets
 from .draw import draw_rect
 
 RECT_COLOR = pygame.Color(0, 40, 80, 100)
+OUTLINE_COLOR = pygame.Color(0, 0, 0, 100)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:
@@ -119,14 +120,16 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
+            rect = pygame.Rect(0, display.get_height() - 12, display.get_width(), 12)
             draw_rect(
                 display, 
-                pos=pygame.Vector2(0, display.get_height() - 12),
-                size=Vec2(display.get_width(), 12),
+                offset=pygame.Vector2(0, 0),
+                rect=rect,
                 fill_color=RECT_COLOR, 
-                outline_color=pygame.Color(255, 255, 255, 255),
+                outline_color=OUTLINE_COLOR,
             )
             text = f'/{self.input[:self.cursor_index]}_{self.input[self.cursor_index:]}'
             text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
-            display.blit(text_surf, (4, display.get_height() - 8))  
+
+            display.blit(text_surf, (4, display.get_height() - 10))
     

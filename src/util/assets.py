@@ -18,7 +18,8 @@ class Assets:
     def load_assets():
         test_tiles = load_sprite_sheet(load_image('test_tiles.png'), (16,16))
 
-        Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelIllegible.ttf', 8)
+        Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelKlein.ttf', 9)
+        Assets.FONT_ILL = pygame.font.Font(ASSET_PATH + 'fonts/DePixelIllegible.ttf', 8)
 
         Assets.PLAYER_SHEET = load_image('player/player.png', False)
         Assets.PLAYER_PALETTES = load_palettes('player/palettes')

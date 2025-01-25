@@ -59,9 +59,8 @@ class Collider:
    
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         draw_rect(
-            display, offset, 
-            pygame.Vector2(self.pos.x + self.offset.x, self.pos.y + self.offset.y),
-            size=self.size, 
-            outline_color=(255, 0, 255, 100),
-            fill_color=(0, 0, 0, 0),
+            display, 
+            offset=offset, 
+            rect=self.rect,
+            outline_color=(255, 0, 255, 50),
         )
