@@ -14,6 +14,7 @@ class Camera:
         self.pos = pygame.Vector2(0, 0)
         self.offset = pygame.Vector2(0, 0)
         self.boundary: pygame.Rect | None = None
+        self.follow = False
 
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = 0
@@ -47,21 +48,6 @@ class Camera:
             for collider in self.level.colliders:
                 collider.render(self.display, -self.offset)
 
-    def _render_tilemap(self, tilemap):
-        if not tilemap:
-            return
-
-        tile_size = tilemap.tile_size
-        x_start = int(-self.offset.x // tile_size.x)
-        x_stop = int((self.offset.x + self.display.width) // tile_size.x + 1)
-        y_start = int(-self.offset.y // tile_size.y)
-        y_stop = int((self.offset.y + self.display.height) // tile_size.y + 1)
-        for x in range(x_start, x_stop):
-            for y in range(y_start, y_stop):
-                tile = tilemap.get_tile(Vec2(x, y))
-                if tile:
-                    tile.render(self.display, self.offset)
-    
     def screenshake(self, duration: int, intensity: int):
         self.screenshake_timer = duration
         self.screenshake_intensity = intensity
@@ -94,8 +80,6 @@ class Camera:
     
     def move_to(self, target_pos: pygame.Vector2, smoothing = 0.2, buffer = 64):
         """Move the camera smoothly towards a target position only if it moves outside the dead zone."""
-        distance_to = target_pos.distance_to(self.pos)
-        smoothing *= (distance_to / buffer)
         cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
         self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
         self.pos = self._clamp(self.pos, self.size, self.boundary)
@@ -110,4 +94,19 @@ class Camera:
                 max(boundary.top + h_height, min(int(pos.y), boundary.bottom - h_height))
             )
         return clamped
+    
+    def _render_tilemap(self, tilemap):
+        if not tilemap:
+            return
+
+        tile_size = tilemap.tile_size
+        x_start = int(-self.offset.x // tile_size.x)
+        x_stop = int((self.offset.x + self.display.width) // tile_size.x + 1)
+        y_start = int(-self.offset.y // tile_size.y)
+        y_stop = int((self.offset.y + self.display.height) // tile_size.y + 1)
+        for x in range(x_start, x_stop):
+            for y in range(y_start, y_stop):
+                tile = tilemap.get_tile(Vec2(x, y))
+                if tile:
+                    tile.render(self.display, self.offset)
     
