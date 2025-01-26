@@ -1,14 +1,14 @@
-from src.util import State
+from src.util import State, Timer
 from ..player import Player
 from ..enums import Animations, States
 
 class Run(State):
     def __init__(self):
         super().__init__(States.RUN)
-        self.timer = 0
+        self.slide_timer = Timer(Player.SLIDE_BUFFER)
 
     def on_enter(self):
-        self.timer = 0 # duration player has been in RUN state
+        self.slide_timer.start()
         self.owner.sprite.set_next(Animations.RUN)
         if self.owner.rotated:
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
@@ -26,10 +26,9 @@ class Run(State):
             self.owner.sprite.flip = self.owner.move_dir.x == -1
 
         # switch to slide state
-        self.timer = max(0, self.timer + 1)
-        if self.timer < Player.SLIDE_BUFFER:
+        if self.slide_timer.is_active:
             if (
-                self.owner.slide_input_timer
+                self.owner.slide_input_timer.is_active
                 and self.owner.state_machine.previous_state.id == States.AIR
             ):
                 self.switch(States.SLIDE)

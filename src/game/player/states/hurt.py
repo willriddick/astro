@@ -1,7 +1,5 @@
-import pygame
 from src.util import State, Direction
-from ..player import Player
-from ..enums import Animations, States
+from ..enums import States
 
 class Hurt(State):
     def __init__(self):

@@ -1,31 +1,29 @@
-from src.util import State 
+from src.util import State, Timer
 from ..player import Player
 from ..enums import Animations, States
 
 class WallJump(State):
     def __init__(self):
         super().__init__(States.WALL_JUMP)
-        self.timer = 0
+        self.timer = Timer(Player.WALL_JUMP_DURATION)
     
     def on_enter(self):
-        self.timer = Player.WALL_JUMP_DURATION
+        self.timer.start()
         self.owner.sprite.set_animation(Animations.AIR_UP)
         self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
         self.owner.velocity.x = Player.WALL_JUMP_SPEED.x * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
         self.owner.velocity.y = -Player.WALL_JUMP_SPEED.y * self.owner.velocity_multiplier.y
-        self.owner.jump_input_timer = 0
-        self.owner.variable_jump_timer = Player.VARIABLE_JUMP_BUFFER
-        self.owner.wall_slide_timer = 0
+        self.owner.jump_input_timer.reset()
+        self.owner.variable_jump_timer.start()
+        self.owner.wall_slide_timer.reset()
     
     def on_exit(self):
         self.owner.last_facing_dir = -self.owner.wall_slide_dir
     
     def update(self):
-        self.timer = max(0, self.timer - 1)
-
         self.owner.accelerate_x(
             dir_ = -self.owner.wall_slide_dir, 
-            max_speed = Player.AIR_MOVE_SPEED,
+            speed = Player.AIR_MOVE_SPEED,
             acc = Player.AIR_ACC
         )
 
@@ -36,6 +34,6 @@ class WallJump(State):
                 self.switch(States.IDLE)
             else:
                 self.switch(States.RUN)
-        elif self.timer == 0:
+        elif self.timer.is_done:
             self.switch(States.AIR)
     

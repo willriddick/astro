@@ -26,42 +26,39 @@ class PhysicsEntity(Entity):
         }
    
     @property
-    def center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.rect.center)
-    
-    @property
     def rect(self) -> pygame.FRect:
         return pygame.FRect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+
+    @property
+    def center(self) -> pygame.Vector2:
+        return pygame.Vector2(self.rect.center)
     
     def apply_force(self, force: float, direction: Direction | pygame.Vector2):
         self.velocity = force * (direction.vector if isinstance(direction, Direction) else direction)
     
-    def accelerate_x(self, dir_: int, max_speed: float, acc: tuple[float, float]):
-        self.velocity.x = self.accelerate_decelerate(self.velocity.x, max_speed, dir_, acc, self.velocity_multiplier.x)
+    def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]):
+        print(dir_, speed)
+        self.velocity.x = self._acc_dec(self.velocity.x, speed, dir_, acc, self.velocity_multiplier.x)
     
-    def accelerate_y(self, dir_: int, max_speed: float, acc: tuple[float, float]):
-        self.velocity.y = self.accelerate_decelerate(self.velocity.y, max_speed, dir_, acc, self.velocity_multiplier.y)
+    def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]):
+        self.velocity.y = self._acc_dec(self.velocity.y, speed, dir_, acc, self.velocity_multiplier.y)
     
-    def apply_gravity(self, gravity: float, max_speed: float):
+    def apply_gravity(self, gravity: float, fall_speed: float):
         self.velocity.y = min(
-            max_speed * self.gravity_multiplier,
-            self.velocity.y + gravity * self.gravity_multiplier
+            fall_speed * self.gravity_multiplier,
+            self.velocity.y + (gravity * self.gravity_multiplier * Clock.dt())
         )
 
     @staticmethod
-    def accelerate_decelerate(value: float, target: float, dir_: int, acc: tuple[float, float], multiplier: float) -> float:
-        if dir_ == 0:
-            return approach(
-                value=value,
-                target=0,
-                step=acc[1] * multiplier
-            )
+    def _acc_dec(value: float, target: float, dir_: int, acc: tuple[float, float], multiplier: float) -> float:
+        if dir_ != 0:
+            target = dir_ * target * multiplier
+            step = acc[0] * multiplier * Clock.dt()
         else:
-            return approach(
-                value=value,
-                target=dir_ * target * multiplier,
-                step=acc[0] * multiplier
-            )
+            target = 0
+            step = acc[1] * multiplier * Clock.dt()
+
+        return approach(value, target, step)
 
     def handle_collision(self, tilemap: TileMap):
         if not self.collision_enabled:

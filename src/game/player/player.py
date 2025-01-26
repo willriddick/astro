@@ -1,43 +1,43 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
 from src.game.physics_entity import PhysicsEntity
-from src.game.components import Collider, HealthComponent, Sprite
+from src.game.components import Collider, HealthComponent, Sprite 
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
-    GROUND_MOVE_SPEED = 1.15
-    GROUND_ACC = (0.1, 0.2) # (acceleration, deceleration)
-    AIR_MOVE_SPEED = 1.3
-    AIR_ACC = (0.05, 0.01)
-    PRESSED_LEFT_BUFFER = 5
-    PRESSED_RIGHT_BUFFER = 5
+    GROUND_MOVE_SPEED = 70
+    GROUND_ACC = (360, 720) # (acceleration, deceleration)
+    AIR_MOVE_SPEED = 80
+    AIR_ACC = (180, 36)
+    PRESSED_LEFT_BUFFER = 80
+    PRESSED_RIGHT_BUFFER = 80
 
-    GRAVITY = 0.14
-    FALL_SPEED = 3.2
+    GRAVITY = 500
+    FALL_SPEED = 192
 
     JUMP_INPUT_BUFFER = 4
-    JUMP_SPEED = 3
+    JUMP_SPEED = 180
     MAX_JUMPS = 1
-    COYOTE_BUFFER = 7 # time after falling to allow jump
-    VARIABLE_JUMP_MULTIPLIER = 0.8 # multiplies velocity when releasing jump
-    VARIABLE_JUMP_BUFFER = 20 # time after jumping to allow variable jump
+    COYOTE_BUFFER = 115 # time after falling to allow jump
+    VARIABLE_JUMP_MULTIPLIER = 0.95 # multiplies velocity when releasing jump
+    VARIABLE_JUMP_BUFFER = 200 # time after jumping to allow variable jump
 
-    SLIDE_INPUT_BUFFER = 14 # amount of time after pressing down to allow slide
-    SLIDE_DURATION = 12 # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_MULTIPLIER = 1.4 # multiplies velocity when entering slide state
-    SLIDE_SPEED = 1.7
-    SLIDE_ACC = (0.05, 0.05)
-    SLIDE_BUFFER = 10 # time after landing to allow slide
+    SLIDE_INPUT_BUFFER = 230 # amount of time after pressing down to allow slide
+    SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
+    INITIAL_SLIDE_MULTIPLIER = 1.2 # multiplies velocity when entering slide state
+    SLIDE_SPEED = 100
+    SLIDE_ACC = (3, 3)
+    SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = pygame.Vector2(2.1, 2.6)
-    WALL_JUMP_ACC = (0.13, 0.13)
-    WALL_SLIDE_SPEED = 0.5
-    WALL_SLIDE_GRAVITY = 0.05
-    WALL_SLIDE_BUFFER = 10 # amount of time after wall sliding to allow wall jump
+    WALL_JUMP_DURATION = 165 # time after wall jumping to push player away from wall
+    WALL_JUMP_SPEED = Vec2(125, 155)
+    WALL_JUMP_ACC = (8, 8)
+    WALL_SLIDE_SPEED = 30
+    WALL_SLIDE_GRAVITY = 180
+    WALL_SLIDE_BUFFER = 160 # amount of time after wall sliding to allow wall jump
 
-    ROTATE_DURATION = 11 # time to play FRONT animation when rotating
-    AIR_ROTATE_DURATION = 15
+    ROTATE_DURATION = 180 # time to play FRONT animation when rotating
+    AIR_ROTATE_DURATION = 250
 
     def __init__(self, level, camera, palette_index: int=1):
         super().__init__(level, pygame.Vector2(0, 0), Vec2(8, 13))
@@ -49,17 +49,17 @@ class Player(PhysicsEntity):
 
         # jumping and wall sliding
         self.jumps_remaining = 0
-        self.coyote_timer = 0
-        self.variable_jump_timer = 0
+        self.coyote_timer = Timer(Player.COYOTE_BUFFER)
+        self.variable_jump_timer = Timer(Player.VARIABLE_JUMP_BUFFER)
         self.wall_slide_dir = 0
-        self.wall_slide_timer = 0
+        self.wall_slide_timer = Timer(Player.WALL_SLIDE_BUFFER)
 
         # inputs
-        self.slide_input_timer = 0
+        self.slide_input_timer = Timer(Player.SLIDE_INPUT_BUFFER)
         self.holding_jump = False
-        self.jump_input_timer = 0
-        self.pressed_left_timer = 0
-        self.pressed_right_timer = 0
+        self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
+        self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
+        self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
 
         # setup sprite
         self.palette_index = palette_index
@@ -75,7 +75,7 @@ class Player(PhysicsEntity):
             WallJump(), Ghost(), Hurt(), Dead(),
         ])
 
-        self.health_component = HealthComponent(3, 60)
+        self.health_component = HealthComponent(3, 1000)
         self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
@@ -117,34 +117,29 @@ class Player(PhysicsEntity):
             self.set_state(States.GHOST)
     
     def handle_jump(self):
-        self.coyote_timer = max(0, self.coyote_timer - 1)
-
         if self.on_ground:
-            self.coyote_timer = Player.COYOTE_BUFFER
+            self.coyote_timer.start()
             self.jumps_remaining = Player.MAX_JUMPS
        
-        if self.jump_input_timer > 0 and self.jumps_remaining:
+        if self.jump_input_timer.is_active and self.jumps_remaining:
             self.state_machine.switch(States.JUMP)
        
-        self.variable_jump_timer = max(0, self.variable_jump_timer - 1)
-        if not self.holding_jump and self.variable_jump_timer > 0 and self.velocity.y < 0:
+        if not self.holding_jump and self.variable_jump_timer.is_active and self.velocity.y < 0:
             self.velocity.y *= (Player.VARIABLE_JUMP_MULTIPLIER / (1 / self.gravity_multiplier))
    
     def handle_wall_jump(self):
-        self.wall_slide_timer = max(0, self.wall_slide_timer - 1)
-
         if not self.on_ground:
-            if self.collisions[Direction.RIGHT] and self.pressed_right_timer:
-                self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
+            if self.collisions[Direction.RIGHT] and self.pressed_right_timer.is_active:
+                self.wall_slide_timer.start()
                 self.wall_slide_dir = 1
-            elif self.collisions[Direction.LEFT] and self.pressed_left_timer:
-                self.wall_slide_timer = Player.WALL_SLIDE_BUFFER
+            elif self.collisions[Direction.LEFT] and self.pressed_left_timer.is_active:
+                self.wall_slide_timer.start()
                 self.wall_slide_dir = -1
         
         if (not self.collisions[Direction.LEFT] and not self.collisions[Direction.RIGHT]):
-            self.wall_slide_timer = 0
+            self.wall_slide_timer.reset()
         
-        if self.jump_input_timer > 0 and self.wall_slide_timer:
+        if self.jump_input_timer.is_active and self.wall_slide_timer.is_active:
             self.state_machine.switch(States.WALL_JUMP)
 
     def handle_input(self):
@@ -170,25 +165,19 @@ class Player(PhysicsEntity):
             self.last_facing_dir = self.move_dir.x
  
         # update slide input timer
-        self.slide_input_timer = max(0, self.slide_input_timer - 1)
         if just_pressed[pygame.K_s]:
-            self.slide_input_timer = Player.SLIDE_INPUT_BUFFER
+            self.slide_input_timer.start()
         
         # update jumping input timer
         self.holding_jump = pressed[pygame.K_SPACE]
-        self.jump_input_timer = max(0, self.jump_input_timer - 1)
         if just_pressed[pygame.K_SPACE]:
-            self.jump_input_timer = Player.JUMP_INPUT_BUFFER
+            self.jump_input_timer.start()
 
-        # update pressed left input timer
-        self.pressed_left_timer = max(0, self.pressed_left_timer - 1)
+        # update pressed left/right input timer
         if pressed[pygame.K_a]:
-            self.pressed_left_timer = Player.PRESSED_LEFT_BUFFER
-
-        # update pressed right input timer
-        self.pressed_right_timer = max(0, self.pressed_right_timer - 1)
+            self.pressed_left_timer.start()
         if pressed[pygame.K_d]:
-            self.pressed_right_timer = Player.PRESSED_RIGHT_BUFFER
+            self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):
         self.palette_index = palette_index % len(Assets.PLAYER_PALETTES)
