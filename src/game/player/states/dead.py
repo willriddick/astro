@@ -6,7 +6,7 @@ from ..enums import Animations, States
 class Dead(State):
     def __init__(self):
         super().__init__(States.DEAD)
-        self.timer = Timer(60)
+        self.timer = Timer(1000)
     
     def on_enter(self):
         self.timer.start()

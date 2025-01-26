@@ -86,6 +86,7 @@ class Player(PhysicsEntity):
 
     def spawn(self, pos: pygame.Vector2):
         self.set_pos(pos)
+        print(pos)
         self.velocity = pygame.Vector2(0, 0)
         self.set_state(States.AIR)
         self.health_component.reset()
