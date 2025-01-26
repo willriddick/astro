@@ -44,7 +44,6 @@ class HealthComponent:
         if self.vulnerable:
             self.health = max(0, self.health - amount)
             self.invulnerable_timer.start()
-            print(self.invulnerable_timer.time_left)
             self.on_damaged()
 
             if self.health == 0:

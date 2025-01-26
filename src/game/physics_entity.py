@@ -1,7 +1,8 @@
 import pygame
-from src.tilemap import TileMap
+from src.tilemap import TileMap, Tile
 from src.util import approach, Direction, Vec2
 from .entity import Entity
+from .clock import Clock
 
 class PhysicsEntity(Entity):
     def __init__(self, level: 'Level', pos: pygame.Vector2, size: Vec2):
@@ -64,7 +65,7 @@ class PhysicsEntity(Entity):
 
     def handle_collision(self, tilemap: TileMap):
         if not self.collision_enabled:
-            self.pos += self.velocity
+            self.pos += (self.velocity * Clock.dt())
             return
 
         # Update tile position
@@ -72,21 +73,13 @@ class PhysicsEntity(Entity):
         self.tiles_around = tilemap.get_tiles_around(tile_pos)
 
         # Handle platform collision
-        for platform in filter(lambda _tile: _tile.tile_type.name == 'platform', self.tiles_around):
-            # If player is below platform, disable collision
-            if platform.rect.top < self.rect.bottom:
-                platform.collision = False
-            else:
-                if self.on_ground and self.drop_down:
-                    platform.collision = False
-                else:
-                    platform.collision = True
+        self._handle_platform_collision() 
 
         # Filter out collision tiles
         collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position
-        self.pos.y += self.velocity.y
+        self.pos.y += (self.velocity.y * Clock.dt())
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
@@ -101,7 +94,7 @@ class PhysicsEntity(Entity):
                     self.velocity.y = 0
 
         # Update x position
-        self.pos.x += self.velocity.x
+        self.pos.x += (self.velocity.x * Clock.dt())
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
@@ -115,7 +108,20 @@ class PhysicsEntity(Entity):
                     self.pos.x = entity_rect.x
                     self.velocity.x = 0
         
-        # Update collisions
+        self._update_collision_flags(entity_rect, collisions_around)
+    
+    def _handle_platform_collision(self): 
+        for platform in filter(lambda _tile: _tile.tile_type.name == 'platform', self.tiles_around):
+            # If player is below platform, disable collision
+            if platform.rect.top < self.rect.bottom:
+                platform.collision = False
+            else:
+                if self.on_ground and self.drop_down:
+                    platform.collision = False
+                else:
+                    platform.collision = True
+
+    def _update_collision_flags(self, entity_rect: pygame.Rect, collisions_around: list[Tile]):
         points = {
             Direction.DOWN:  [(entity_rect.left + 1,  entity_rect.bottom + 1),
                               (entity_rect.right - 1, entity_rect.bottom + 1)],
@@ -126,6 +132,7 @@ class PhysicsEntity(Entity):
             Direction.RIGHT: [(entity_rect.right + 1, entity_rect.top + 1),
                               (entity_rect.right + 1, entity_rect.bottom - 1)],
         }
+
         for direction, points in points.items():
             self.collisions[direction] = False
             for tile in collisions_around:

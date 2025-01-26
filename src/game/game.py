@@ -73,7 +73,7 @@ class Game:
 
     def debug_display(self):
         text = ''
-        text += f'fps: {Clock.fps():0.0f} | dt: {Clock.dt():0.3f}\n'
+        text += f'fps: {Clock.fps()} | dt: {Clock.dt()}\n'
         text += f'state: {self.player.state_machine.current_state.name}\n'
         text += f'hp: {self.player.health_component.health}\n'
         text += f'x: {int(self.player.pos.x):4}   y:{int(self.player.pos.y):4} \n'
