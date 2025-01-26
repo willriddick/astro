@@ -26,7 +26,7 @@ class Player(PhysicsEntity):
     SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
     INITIAL_SLIDE_MULTIPLIER = 1.2 # multiplies velocity when entering slide state
     SLIDE_SPEED = 100
-    SLIDE_ACC = (3, 3)
+    SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
     WALL_JUMP_DURATION = 165 # time after wall jumping to push player away from wall

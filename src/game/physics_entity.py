@@ -37,7 +37,6 @@ class PhysicsEntity(Entity):
         self.velocity = force * (direction.vector if isinstance(direction, Direction) else direction)
     
     def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]):
-        print(dir_, speed)
         self.velocity.x = self._acc_dec(self.velocity.x, speed, dir_, acc, self.velocity_multiplier.x)
     
     def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]):
