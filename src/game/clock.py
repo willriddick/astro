@@ -7,18 +7,24 @@ class Clock:
 
     @classmethod
     def update(cls):
-        cls._dt = cls._clock.tick()
+        """
+        Run every game tick.
+        
+        Updates delta time to `_clock.tick() / 1000` since `tick()` returns milliseconds.
+        """
+        cls._dt = cls._clock.tick() / 1000
 
     @classmethod
     def dt(cls) -> float:
-        """
-        Returns the time in seconds since last frame.
-
-        _clock.tick() returns the time in milliseconds since the last call to _clock.tick()
-        so we divide _dt by 1000.
-        """
-        return cls._dt / 1000
+        """Returns the time in seconds since last frame."""
+        return cls._dt
     
     @classmethod
-    def fps(cls):
-        return cls._clock.get_fps()
+    def fps(cls) -> int:
+        """Returns the current frames per second as an int."""
+        return int(cls._clock.get_fps())
+    
+    @classmethod
+    def ticks(cls) -> int:
+        """Returns times since pygame.init() was called in milliseconds."""
+        return pygame.time.get_ticks()
