@@ -1,37 +1,38 @@
 import pygame
+from src.util import Timer
 from .collider import Collider
 
 class HealthComponent:
-    def __init__(self, max_health: int, invulnerable_duration: int = 30):
+    def __init__(self, max_health: int, invulnerable_duration: int = 500):
         self.max_health = max_health
         self.collider: Collider | None = None
         self.health = max_health
         self.invulnerable_duration = invulnerable_duration
-        self.invulnerable_timer = 0
-
-        self.enabled = True
+        self.invulnerable_timer = Timer(invulnerable_duration)
 
         self.on_death = lambda: None
         self.on_damaged = lambda: None
     
+    def update(self, pos: pygame.Vector2):
+        self.collider.update(pos)
+    
     @property
     def vulnerable(self):
-        return self.invulnerable_timer == 0
+        return self.invulnerable_timer.is_done
     
     @property
     def invulnerable(self):
-        return self.invulnerable_timer > 0
-
+        return self.invulnerable_timer.is_active
+    
     def enable(self):
-        self.enabled = True
-    
+        self.collider.enabled = True
+
     def disable(self):
-        self.enabled = False
+        self.collider.enabled = False
     
-    def update(self, pos: pygame.Vector2):
-        self.collider.update(pos)
-        self.invulnerable_timer = max(0, self.invulnerable_timer - 1)
-        self.collider.enabled = self.enabled
+    @property
+    def enabled(self) -> bool:
+        return self.collider.enabled
 
     def reset(self):
         self.health = self.max_health
@@ -39,10 +40,11 @@ class HealthComponent:
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)
         
-    def take_damage(self, amount: int):
+    def apply_damage(self, amount: int):
         if self.vulnerable:
             self.health = max(0, self.health - amount)
-            self.invulnerable_timer = self.invulnerable_duration
+            self.invulnerable_timer.start()
+            print(self.invulnerable_timer.time_left)
             self.on_damaged()
 
             if self.health == 0:

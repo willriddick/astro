@@ -11,10 +11,16 @@ class Timer:
     def reset(self) -> None:
         self.start_time = None
     
-    def is_done(self) -> bool:
+    @property
+    def time_left(self) -> float:
         if self.start_time is None:
-            return True
-        return (pygame.time.get_ticks() - self.start_time) >= self.duration
+            return 0
+        return max(0, self.duration - (pygame.time.get_ticks() - self.start_time))
     
+    @property
+    def is_done(self) -> bool:
+        return self.time_left == 0
+    
+    @property
     def is_active(self) -> bool:
-        return not self.is_done()
+        return self.time_left > 0
