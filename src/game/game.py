@@ -1,11 +1,11 @@
 import sys
 import pygame
 from src.util import Assets, CommandPrompt, Vec2
+from .clock import Clock
 from .level import Level
 from .camera import Camera
 from .player import Player 
 
-FPS = 60
 WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
@@ -16,7 +16,6 @@ class Game:
         pygame.display.set_caption('GAME')
 
         self.running = False
-        self.clock = pygame.time.Clock()
         self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
@@ -53,7 +52,7 @@ class Game:
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
                 pygame.display.update()
-                self.clock.tick(FPS)
+                Clock.update()
             except KeyboardInterrupt:
                 self.running = False
 
@@ -73,9 +72,11 @@ class Game:
         self.level.entities.append(self.player)
 
     def debug_display(self):
-        text = f'{self.player.state_machine.current_state.name} \n'
+        text = ''
+        text += f'fps: {Clock.fps():0.0f} | dt: {Clock.dt():0.3f}\n'
+        text += f'state: {self.player.state_machine.current_state.name}\n'
         text += f'hp: {self.player.health_component.health}\n'
-        text += f'x: {int(self.player.pos.x):04}, y:{int(self.player.pos.y):04} \n'
+        text += f'x: {int(self.player.pos.x):4}   y:{int(self.player.pos.y):4} \n'
         text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.player.collisions.items())
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         self.camera.display.blit(text_surf, (0, 0))
