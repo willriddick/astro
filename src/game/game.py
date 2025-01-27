@@ -47,7 +47,8 @@ class Game:
 
             # Draw command prompt
             self.command_prompt.render(self.camera.display)
-            self.debug_display()
+
+            self._debug_display()
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
@@ -58,21 +59,9 @@ class Game:
 
         pygame.quit()
         sys.exit()
-
-    def new(self, map_path: str = None, seed: int = None):
-        self.level = Level(map_path=map_path, seed=seed)
-        self.camera.level = self.level
-
-        self.player = Player(self.level, self.camera)
-        self.player.spawn(self.level.spawn_pos)
-
-        self.camera.boundary = self.level.tilemap.rect
-        self.camera.set_pos(self.level.spawn_pos)
-
-        self.level.entities.append(self.player)
-
-    def debug_display(self):
-        text = f'fps: {Clock.fps()}\n{self.player}'
+    
+    def _debug_display(self):
+        text = f'fps: {Clock.fps()}\n{self.player.debug}\n{self.camera.debug}'
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
@@ -83,6 +72,15 @@ class Game:
             outline_color=(0, 0, 0, 0)
         )
         self.camera.display.blit(text_surf, (4, 4))
+
+    def new(self, map_path: str = None, seed: int = None):
+        self.level = Level(map_path=map_path, seed=seed)
+        self.camera.level = self.level
+        self.player = Player(self.level, self.camera)
+        self.player.spawn(self.level.spawn_pos)
+        self.camera.boundary = self.level.tilemap.rect
+        self.camera.set_pos(self.level.spawn_pos)
+        self.level.entities.append(self.player)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

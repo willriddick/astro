@@ -23,7 +23,7 @@ class Player(PhysicsEntity):
 
     SLIDE_INPUT_BUFFER = 230 # amount of time after pressing down to allow slide
     SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_MULTIPLIER = 1.2 # multiplies velocity when entering slide state
+    INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
     SLIDE_SPEED = 100
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
@@ -78,12 +78,13 @@ class Player(PhysicsEntity):
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
     
-    def __str__(self):
+    @property
+    def debug(self) -> str:
         return (
-            f'state: {self.state_machine.current_state.name}\n'
-            f'hp: {self.health_component.health}\n'
             f'x:{int(self.pos.x):4} y:{int(self.pos.y):4}\n'
-            f'vel:{self.velocity.x:4.1f}, {self.velocity.x:4.1f}\n'
+            f'hp: {self.health_component.health}\n'
+            f'state: {self.state_machine.current_state.name}\n'
+            f'vel:{self.velocity.x:4.0f} {self.velocity.y:4.0f}\n'
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
         )
     
