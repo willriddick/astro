@@ -1,6 +1,6 @@
 import sys
 import pygame
-from src.util import Assets, CommandPrompt, Vec2
+from src.util import Assets, CommandPrompt, Vec2, draw_rect
 from .clock import Clock
 from .level import Level
 from .camera import Camera
@@ -72,13 +72,17 @@ class Game:
         self.level.entities.append(self.player)
 
     def debug_display(self):
-        text = f'fps: {Clock.fps()}\n'
-        text += f'state: {self.player.state_machine.current_state.name}\n'
-        text += f'hp: {self.player.health_component.health}\n'
-        text += f'x: {int(self.player.pos.x):4}   y:{int(self.player.pos.y):4} \n'
-        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.player.collisions.items())
+        text = f'fps: {Clock.fps()}\n{self.player}'
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
-        self.camera.display.blit(text_surf, (0, 0))
+        text_surf.set_alpha(70)
+        text_rect = text_surf.get_rect()
+        draw_rect(
+            self.camera.display,
+            rect=pygame.Rect(0, 0, 100, text_rect.height + 8),
+            fill_color=(0, 0, 0, 40),
+            outline_color=(0, 0, 0, 0)
+        )
+        self.camera.display.blit(text_surf, (4, 4))
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

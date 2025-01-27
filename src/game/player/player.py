@@ -1,7 +1,6 @@
 import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
-from src.game.physics_entity import PhysicsEntity
-from src.game.components import Collider, HealthComponent, Sprite 
+from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -40,10 +39,9 @@ class Player(PhysicsEntity):
     AIR_ROTATE_DURATION = 250
 
     def __init__(self, level, camera, palette_index: int=1):
-        super().__init__(level, pygame.Vector2(0, 0), Vec2(8, 13))
+        super().__init__(level, size=Vec2(8, 13))
 
         self.camera = camera
-
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
 
@@ -80,15 +78,24 @@ class Player(PhysicsEntity):
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
     
+    def __str__(self):
+        return (
+            f'state: {self.state_machine.current_state.name}\n'
+            f'hp: {self.health_component.health}\n'
+            f'x:{int(self.pos.x):4} y:{int(self.pos.y):4}\n'
+            f'vel:{self.velocity.x:4.1f}, {self.velocity.x:4.1f}\n'
+            f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
+        )
+    
     def set_pos(self, pos: pygame.Vector2):
         self.pos = pos
         self.health_component.update(pos)
+        self.sprite.set_pos(pos)
 
     def spawn(self, pos: pygame.Vector2):
-        self.set_pos(pos)
-        print(pos)
         self.velocity = pygame.Vector2(0, 0)
         self.set_state(States.AIR)
+        self.set_pos(pos)
         self.health_component.reset()
         self.health_component.enable()
     
@@ -200,4 +207,3 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
         self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
         self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.set_animation(Animations.IDLE_B)

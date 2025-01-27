@@ -1,9 +1,8 @@
 import pygame
-from .components.sprite import Sprite
+from .sprite import Sprite
 
 class Entity:
     def __init__(self, level: 'Level', pos: pygame.Vector2):
-        super().__init__()
         self.level = level
         self.pos = pos
         self.sprite: Sprite | None = None

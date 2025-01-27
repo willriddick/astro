@@ -1,7 +1,6 @@
 import pygame
 from src.util import Assets, Vec2
-from src.game.components import Sprite, DamageComponent, Collider
-from src.game.entity import Entity
+from src.game.components import Entity, Sprite, DamageComponent, Collider
 
 class Spike(Entity):
     def __init__(self, level: 'Level', pos: pygame.Vector2):
@@ -13,7 +12,6 @@ class Spike(Entity):
         
         self.sprite = Sprite(self.pos)
         self.sprite.add_animation(0, [Assets.SPIKE])
-        self.sprite.set_animation(0)
     
     def update(self):
         self.damage_component.update(self.pos)

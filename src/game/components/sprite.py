@@ -27,11 +27,7 @@ class Sprite:
         self.alpha_speed = 0
         self.alpha_range = (0, 255)
     
-    def reset(self):
-        self.next_timer.reset()
-        self.flash_timer.reset()
-        self.alpha_timer.reset()
-    
+   
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
 
@@ -47,6 +43,17 @@ class Sprite:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
     
+    def reset(self):
+        self.next_timer.reset()
+        self.flash_timer.reset()
+        self.alpha_timer.reset()
+    
+    def set_pos(self, pos: pygame.Vector2):
+        self.pos = pos
+    
+    def get_pos(self) -> pygame.Vector2:
+        return self.pos
+    
     def add_animation(self, id_: Enum, frames: list[pygame.Surface], frame_rate: int = 0, range_: tuple[int, int]=None):
         if range_:
             start, stop = range_
@@ -55,6 +62,8 @@ class Sprite:
             self.animations[id_] = (frames[start:stop], frame_rate)
         else:
             self.animations[id_] = (frames, frame_rate)
+
+        self.current = id_
     
     def set_animation(self, id_: Enum, frame: int = 0):
         assert id_ in self.animations, f'Animation {id_} not found'
@@ -88,7 +97,7 @@ class Sprite:
         self.flash_color = color
         self.flash_blend = blend
     
-    def oscillate_alpha(self, duration: int, speed = 100, alpha_range = (20, 255)):
+    def oscillate_alpha(self, duration: int, speed = 100, alpha_range = (40, 255)):
         """Oscillates the alpha value of the sprite quickly for a duration."""
         self.alpha_timer.start(duration)
         self.alpha_speed = speed

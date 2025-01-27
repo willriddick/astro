@@ -5,9 +5,9 @@ def draw_rect(
         display: pygame.Surface,
         offset = pygame.Vector2(0, 0),
         rect = pygame.Rect(0, 0, 0, 0),
-        line_width = 1,
         fill_color = pygame.Color(0, 0, 0, 0),
-        outline_color = pygame.Color(255, 255, 255, 255),
+        outline_color = pygame.Color(0, 0, 0, 0),
+        line_width = 1,
     ):
     surface = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
     surface.fill(fill_color) 
