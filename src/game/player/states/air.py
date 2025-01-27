@@ -28,6 +28,9 @@ class Air(State):
             self.switch(States.WALL_SLIDE)
 
         if self.owner.on_ground:
+            if self.owner.velocity.y == Player.FALL_SPEED:
+                self.owner.camera.screenshake(15, 1)
+
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)
             else:
