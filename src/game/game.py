@@ -36,7 +36,6 @@ class Game:
         while self.running:
             Debug.update()
             Debug.add_display(self.player.debug)
-            Debug.add_display(self.camera.debug)
 
             for event in pygame.event.get():
                 self.handle_event(event)

@@ -62,5 +62,5 @@ class Collider:
             display, 
             offset=offset, 
             rect=self.rect,
-            outline_color=(255, 0, 255, 50),
+            outline_color=(255, 0, 255, 100),
         )

@@ -11,9 +11,9 @@ class Camera:
         self.display = pygame.Surface(size)
         self.fill_color = (24, 20, 37)
 
+        self.offset = pygame.Vector2(0, 0)
         self.pos = pygame.Vector2(0, 0)
         self.smoothing = 0.0
-        self.offset = pygame.Vector2(0, 0)
         self.boundary: pygame.Rect | None = None
 
         self.screenshake_offset = pygame.Vector2(0, 0)
@@ -21,7 +21,6 @@ class Camera:
         self.screenshake_intensity = 0
 
         self.level: Level | None = None
-
 
     def update(self) -> None:
         """Update the camera and render the display surface."""
