@@ -1,8 +1,9 @@
 import numpy as np
 import pygame
-from src.util import Vec2, randf
+from src.util import Assets, Vec2, randf, draw_rect
 from .level import Level
 from .clock import Clock
+from .debug import Debug
 
 class Camera:
     def __init__(self, size: Vec2):
@@ -21,6 +22,7 @@ class Camera:
 
         self.level: Level | None = None
 
+
     def update(self) -> None:
         """Update the camera and render the display surface."""
         # Clear display surface
@@ -37,13 +39,31 @@ class Camera:
 
         # Render the tilemap  
         self._render_tilemap(self.level.tilemap)
+    
+        # Render debug display information
+        if Debug.enabled():
+            self._debug_display()
 
         # Render all entities relative to the offset
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
-        
-        #for collider in self.level.colliders:
-        #   collider.render(self.display, -self.offset)
+
+        # Render debug shapes like colliders
+        if Debug.enabled():
+            for collider in self.level.colliders:
+                collider.render(self.display, -self.offset)
+   
+    def _debug_display(self):
+        text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
+        text_surf.set_alpha(70)
+        text_rect = text_surf.get_rect()
+        draw_rect(
+            self.display,
+            rect=pygame.Rect(0, 0, 100, text_rect.height + 8),
+            fill_color=(0, 0, 0, 40),
+            outline_color=(0, 0, 0, 0)
+        )
+        self.display.blit(text_surf, (4, 4))
 
     @property
     def debug(self) -> str:
