@@ -7,20 +7,22 @@ class DamageComponent:
         self.collider: Collider | None = None
         self.damage = damage
         self.nearest = None
-        self.enabled = True
     
     def enable(self):
-        self.enabled = True
-    
+        self.collider.enabled = True
+
     def disable(self):
-        self.enabled = False
+        self.collider.enabled = False
+    
+    @property
+    def enabled(self) -> bool:
+        return self.collider.enabled
     
     def update(self, pos: pygame.Vector2):
         self.collider.update(pos)
-        self.collider.enabled = self.enabled
 
         self.nearest = self.collider.get_nearest(
             lambda c: isinstance(c.owner, HealthComponent) and c.owner.enabled
         )
         if self.nearest:
-            self.nearest.owner.take_damage(self.damage)
+            self.nearest.owner.apply_damage(self.damage)

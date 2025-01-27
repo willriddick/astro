@@ -1,9 +1,8 @@
 from random import choice, randint
 import pygame
 from src.util import Assets, randf, Vec2
-from .entity import Entity
-from .physics_entity import PhysicsEntity
-from .components import Sprite
+from .clock import Clock
+from .components import PhysicsEntity, Entity, Sprite
 
 class AsteroidSpawner(Entity):
     def __init__(self):
@@ -69,7 +68,7 @@ class Asteroid(PhysicsEntity):
         return f'asteroid: pos={self.pos}, vel={self.velocity}, frame={self.sprite.frame}'
     
     def update(self):
-        self.pos += self.velocity
+        self.pos += (self.velocity * Clock.dt())
         self.sprite.update(self.pos)
         
         if not self.spawner.boundary.collidepoint(self.center):

@@ -8,3 +8,4 @@ from .draw import draw_rect
 from .vec2 import Vec2
 from .direction import Direction
 from .command_prompt import CommandPrompt
+from .timer import Timer

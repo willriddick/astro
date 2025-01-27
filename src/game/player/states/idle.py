@@ -1,23 +1,21 @@
-from src.util import State
+from src.util import State, Timer
 from ..player import Player
 from ..enums import Animations, States
 
 class Idle(State):
     def __init__(self):
         super().__init__(States.IDLE)
-        self.timer = 0
+        self.animation_timer = Timer(30)
     
     def on_enter(self):
-        self.timer = 0
+        self.animation_timer.start()
         self.owner.sprite.set_next(Animations.IDLE_A)
     
     def update(self):
-        self.timer = max(0, self.timer + 1)
-
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
 
-        if self.timer >= 30:
+        if self.animation_timer.is_done:
             self.owner.sprite.set_animation(Animations.IDLE_B)
 
         if self.owner.move_dir.x != 0:

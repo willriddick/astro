@@ -1,11 +1,11 @@
 import sys
 import pygame
-from src.util import Assets, CommandPrompt, Vec2
+from src.util import Assets, CommandPrompt, Vec2, draw_rect
+from .clock import Clock
 from .level import Level
 from .camera import Camera
 from .player import Player 
 
-FPS = 60
 WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
@@ -16,7 +16,6 @@ class Game:
         pygame.display.set_caption('GAME')
 
         self.running = False
-        self.clock = pygame.time.Clock()
         self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
@@ -48,37 +47,40 @@ class Game:
 
             # Draw command prompt
             self.command_prompt.render(self.camera.display)
-            self.debug_display()
+
+            self._debug_display()
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
                 pygame.display.update()
-                self.clock.tick(FPS)
+                Clock.update()
             except KeyboardInterrupt:
                 self.running = False
 
         pygame.quit()
         sys.exit()
+    
+    def _debug_display(self):
+        text = f'fps: {Clock.fps()}\n{self.player.debug}\n{self.camera.debug}'
+        text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
+        text_surf.set_alpha(70)
+        text_rect = text_surf.get_rect()
+        draw_rect(
+            self.camera.display,
+            rect=pygame.Rect(0, 0, 100, text_rect.height + 8),
+            fill_color=(0, 0, 0, 40),
+            outline_color=(0, 0, 0, 0)
+        )
+        self.camera.display.blit(text_surf, (4, 4))
 
     def new(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.camera.level = self.level
-
         self.player = Player(self.level, self.camera)
         self.player.spawn(self.level.spawn_pos)
-
         self.camera.boundary = self.level.tilemap.rect
         self.camera.set_pos(self.level.spawn_pos)
-
         self.level.entities.append(self.player)
-
-    def debug_display(self):
-        text = f'{self.player.state_machine.current_state.name} \n'
-        text += f'hp: {self.player.health_component.health}\n'
-        text += f'x: {int(self.player.pos.x):04}, y:{int(self.player.pos.y):04} \n'
-        text += ' '.join(f'{dir_.name[0]}:{int(val)}' for dir_, val in self.player.collisions.items())
-        text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
-        self.camera.display.blit(text_surf, (0, 0))
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

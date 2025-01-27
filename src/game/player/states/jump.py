@@ -10,7 +10,7 @@ class Jump(State):
         # special case for coyote time 
         if (
             self.owner.jumps_remaining == Player.MAX_JUMPS 
-            and not self.owner.on_ground and self.owner.coyote_timer == 0
+            and not self.owner.on_ground and self.owner.coyote_timer.is_done
         ):
             self.owner.jumps_remaining -= 1
         
@@ -19,9 +19,9 @@ class Jump(State):
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
 
             self.owner.velocity.y = -Player.JUMP_SPEED * self.owner.velocity_multiplier.y
-            self.owner.jump_input_timer = 0
-            self.owner.coyote_timer = 0
-            self.owner.variable_jump_timer = Player.VARIABLE_JUMP_BUFFER
+            self.owner.jump_input_timer.reset()
+            self.owner.coyote_timer.reset()
+            self.owner.variable_jump_timer.start()
         
         # switch to AIR
         self.switch(States.AIR)

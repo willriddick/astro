@@ -12,8 +12,8 @@ class WallSlide(State):
     
     def on_exit(self):
         self.owner.last_rotate_dir = -self.owner.wall_slide_dir
-        self.owner.slide_left_timer = 0
-        self.owner.slide_right_timer = 0
+        self.owner.pressed_left_timer.reset()
+        self.owner.pressed_right_timer.reset()
     
     def update(self):
         if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:

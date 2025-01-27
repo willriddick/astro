@@ -1,29 +1,27 @@
 import numpy as np
 import pygame
-from src.game.level import Level
-from src.util import Vec2, randf, draw_rect
+from src.util import Vec2, randf
+from .level import Level
+from .clock import Clock
 
 class Camera:
     def __init__(self, size: Vec2):
-        self.debug = True
-
         self.size = size
         self.display = pygame.Surface(size)
         self.fill_color = (24, 20, 37)
 
         self.pos = pygame.Vector2(0, 0)
+        self.smoothing = 0.0
         self.offset = pygame.Vector2(0, 0)
         self.boundary: pygame.Rect | None = None
-        self.follow = False
 
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
-        self.screenshake_step = 0
 
         self.level: Level | None = None
 
-    def update(self):
+    def update(self) -> None:
         """Update the camera and render the display surface."""
         # Clear display surface
         self.display.fill(self.fill_color)
@@ -33,8 +31,8 @@ class Camera:
 
         # Calculate the offset from the in-game position
         self.offset = pygame.Vector2(
-            self.pos.x - self.size.x // 2,
-            self.pos.y - self.size.y // 2
+            self.clamp_pos.x - self.size.x // 2,
+            self.clamp_pos.y - self.size.y // 2
         ) + self.screenshake_offset
 
         # Render the tilemap  
@@ -44,58 +42,74 @@ class Camera:
         for entity in self.level.entities:
             entity.render(self.display, -self.offset)
         
-        if self.debug:
-            for collider in self.level.colliders:
-                collider.render(self.display, -self.offset)
+        #for collider in self.level.colliders:
+        #   collider.render(self.display, -self.offset)
 
-    def screenshake(self, duration: int, intensity: int):
+    @property
+    def debug(self) -> str:
+        return (
+            f'x:{int(self.pos.x):4} y:{int(self.pos.y):4}\n'
+            f'clamp x:{int(self.clamp_pos.x):4} y:{int(self.clamp_pos.y):4}\n'
+            f'smoothing: {self.smoothing:.3f}\n'
+        )
+
+    @property
+    def rect(self) -> pygame.Rect:
+        """Get the camera's current rectangle in the game world."""
+        return pygame.Rect(
+            self.clamp_pos.x - self.size.x // 2,
+            self.clamp_pos.y - self.size.y // 2,
+            self.size.x, 
+            self.size.y
+        )
+    
+    @property
+    def clamp_pos(self) -> pygame.Vector2:
+        if not self.boundary:
+            return self.pos
+        
+        # Half the width and height of the boundary (use float division for precision)
+        h_width = self.size.x / 2
+        h_height = self.size.y / 2
+
+        # Ensure the position stays within the clamped bounds
+        clamped_x = max(self.boundary.left + h_width, min(self.pos.x, self.boundary.right - h_width))
+        clamped_y = max(self.boundary.top + h_height, min(self.pos.y, self.boundary.bottom - h_height))
+        
+        return pygame.Vector2(clamped_x, clamped_y)
+    
+    def set_pos(self, target_pos: pygame.Vector2) -> None:
+        """Set the camera's position to a target position."""
+        self.pos = target_pos
+    
+    def move_to(self, target_pos: pygame.Vector2, smoothing=20, factor=20) -> None:
+        """Smoothly interpolate towards the target position using an exponential decay approach."""
+        # Calculate dynamic smoothing based on the distance to the target
+        distance_to_target = (target_pos - self.pos).length()
+        dynamic_smoothing = smoothing * (1 + distance_to_target / factor) 
+        
+        # Apply exponential smoothing (cosine interpolation)
+        self.smoothing = (1 - np.cos(dynamic_smoothing * np.pi * Clock.dt())) / 2
+        
+        # Clamp the position and update
+        self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
+   
+    def screenshake(self, duration: int, intensity: int) -> None:
         self.screenshake_timer = duration
         self.screenshake_intensity = intensity
-        self.screenshake_step = intensity / duration
     
-    def _handle_screenshake(self):
+    def _handle_screenshake(self) -> None:
         self.screenshake_timer = max(0, self.screenshake_timer - 1)
         if self.screenshake_timer > 0:
             self.screenshake_offset = pygame.Vector2(
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
             )
-            self.screenshake_intensity -= self.screenshake_step
+            self.screenshake_intensity * 0.9
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     
-    @property
-    def rect(self):
-        """Get the camera's current rectangle in the game world."""
-        return pygame.Rect(
-            self.pos.x - self.size.x // 2,
-            self.pos.y - self.size.y // 2,
-            self.size.x, 
-            self.size.y
-        )
-    
-    def set_pos(self, target_pos: pygame.Vector2):
-        """Set the camera's position to a target position."""
-        self.pos = self._clamp(target_pos, self.size, self.boundary)
-    
-    def move_to(self, target_pos: pygame.Vector2, smoothing = 0.2, buffer = 64):
-        """Move the camera smoothly towards a target position only if it moves outside the dead zone."""
-        cos_smoothing = (1 - np.cos(smoothing * np.pi)) / 2
-        self.pos = self.pos * (1 - cos_smoothing) + target_pos * cos_smoothing
-        self.pos = self._clamp(self.pos, self.size, self.boundary)
-
-    def _clamp(self, pos: pygame.Vector2, size: Vec2, boundary: pygame.Rect) -> pygame.Vector2:
-        clamped = pos
-        if boundary:
-            h_width = size.x // 2
-            h_height = size.y // 2
-            clamped = pygame.Vector2(
-                max(boundary.left + h_width, min(int(pos.x), boundary.right - h_width)),
-                max(boundary.top + h_height, min(int(pos.y), boundary.bottom - h_height))
-            )
-        return clamped
-    
-    def _render_tilemap(self, tilemap):
+    def _render_tilemap(self, tilemap) -> None:
         if not tilemap:
             return
 
