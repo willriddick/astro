@@ -3,6 +3,7 @@ from src.util import Assets
 from src.tilemap import TileMap
 from .map_builder import generate
 from .spike import Spike
+from .gravity import Gravity
 from .components import Collider, Entity
 
 class Level:
@@ -27,6 +28,9 @@ class Level:
         for spike in self.tilemap.get_tiles_with('spike'):
             Spike(self, spike.pos)
             del spike
+        
+        for gravity in self.tilemap.get_tiles_with('gravity'):
+            Gravity(self, gravity.pos)
 
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)

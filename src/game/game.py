@@ -27,6 +27,7 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
+        self.player = None
         self.level = None
         self.new('maps/10x8/1_2/test')
     

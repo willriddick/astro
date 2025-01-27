@@ -1,4 +1,6 @@
+import pygame
 from src.util import State
+from src.game.gravity import Gravity
 from ..player import Player
 from ..enums import Animations, States
 
@@ -10,6 +12,14 @@ class Air(State):
         self.owner.sprite.set_next(Animations.AIR_UP if self.owner.velocity.y < 0 else Animations.AIR_DOWN)
 
     def update(self):
+        nearest = self.owner.collider.get_nearest(lambda c: isinstance(c.owner, Gravity))
+        if nearest:
+            self.owner.gravity_multiplier = nearest.owner.gravity_multiplier
+            self.owner.velocity_multiplier = pygame.Vector2(0.75, 0.75)
+        else:
+            self.owner.gravity_multiplier = 1
+            self.owner.velocity_multiplier = pygame.Vector2(1, 1)
+
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
         self.owner.handle_wall_jump()

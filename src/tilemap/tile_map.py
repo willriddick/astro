@@ -162,7 +162,7 @@ class TileMap:
 
             for tile in tilemap.map.values():
                 tile_data = {
-                    't': tile.type.name,
+                    't': tile.tile_type.name,
                     'v': tile.variant,
                     'p': [tile.tile_pos.x,  tile.tile_pos.y]
                 }

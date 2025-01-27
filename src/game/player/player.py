@@ -74,7 +74,8 @@ class Player(PhysicsEntity):
         ])
 
         self.health_component = HealthComponent(3, 1000)
-        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
+        self.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
+        self.health_component.collider = self.collider
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
     
@@ -134,7 +135,7 @@ class Player(PhysicsEntity):
             self.state_machine.switch(States.JUMP)
        
         if not self.holding_jump and self.variable_jump_timer.is_active and self.velocity.y < 0:
-            self.velocity.y *= (Player.VARIABLE_JUMP_MULTIPLIER / (1 / self.gravity_multiplier))
+            self.velocity.y *= Player.VARIABLE_JUMP_MULTIPLIER
    
     def handle_wall_jump(self):
         if not self.on_ground:

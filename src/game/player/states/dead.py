@@ -13,7 +13,7 @@ class Dead(State):
         self.owner.sprite.reset()
         self.owner.sprite.flash(self.timer.duration, pygame.Color(255, 0, 0), pygame.BLEND_RGB_MULT)
         self.owner.sprite.set_animation(Animations.IDLE_A)
-        self.owner.apply_force(2, Direction.UP)
+        self.owner.apply_force(100, Direction.UP)
         self.owner.health_component.disable()
     
     def update(self):
