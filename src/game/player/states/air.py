@@ -12,9 +12,9 @@ class Air(State):
         self.owner.sprite.set_next(Animations.AIR_UP if self.owner.velocity.y < 0 else Animations.AIR_DOWN)
 
     def update(self):
-        nearest = self.owner.collider.get_nearest(lambda c: isinstance(c.owner, Gravity))
+        nearest = self.owner.collider.get_nearest(Gravity)
         if nearest:
-            self.owner.gravity_multiplier = nearest.owner.gravity_multiplier
+            self.owner.gravity_multiplier = nearest.gravity_multiplier
             self.owner.velocity_multiplier = pygame.Vector2(0.75, 0.75)
         else:
             self.owner.gravity_multiplier = 1

@@ -8,9 +8,9 @@ class Gravity(Entity):
 
         self.collider = Collider(
             level=self.level, 
-            owner=self, 
             size=Vec2(16, 16), 
             offset=Vec2(0, 0)
         )
+        self.collider.add_owner(self)
         self.collider.update(self.pos)
     

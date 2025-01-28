@@ -73,9 +73,14 @@ class Player(PhysicsEntity):
             WallJump(), Ghost(), Hurt(), Dead(),
         ])
 
-        self.health_component = HealthComponent(3, 1000)
-        self.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
-        self.health_component.collider = self.collider
+        self.collider = Collider(
+            level=self.level, 
+            size=Vec2(8, 12),
+            offset=Vec2(0, 1)
+        )
+        self.collider.add_owner(self)
+
+        self.health_component = HealthComponent(self.collider, 3, 1000)
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
     
@@ -113,6 +118,9 @@ class Player(PhysicsEntity):
     
     def on_death(self):
         self.set_state(States.DEAD)
+    
+    def apply_damage(self, damage: int):
+        self.health_component.apply_damage(damage)
     
     def set_state(self, state: 'States'):
         self.state_machine.switch(state)

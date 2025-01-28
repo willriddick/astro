@@ -7,14 +7,14 @@ class Entity:
         self.pos = pos
         self.sprite: Sprite | None = None
     
-    def update(self):
+    def update(self) -> None:
         pass
 
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        assert self.sprite, 'Sprite not set {self}'
-        self.sprite.render(display, offset)
+    def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
+        if self.sprite:
+            self.sprite.render(display, offset)
     
-    def set_pos(self, pos: pygame.Vector2):
+    def set_pos(self, pos: pygame.Vector2) -> None:
         self.pos = pos
     
     def get_pos(self) -> pygame.Vector2:

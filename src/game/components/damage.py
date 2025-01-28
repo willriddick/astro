@@ -3,8 +3,9 @@ from .collider import Collider
 from .health import HealthComponent
 
 class DamageComponent:
-    def __init__(self, damage: int):
-        self.collider: Collider | None = None
+    def __init__(self, collider: Collider, damage: int):
+        self.collider = collider
+        self.collider.add_owner(self)
         self.damage = damage
         self.nearest = None
     
@@ -21,8 +22,6 @@ class DamageComponent:
     def update(self, pos: pygame.Vector2):
         self.collider.update(pos)
 
-        self.nearest = self.collider.get_nearest(
-            lambda c: isinstance(c.owner, HealthComponent) and c.owner.enabled
-        )
+        self.nearest: HealthComponent = self.collider.get_nearest(HealthComponent)
         if self.nearest:
-            self.nearest.owner.apply_damage(self.damage)
+            self.nearest.apply_damage(self.damage)
