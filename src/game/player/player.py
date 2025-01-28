@@ -4,22 +4,22 @@ from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
-    GROUND_MOVE_SPEED = 70
+    GROUND_MOVE_SPEED = 80
     GROUND_ACC = (360, 720) # (acceleration, deceleration)
-    AIR_MOVE_SPEED = 80
+    AIR_MOVE_SPEED = 90
     AIR_ACC = (180, 36)
-    PRESSED_LEFT_BUFFER = 80
-    PRESSED_RIGHT_BUFFER = 80
+    PRESSED_LEFT_BUFFER = 120
+    PRESSED_RIGHT_BUFFER = 120
 
-    GRAVITY = 500
-    FALL_SPEED = 192
+    GRAVITY = 485
+    FALL_SPEED = 180
 
-    JUMP_INPUT_BUFFER = 4
-    JUMP_SPEED = 180
+    JUMP_INPUT_BUFFER = 50
+    JUMP_SPEED = 185
     MAX_JUMPS = 1
     COYOTE_BUFFER = 115 # time after falling to allow jump
-    VARIABLE_JUMP_MULTIPLIER = 0.95 # multiplies velocity when releasing jump
-    VARIABLE_JUMP_BUFFER = 200 # time after jumping to allow variable jump
+    VARIABLE_JUMP_MULTIPLIER = 0.93 # multiplies velocity when releasing jump
+    VARIABLE_JUMP_BUFFER = 300 # time after jumping to allow variable jump
 
     SLIDE_INPUT_BUFFER = 230 # amount of time after pressing down to allow slide
     SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
@@ -28,12 +28,12 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 165 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = Vec2(125, 155)
+    WALL_JUMP_DURATION = 80 # time after wall jumping to push player away from wall
+    WALL_JUMP_SPEED = Vec2(125, 165)
     WALL_JUMP_ACC = (8, 8)
     WALL_SLIDE_SPEED = 30
     WALL_SLIDE_GRAVITY = 180
-    WALL_SLIDE_BUFFER = 160 # amount of time after wall sliding to allow wall jump
+    WALL_SLIDE_BUFFER = 150 # amount of time after wall sliding to allow wall jump
 
     ROTATE_DURATION = 180 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 250

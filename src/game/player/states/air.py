@@ -1,5 +1,5 @@
 import pygame
-from src.util import State
+from src.util import State, Timer
 from src.game.gravity import Gravity
 from ..player import Player
 from ..enums import Animations, States
@@ -7,18 +7,20 @@ from ..enums import Animations, States
 class Air(State):
     def __init__(self):
         super().__init__(States.AIR)
+        self.timer = Timer(1000)
     
     def on_enter(self):
+        self.timer.start()
         self.owner.sprite.set_next(Animations.AIR_UP if self.owner.velocity.y < 0 else Animations.AIR_DOWN)
 
     def update(self):
         nearest = self.owner.collider.get_nearest(Gravity)
         if nearest:
             self.owner.gravity_multiplier = nearest.gravity_multiplier
-            self.owner.velocity_multiplier = pygame.Vector2(0.75, 0.75)
+            self.owner.velocity_multiplier.x = 0.75
         else:
             self.owner.gravity_multiplier = 1
-            self.owner.velocity_multiplier = pygame.Vector2(1, 1)
+            self.owner.velocity_multiplier.x = 1.0
 
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
@@ -38,8 +40,8 @@ class Air(State):
             self.switch(States.WALL_SLIDE)
 
         if self.owner.on_ground:
-            if self.owner.velocity.y == Player.FALL_SPEED:
-                self.owner.camera.screenshake(15, 1)
+            if self.timer.is_done:
+                self.owner.camera.screenshake(20, 2)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)
