@@ -55,7 +55,7 @@ CONFIGS = [
         room_count=(7, 12),
         main_length=(4, 5),
         bridge_count=(3, 3),
-        item_count=(3, 4),
+        item_count=4,
         branch_length_range=(1, 3),
         weights={
             Direction.UP: 10,

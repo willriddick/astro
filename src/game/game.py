@@ -36,6 +36,7 @@ class Game:
        
         while self.running:
             Debug.update()
+            Debug.add_display(f'fps: {Clock.fps()}')
             Debug.add_display(self.player.debug)
 
             for event in pygame.event.get():

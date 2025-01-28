@@ -10,7 +10,7 @@ def generate(
 ) -> tuple[TileMap, Tile]:
     level = generate_level(config, seed)
     tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
-    size = "10x8"
+    size = "14x10"
 
     for room in level.map.values():
         sub, flip = _get_folder_flip(room.key)
