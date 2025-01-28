@@ -1,4 +1,5 @@
 import pygame
+from src.level_gen import CONFIGS
 from src.util import Assets
 from src.tilemap import TileMap
 from .map_builder import generate
@@ -7,11 +8,7 @@ from .gravity import Gravity
 from .components import Collider, Entity
 
 class Level:
-    def __init__(self, 
-        config = 'configs/0.json', 
-        seed=None, 
-        map_path: str = None
-    ):
+    def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         if map_path:
             self.tilemap = TileMap.load(map_path, Assets.TILESET)
             self.spawn_tile = None
