@@ -61,7 +61,7 @@ class Game:
             except KeyboardInterrupt:
                 self.running = False
             
-            asyncio.sleep(0)
+            await asyncio.sleep(0)
 
         pygame.quit()
         sys.exit()
