@@ -65,7 +65,7 @@ class Game:
 
     def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
-        self.level.camera = self.camera
+        self.level.player.camera = self.camera
         self.camera.level = self.level
         self.camera.boundary = self.level.tilemap.rect
         self.camera.set_pos(self.level.spawn_pos)

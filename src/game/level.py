@@ -12,7 +12,6 @@ from .exit import Exit
 
 class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
-        self.camera = None
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
 
@@ -31,7 +30,7 @@ class Level:
         for gravity in self.tilemap.get_tiles_with('gravity'):
             Gravity(self, gravity.pos)
         
-        self.player = Player(self, self.camera)
+        self.player = Player(self)
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
 
