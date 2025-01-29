@@ -5,7 +5,6 @@ from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-from .player import Player 
 
 WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
@@ -28,7 +27,6 @@ class Game:
         Assets.load_assets()
 
         self.paused = False
-        self.player = None  
         self.level = None
         self.new_level()
     
@@ -38,7 +36,7 @@ class Game:
         while self.running:
             Debug.update()
             Debug.add_display(f'fps: {Clock.fps()}')
-            Debug.add_display(self.player.debug)
+            Debug.add_display(self.level.player.debug)
 
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -48,7 +46,7 @@ class Game:
             
             if not self.command_prompt.enabled and not self.paused:
                 self.camera.update()
-                self.camera.move_to(self.player.center)
+                self.camera.move_to(self.level.player.center)
                 for entity in self.level.entities:
                     entity.update()
 
@@ -67,13 +65,10 @@ class Game:
 
     def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
+        self.level.camera = self.camera
         self.camera.level = self.level
-        self.player = Player(self.level, self.camera)
-        self.level.entities.append(self.player)
-        self.player.game = self
         self.camera.boundary = self.level.tilemap.rect
         self.camera.set_pos(self.level.spawn_pos)
-        self.player.spawn(self.level.spawn_pos)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

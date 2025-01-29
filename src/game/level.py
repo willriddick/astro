@@ -4,6 +4,7 @@ import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2
 from src.tilemap import TileMap, Tile
+from .player import Player 
 from .components import Collider, Entity
 from .spike import Spike
 from .gravity import Gravity
@@ -11,6 +12,7 @@ from .exit import Exit
 
 class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
+        self.camera = None
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
 
@@ -28,6 +30,10 @@ class Level:
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
             Gravity(self, gravity.pos)
+        
+        self.player = Player(self, self.camera)
+        self.entities.append(self.player)
+        self.player.spawn(self.spawn_pos)
 
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
