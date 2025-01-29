@@ -28,7 +28,7 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 80 # time after wall jumping to push player away from wall
+    WALL_JUMP_DURATION = 30 # time after wall jumping to push player away from wall
     WALL_JUMP_SPEED = Vec2(120, 160)
     WALL_JUMP_ACC = (8, 8)
     WALL_SLIDE_SPEED = 30
@@ -99,10 +99,10 @@ class Player(PhysicsEntity):
         self.health_component.update(pos)
         self.sprite.set_pos(pos)
 
-    def spawn(self, pos: pygame.Vector2):
+    def spawn(self, pos: pygame.Vector2 | None = None):
         self.velocity = pygame.Vector2(0, 0)
         self.set_state(States.AIR)
-        self.set_pos(pos)
+        self.set_pos(pos) if pos else self.set_pos(self.level.spawn_pos)
         self.health_component.reset()
         self.health_component.enable()
     

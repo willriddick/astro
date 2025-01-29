@@ -29,7 +29,7 @@ class Game:
 
         self.player = None
         self.level = None
-        self.new('maps/10x8/1_2/test')
+        self.new() #self.new('maps/10x8/1_2/test')
     
     def run(self):
         self.running = True

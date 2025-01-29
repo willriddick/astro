@@ -1,27 +1,26 @@
+import os
+import random
 import pygame
-from src.level_gen import CONFIGS
-from src.util import Assets
-from src.tilemap import TileMap
-from .map_builder import generate
+from src.level_gen import CONFIGS, generate_level, Attribute
+from src.util import Assets, Vec2
+from src.tilemap import TileMap, Tile
+from .components import Collider, Entity
 from .spike import Spike
 from .gravity import Gravity
-from .components import Collider, Entity
 
 class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
+        self.entities: list[Entity] = []
+        self.colliders: list[Collider] = []
+        self.spawn_pos = pygame.Vector2(16, 16)
+        self.exit_pos = pygame.Vector2(0, 0)
+
         if map_path:
             self.tilemap = TileMap.load(map_path, Assets.TILESET)
-            self.spawn_tile = None
         else:
-            self.tilemap, self.spawn_tile = generate(config, seed)
+            self.tilemap, spawn_tile = self.generate(config, seed)
+            self.spawn_pos = spawn_tile.pos
         
-        self.spawn_pos = pygame.Vector2(32, 16)
-        if self.spawn_tile:
-            self.spawn_pos = pygame.Vector2(self.spawn_tile.pos)
-
-        self.colliders: list[Collider] = []
-        self.entities: list[Entity] = []
-
         for spike in self.tilemap.get_tiles_with('spike'):
             Spike(self, spike.pos)
             del spike
@@ -38,3 +37,51 @@ class Level:
 
     def get_colliders(self) -> list['Collider']:
         return self.colliders
+
+    def generate(self, config: str, seed  = None) -> tuple[TileMap, Tile]:
+        level = generate_level(config, seed)
+        tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
+        size = "14x10"
+
+        for room in level.map.values():
+            sub, flip = self._get_folder_flip(room.key)
+            map_folder = f'maps/{size}/{sub}'
+            map_paths: list[str] = []
+            for name in os.listdir(map_folder):
+                map_paths.append(map_folder + '/' + name)
+
+            map_path = random.choice(map_paths)
+            new_map = TileMap.load(map_path, Assets.TILESET)
+            
+            if room.has_attribute(Attribute.ENTRANCE):
+                floors = new_map.get_valid_floor(['stone'])
+                pos = random.choice(floors).tile_pos
+                spawn_tile = new_map.create_tile(Assets.TILESET.get_by('door'), 0, Vec2(pos.x, pos.y - 1))
+            
+            if room.has_attribute(Attribute.EXIT):
+                floors = new_map.get_valid_floor(['stone'])
+                pos = random.choice(floors).tile_pos
+
+            tilemap.place_tilemap(new_map, room.position, flip)
+        
+        return tilemap, spawn_tile
+
+    @staticmethod
+    def _get_folder_flip(key: int) -> tuple[str, bool]:
+        match key:
+            case 1 | 2:  
+                folder = '1_2'
+                flip = key == 2
+            case 5 | 6:
+                folder = '5_6'
+                flip = key == 6
+            case 9 | 10:
+                folder = '9_10'
+                flip = key == 10
+            case 13 | 14:
+                folder = '13_14'
+                flip = key == 14
+            case _:
+                folder = str(key)
+                flip = random.choice([True, False])
+        return folder, flip

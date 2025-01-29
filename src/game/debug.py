@@ -1,5 +1,5 @@
 class Debug:
-    _state = True
+    _state = False
     _messages: list[str] = []
 
     @classmethod
