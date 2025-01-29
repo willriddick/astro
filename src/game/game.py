@@ -85,12 +85,9 @@ class Game:
             case ['n', seed]:
                 self.new_level(seed)
             case ['p', index]:
-                self.player.load_sprite(int(index))
+                self.level.player.load_sprite(int(index))
             case ['tp', x, y]:
-                self.player.pos = pygame.Vector2(int(x), int(y))
-            case ['jumps', amount]:
-                self.player.max_jumps = int(amount)
-                self.player.jumps_remaining = self.player.max_jumps
+                self.level.player.pos = pygame.Vector2(int(x), int(y))
             case ['q']:
                 self.running = False
             case _:
