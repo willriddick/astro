@@ -2,6 +2,7 @@ import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from .enums import Animations, States
+from src.game.exit import Exit
 
 class Player(PhysicsEntity):
     GROUND_MOVE_SPEED = 80
@@ -41,6 +42,7 @@ class Player(PhysicsEntity):
     def __init__(self, level, camera, palette_index: int=1):
         super().__init__(level, size=Vec2(8, 13))
 
+        self.game = None
         self.camera = camera
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
@@ -101,8 +103,8 @@ class Player(PhysicsEntity):
 
     def spawn(self, pos: pygame.Vector2 | None = None):
         self.velocity = pygame.Vector2(0, 0)
-        self.set_state(States.AIR)
         self.set_pos(pos) if pos else self.set_pos(self.level.spawn_pos)
+        self.set_state(States.AIR)
         self.health_component.reset()
         self.health_component.enable()
     
@@ -112,6 +114,9 @@ class Player(PhysicsEntity):
         self.health_component.update(self.pos)
         self.state_machine.update()
         self.handle_collision(self.level.tilemap)
+
+        if self.collider.get_nearest(Exit):
+            self.game.new_level()
     
     def on_damage(self):
         self.set_state(States.HURT)

@@ -27,9 +27,10 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
-        self.player = None
+        self.paused = False
+        self.player = None  
         self.level = None
-        self.new() #self.new('maps/10x8/1_2/test')
+        self.new_level()
     
     def run(self):
         self.running = True
@@ -45,7 +46,7 @@ class Game:
             
             self.handle_commands()
             
-            if not self.command_prompt.enabled:
+            if not self.command_prompt.enabled and not self.paused:
                 self.camera.update()
                 self.camera.move_to(self.player.center)
                 for entity in self.level.entities:
@@ -64,14 +65,15 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def new(self, map_path: str = None, seed: int = None):
+    def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.camera.level = self.level
         self.player = Player(self.level, self.camera)
-        self.player.spawn(self.level.spawn_pos)
+        self.level.entities.append(self.player)
+        self.player.game = self
         self.camera.boundary = self.level.tilemap.rect
         self.camera.set_pos(self.level.spawn_pos)
-        self.level.entities.append(self.player)
+        self.player.spawn(self.level.spawn_pos)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()
@@ -84,9 +86,9 @@ class Game:
             case ['d']:
                 Debug.toggle()
             case ['n']:
-                self.new()
+                self.new_level()
             case ['n', seed]:
-                self.new(seed)
+                self.new_level(seed)
             case ['p', index]:
                 self.player.load_sprite(int(index))
             case ['tp', x, y]:
@@ -106,6 +108,9 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.paused = not self.paused 
     
     def handle_resize(self, width, height):
         new_width = width

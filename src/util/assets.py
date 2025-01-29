@@ -14,6 +14,7 @@ class Assets:
     ASTEROIDS: list[pygame.Surface] = None
     SPIKE: pygame.Surface = None
     GRAVITY: pygame.Surface = None
+    EXIT: pygame.Surface = None
 
     @staticmethod
     def load_assets():
@@ -33,6 +34,10 @@ class Assets:
         from src.tilemap.tile_set import TileSet, TileType
         Assets.TILESET = TileSet(Vec2(16, 16))
 
+        Assets.TILESET.add(TileType('entrance', [test_tiles[0]],))
+        Assets.TILESET.add(TileType('exit', [test_tiles[1]],))
+        Assets.TILESET.add(TileType('gravity', [Assets.GRAVITY]))
+
         Assets.TILESET.add(TileType(
             name='stone', 
             images=load_sprite_sheet(load_image('tileset/template.png'), (16,16)), 
@@ -41,32 +46,15 @@ class Assets:
         ))
 
         Assets.TILESET.add(TileType(
-            name='door', 
-            images=[test_tiles[0]],
-            collision=False,
-            autotile=False,
-        ))
-
-        Assets.TILESET.add(TileType(
             name='platform', 
             images=[test_tiles[2]],
             collision=True,
             size=Vec2(16, 2),
-            autotile=False,
         ))
 
         Assets.TILESET.add(TileType(
             name='spike', 
             images=[Assets.SPIKE],
-            collision=False,
             size=Vec2(16, 2),
-            autotile=False,
         ))
     
-        Assets.TILESET.add(TileType(
-            name='gravity', 
-            images=[Assets.GRAVITY],
-            collision=False,
-            size=Vec2(16, 16),
-            autotile=False,
-        ))
