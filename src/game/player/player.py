@@ -29,8 +29,8 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 30 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = Vec2(120, 160)
+    WALL_JUMP_DURATION = 1 # time after wall jumping to push player away from wall
+    WALL_JUMP_SPEED = Vec2(110, 160)
     WALL_JUMP_ACC = (8, 8)
     WALL_SLIDE_SPEED = 30
     WALL_SLIDE_GRAVITY = 180

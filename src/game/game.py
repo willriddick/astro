@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import pygame
 from src.util import Assets, CommandPrompt, Vec2
@@ -30,7 +31,7 @@ class Game:
         self.level = None
         self.new_level()
     
-    def run(self):
+    async def run(self):
         self.running = True
        
         while self.running:
@@ -59,6 +60,8 @@ class Game:
                 Clock.update()
             except KeyboardInterrupt:
                 self.running = False
+            
+            asyncio.sleep(0)
 
         pygame.quit()
         sys.exit()
