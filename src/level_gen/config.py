@@ -69,5 +69,29 @@ CONFIGS = [
             Direction.LEFT: 5,
             Direction.RIGHT: 5,
         },
-    )
+    ),
+
+    Config(
+        rows=(5, 7),
+        cols=(2, 3),
+        room_count=(7, 9),
+        main_length=(6, 7),
+        bridge_count=(0, 2),
+        item_count=4,
+        branch_length_range=(1, 1),
+        weights={
+            Direction.UP: 5,
+            Direction.DOWN: 0,
+            Direction.LEFT: 5,
+            Direction.RIGHT: 5,
+        },
+        branch_weights={
+            Direction.UP: 5,
+            Direction.DOWN: 5,
+            Direction.LEFT: 5,
+            Direction.RIGHT: 5,
+        },
+    ),
+
+
 ]
