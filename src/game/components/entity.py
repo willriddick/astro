@@ -23,10 +23,9 @@ class Entity:
     - update(): Update the entity.
     - render(display: pygame.Surface, offset: pygame.Vector2): Render the entity's sprite.
     """
-    def __init__(self, position: pygame.Vector2, size: Vec2, offset = pygame.Vector2(0, 0)):
+    def __init__(self, position: pygame.Vector2, size: Vec2):
         self.position = position
         self.size = size
-        self.offset = offset
         self.sprite: Sprite | None = None
     
     def update(self) -> None:
@@ -38,12 +37,7 @@ class Entity:
 
     @property
     def rect(self) -> pygame.FRect:
-        return pygame.FRect(
-            self.position.x + self.offset.x,
-            self.position.y + self.offset.y,
-            self.size.x,
-            self.size.y
-        )
+        return pygame.FRect(self.position.x, self.position.y, self.size.x, self.size.y)
     
     @property
     def tile_position(self) -> Vec2:

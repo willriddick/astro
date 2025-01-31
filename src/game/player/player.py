@@ -95,8 +95,6 @@ class Player(PhysicsEntity):
         )
     
     def update(self):
-        from src.game.level import Level
-
         self.handle_input()
         self.sprite.update(self.position)
         self.health_component.update(self.position)
@@ -106,12 +104,6 @@ class Player(PhysicsEntity):
         if self.collider.get_nearest(Exit):
             print('EXIT')
         
-    def render(self, display, offset):
-        super().render(display, offset)
-
-        #draw_rect(display, offset, self.rect, outline_color=(0, 150, 150, 100))
-        draw_rect(display, offset, pygame.Rect(self.position.x, self.position.y, 1, 1), outline_color=(255, 255, 255, 255))
-    
     def set_position(self, position: pygame.Vector2):
         self.position = position
         self.health_component.update(position)

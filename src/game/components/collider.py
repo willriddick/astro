@@ -5,14 +5,15 @@ from src.game.level import Level
 from ..components import Entity
 
 class Collider(Entity):
-    def __init__(self, size: Vec2, offset: Vec2):
-        super().__init__(pygame.Vector2(0, 0), size, offset)
+    def __init__(self, size: Vec2, offset = pygame.Vector2(0, 0)):
+        super().__init__(pygame.Vector2(0, 0), size)
         Level.current.register_collider(self)
+        self.offset = offset
         self.owners: set[object] = set()
         self.enabled = True
     
     def update(self, position: pygame.Vector2):
-        self.position = position
+        self.position = position + self.offset
    
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         draw_rect(

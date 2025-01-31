@@ -6,8 +6,8 @@ from .entity import Entity
 from ..clock import Clock
 
 class PhysicsEntity(Entity):
-    def __init__(self, position: pygame.Vector2, size: Vec2, offset = pygame.Vector2(0, 0)):
-        super().__init__(position, size, offset)
+    def __init__(self, position: pygame.Vector2, size: Vec2):
+        super().__init__(position, size)
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)
         self.gravity_multiplier = 1
@@ -53,7 +53,7 @@ class PhysicsEntity(Entity):
 
     def handle_collision(self):
         if not self.collision_enabled:
-            self.position += (self.velocity * Clock.dt())
+            self.position += self.velocity * Clock.dt()
             return
 
         # Update tile position
@@ -67,7 +67,7 @@ class PhysicsEntity(Entity):
         collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position
-        self.position.y += (self.velocity.y * Clock.dt())
+        self.position.y += self.velocity.y * Clock.dt()
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
@@ -82,7 +82,7 @@ class PhysicsEntity(Entity):
                     self.velocity.y *= 0.85
 
         # Update x position
-        self.position.x += (self.velocity.x * Clock.dt())
+        self.position.x += self.velocity.x * Clock.dt() 
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
