@@ -1,5 +1,6 @@
 import pygame
 from src.util import Timer
+from .damage import DamageComponent
 from .entity import Entity
 from .collider import Collider
 
@@ -17,7 +18,11 @@ class HealthComponent(Entity):
     
     def update(self, pos: pygame.Vector2):
         self.collider.update(pos)
-    
+
+        self.nearest = self.collider.get_nearest(DamageComponent)
+        if self.nearest:
+            self.apply_damage(self.nearest.damage)
+
     @property
     def vulnerable(self):
         return self.invulnerable_timer.is_done

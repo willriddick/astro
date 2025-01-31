@@ -39,12 +39,13 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 180 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 250
 
-    def __init__(self, level, palette_index: int=1):
-        super().__init__(level, size=Vec2(8, 13))
+    def __init__(self, palette_index: int=1):
+        super().__init__(size=Vec2(8, 13))
 
         self.camera = None
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
+        self.spawn_pos = None
 
         # jumping and wall sliding
         self.jumps_remaining = 0
@@ -75,7 +76,6 @@ class Player(PhysicsEntity):
         ])
 
         self.collider = Collider(
-            level=self.level, 
             size=Vec2(8, 12),
             offset=Vec2(0, 1)
         )
@@ -101,18 +101,23 @@ class Player(PhysicsEntity):
         self.sprite.set_pos(pos)
 
     def spawn(self, pos: pygame.Vector2 | None = None):
+        if self.spawn_pos is None:
+            self.spawn_pos = pos
+
         self.velocity = pygame.Vector2(0, 0)
-        self.set_pos(pos) if pos else self.set_pos(self.level.spawn_pos)
+        self.set_pos(pos) if pos else self.set_pos(self.spawn_pos)
         self.set_state(States.AIR)
         self.health_component.reset()
         self.health_component.enable()
     
     def update(self):
+        from src.game.level import Level
+
         self.handle_input()
         self.sprite.update(self.pos)
         self.health_component.update(self.pos)
         self.state_machine.update()
-        self.handle_collision(self.level.tilemap)
+        self.handle_collision(Level.current.tilemap)
 
         if self.collider.get_nearest(Exit):
             print('EXIT')

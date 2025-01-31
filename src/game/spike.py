@@ -3,11 +3,9 @@ from src.util import Assets, Vec2
 from src.game.components import Entity, Sprite, DamageComponent, Collider
 
 class Spike(Entity):
-    def __init__(self, level: 'Level', pos: pygame.Vector2):
-        super().__init__(level, pos)
-        self.level.entities.append(self)
+    def __init__(self, pos: pygame.Vector2):
+        super().__init__(pos)
         self.collider = Collider(
-            level=self.level,
             size=Vec2(16, 2),
             offset=Vec2(0, 14)
         )

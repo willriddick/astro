@@ -2,8 +2,7 @@ import pygame
 from .sprite import Sprite
 
 class Entity:
-    def __init__(self, level: 'Level', pos: pygame.Vector2):
-        self.level = level
+    def __init__(self, pos: pygame.Vector2):
         self.pos = pos
         self.sprite: Sprite | None = None
     

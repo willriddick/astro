@@ -20,8 +20,6 @@ class Camera:
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
 
-        self.level: Level | None = None
-
     def update(self) -> None:
         """Update the camera and render the display surface."""
         # Clear display surface
@@ -37,19 +35,19 @@ class Camera:
         ) + self.screenshake_offset
 
         # Render the tilemap  
-        self._render_tilemap(self.level.tilemap)
+        self._render_tilemap(Level.current.tilemap)
     
         # Render debug display information
         if Debug.enabled():
             self._debug_display()
 
         # Render all entities relative to the offset
-        for entity in self.level.entities:
+        for entity in Level.current.entities:
             entity.render(self.display, -self.offset)
 
         # Render debug shapes like colliders
         if Debug.enabled():
-            for collider in self.level.colliders:
+            for collider in Level.current.colliders:
                 collider.render(self.display, -self.offset)
    
     def _debug_display(self):

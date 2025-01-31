@@ -5,8 +5,8 @@ from .entity import Entity
 from ..clock import Clock
 
 class PhysicsEntity(Entity):
-    def __init__(self, level: 'Level', size: Vec2, pos = pygame.Vector2(0, 0)):
-        super().__init__(level, pos)
+    def __init__(self, size: Vec2, pos = pygame.Vector2(0, 0)):
+        super().__init__(pos)
         self.size = size
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)

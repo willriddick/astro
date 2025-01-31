@@ -3,15 +3,19 @@ import random
 import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2
-from src.tilemap import TileMap, Tile
-from .player import Player 
-from .components import Collider, Entity
-from .spike import Spike
-from .gravity import Gravity
-from .exit import Exit
+from src.tilemap import TileMap
 
 class Level:
+    current: 'Level' = None
+
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
+        from .components import Entity, Collider
+        from .player import Player 
+        from .spike import Spike
+        from .gravity import Gravity
+        
+        Level.current = self
+
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
 
@@ -24,13 +28,13 @@ class Level:
             self.tilemap = self.generate(config, seed)
         
         for spike in self.tilemap.get_tiles_with('spike'):
-            Spike(self, spike.pos)
+            Spike(spike.pos)
             del spike
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
-            Gravity(self, gravity.pos)
+            Gravity(gravity.pos)
         
-        self.player = Player(self)
+        self.player = Player()
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
 
@@ -45,6 +49,8 @@ class Level:
         return self.colliders
 
     def generate(self, config: str, seed  = None) -> None:
+        from .exit import Exit
+
         level = generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
         size = "14x10"
@@ -71,7 +77,7 @@ class Level:
         
         self.spawn_pos = spawn_tile.pos
         self.exit_pos = exit_tile.pos
-        Exit(self, self.exit_pos)
+        Exit(self.exit_pos)
 
         return tilemap
 

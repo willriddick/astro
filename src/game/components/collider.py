@@ -1,12 +1,12 @@
 from typing import Callable
 import pygame
 from src.util import Vec2, draw_rect
+from src.game.level import Level
 
 class Collider:
-    def __init__(self, level: 'Level', size: Vec2, offset: Vec2):
-        self.level = level
+    def __init__(self, size: Vec2, offset: Vec2):
         self.owners: set[object] = set()
-        self.level.register_collider(self)
+        Level.current.register_collider(self)
         self.size = size
         self.offset = offset
         self.layer = 0
@@ -67,11 +67,11 @@ class Collider:
             return []
 
         return [
-            collider for collider in self.level.colliders
+            collider for collider in Level.current.colliders
             if collider.enabled
-            and collider is not self
-            and self.rect.colliderect(collider.rect)
-            and filter_(collider)
+                and collider is not self
+                and self.rect.colliderect(collider.rect)
+                and filter_(collider)
         ]
    
     def update(self, pos: pygame.Vector2):
