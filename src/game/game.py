@@ -80,7 +80,7 @@ class Game:
 
         match command.split():
             case ['g']:
-                self.player.toggle_ghost()
+                self.level.player.toggle_ghost()
             case ['d']:
                 Debug.toggle()
             case ['n']:

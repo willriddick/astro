@@ -1,5 +1,5 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, draw_rect
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from .enums import Animations, States
 from src.game.exit import Exit
@@ -40,12 +40,11 @@ class Player(PhysicsEntity):
     AIR_ROTATE_DURATION = 250
 
     def __init__(self, palette_index: int=1):
-        super().__init__(size=Vec2(8, 13))
+        super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
         self.camera = None
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
-        self.spawn_pos = None
 
         # jumping and wall sliding
         self.jumps_remaining = 0
@@ -88,39 +87,42 @@ class Player(PhysicsEntity):
     @property
     def debug(self) -> str:
         return (
-            f'x:{int(self.pos.x):4} y:{int(self.pos.y):4}\n'
+            f'x:{int(self.position.x):4} y:{int(self.position.y):4}\n'
             f'hp: {self.health_component.health}\n'
             f'state: {self.state_machine.current_state.name}\n'
             f'vel:{self.velocity.x:4.0f} {self.velocity.y:4.0f}\n'
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
         )
     
-    def set_pos(self, pos: pygame.Vector2):
-        self.pos = pos
-        self.health_component.update(pos)
-        self.sprite.set_pos(pos)
-
-    def spawn(self, pos: pygame.Vector2 | None = None):
-        if self.spawn_pos is None:
-            self.spawn_pos = pos
-
-        self.velocity = pygame.Vector2(0, 0)
-        self.set_pos(pos) if pos else self.set_pos(self.spawn_pos)
-        self.set_state(States.AIR)
-        self.health_component.reset()
-        self.health_component.enable()
-    
     def update(self):
         from src.game.level import Level
 
         self.handle_input()
-        self.sprite.update(self.pos)
-        self.health_component.update(self.pos)
+        self.sprite.update(self.position)
+        self.health_component.update(self.position)
         self.state_machine.update()
-        self.handle_collision(Level.current.tilemap)
+        self.handle_collision()
 
         if self.collider.get_nearest(Exit):
             print('EXIT')
+        
+    def render(self, display, offset):
+        super().render(display, offset)
+
+        #draw_rect(display, offset, self.rect, outline_color=(0, 150, 150, 100))
+        draw_rect(display, offset, pygame.Rect(self.position.x, self.position.y, 1, 1), outline_color=(255, 255, 255, 255))
+    
+    def set_position(self, position: pygame.Vector2):
+        self.position = position
+        self.health_component.update(position)
+        self.sprite.set_pos(position)
+
+    def spawn(self, position: pygame.Vector2 = None):
+        self.velocity = pygame.Vector2(0, 0)
+        self.set_position(position or pygame.Vector2(0, 0))
+        self.set_state(States.AIR)
+        self.health_component.reset()
+        self.health_component.enable()
     
     def on_damage(self):
         self.set_state(States.HURT)
@@ -216,7 +218,7 @@ class Player(PhysicsEntity):
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
         
-        self.sprite = Sprite(self.pos, image_offset=Vec2(4, 5))
+        self.sprite = Sprite(self.position, image_offset=Vec2(4, 5))
         self.sprite.add_animation(Animations.IDLE_A, image_list, 0, range_=(0,1))
         self.sprite.add_animation(Animations.IDLE_B, image_list, 5, range_=(0,4))
         self.sprite.add_animation(Animations.RUN, image_list, 10, range_=(4,10))

@@ -2,16 +2,16 @@ from typing import Callable
 import pygame
 from src.util import Vec2, draw_rect
 from src.game.level import Level
+from ..components import Entity
 
-class Collider:
+class Collider(Entity):
     def __init__(self, size: Vec2, offset: Vec2):
+        super().__init__(pygame.Vector2(0, 0), size, offset)
         self.owners: set[object] = set()
         Level.current.register_collider(self)
         self.size = size
-        self.offset = offset
         self.layer = 0
         self.enabled = True
-        self.pos = pygame.Vector2(0, 0)
   
     @property
     def rect(self) -> pygame.FRect:
