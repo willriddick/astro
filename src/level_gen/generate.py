@@ -7,18 +7,12 @@ from .path import Path
 from .status import Status
 from .attribute import Attribute
 
-def generate_level(
-        config_path: str, 
-        _seed: int | float | str | bytes | bytearray | None = None
-    ) -> LevelMap:
-    """
-    Build a Level instance from a random seed and JSON configuration.
-    """
+def generate_level(config: Config, _seed: int | None = None) -> LevelMap:
+    """Build a Level instance from a random seed and JSON configuration."""
     if _seed is not None:
         seed(_seed)
     
     # Create config and level
-    config = Config(config_path)
     level = LevelMap(config)
     
     # Set ENTRANCE

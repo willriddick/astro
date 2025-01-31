@@ -162,7 +162,7 @@ class TileMap:
 
             for tile in tilemap.map.values():
                 tile_data = {
-                    't': tile.type.name,
+                    't': tile.tile_type.name,
                     'v': tile.variant,
                     'p': [tile.tile_pos.x,  tile.tile_pos.y]
                 }
@@ -174,7 +174,7 @@ class TileMap:
 
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
-            print(f'Save failed... file not found: {path}')
+            print(f'Save failed... path not found: {path}')
     
     @staticmethod
     def load(path: str, tileset: TileSet) -> 'TileMap':
@@ -182,6 +182,8 @@ class TileMap:
             # Read data from JSON file
             with open(path, 'r') as f:
                 tilemap_data = json.load(f)
+
+            print(f'Tilemap loaded from {path}')
 
             # Reconstruct tilemap from data
             tilemap = TileMap(tileset, Vec2(*tilemap_data['size']))
@@ -197,4 +199,4 @@ class TileMap:
 
             return tilemap
         except FileNotFoundError:
-            print(f'File not found: {path}')
+            print(f'Load failed... path not found: {path}')

@@ -24,9 +24,7 @@ class LevelMap:
         def print_paths() -> str:
             return ''.join(f'{path}\n' for path in self.paths) + '\n'
    
-        return (f'Config: \n{self.config}'
-                f'Rooms: \n{print_rooms()}'
-                f'Paths: \n{print_paths()}')
+        return f'Rooms: \n{print_rooms()}Paths: \n{print_paths()}'
   
     def get_rooms(self) -> list[Room]:
         """Returns a list of the rooms."""

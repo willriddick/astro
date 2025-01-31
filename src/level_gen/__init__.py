@@ -3,3 +3,4 @@ from .level_map import LevelMap
 from .room import Room
 from .attribute import Attribute
 from .display import Display
+from .config import Config, CONFIGS

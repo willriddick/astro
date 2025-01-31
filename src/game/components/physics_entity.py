@@ -87,7 +87,7 @@ class PhysicsEntity(Entity):
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
                     self.pos.y = entity_rect.y
-                    self.velocity.y = 0
+                    self.velocity.y *= 0.85
 
         # Update x position
         self.pos.x += (self.velocity.x * Clock.dt())

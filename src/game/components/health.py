@@ -1,11 +1,13 @@
 import pygame
 from src.util import Timer
+from .entity import Entity
 from .collider import Collider
 
-class HealthComponent:
-    def __init__(self, max_health: int, invulnerable_duration: int = 500):
+class HealthComponent(Entity):
+    def __init__(self, collider: Collider, max_health: int, invulnerable_duration: int = 500):
+        self.collider = collider
+        self.collider.add_owner(self)
         self.max_health = max_health
-        self.collider: Collider | None = None
         self.health = max_health
         self.invulnerable_duration = invulnerable_duration
         self.invulnerable_timer = Timer(invulnerable_duration)

@@ -137,8 +137,8 @@ class Editor:
             case ['save' | 's', path]:
                 TileMap.save(self.tilemap, path)
             case ['load' | 'l', path]:
-                self.last_path = path
-                self.tilemap = TileMap.load(path, Assets.TILESET)
+                self.last_path = f'assets/maps/{path}'
+                self.tilemap = TileMap.load(self.last_path, Assets.TILESET)
             case ['clear' | 'c']: 
                 self.tilemap.clear()
                 print(f'Tilemap cleared')

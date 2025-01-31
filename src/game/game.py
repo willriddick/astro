@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import pygame
 from src.util import Assets, CommandPrompt, Vec2
@@ -5,7 +6,6 @@ from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-from .player import Player 
 
 WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
@@ -27,15 +27,17 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
+        self.paused = False
         self.level = None
-        self.new('maps/10x8/1_2/test')
+        self.new_level()
     
-    def run(self):
+    async def run(self):
         self.running = True
        
         while self.running:
             Debug.update()
-            Debug.add_display(self.player.debug)
+            Debug.add_display(f'fps: {Clock.fps()}')
+            Debug.add_display(self.level.player.debug)
 
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -43,9 +45,9 @@ class Game:
             
             self.handle_commands()
             
-            if not self.command_prompt.enabled:
+            if not self.command_prompt.enabled and not self.paused:
                 self.camera.update()
-                self.camera.move_to(self.player.center)
+                self.camera.move_to(self.level.player.center)
                 for entity in self.level.entities:
                     entity.update()
 
@@ -58,18 +60,18 @@ class Game:
                 Clock.update()
             except KeyboardInterrupt:
                 self.running = False
+            
+            await asyncio.sleep(0)
 
         pygame.quit()
         sys.exit()
 
-    def new(self, map_path: str = None, seed: int = None):
+    def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
+        self.level.player.camera = self.camera
         self.camera.level = self.level
-        self.player = Player(self.level, self.camera)
-        self.player.spawn(self.level.spawn_pos)
         self.camera.boundary = self.level.tilemap.rect
         self.camera.set_pos(self.level.spawn_pos)
-        self.level.entities.append(self.player)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()
@@ -82,16 +84,13 @@ class Game:
             case ['d']:
                 Debug.toggle()
             case ['n']:
-                self.new()
+                self.new_level()
             case ['n', seed]:
-                self.new(seed)
+                self.new_level(seed)
             case ['p', index]:
-                self.player.load_sprite(int(index))
+                self.level.player.load_sprite(int(index))
             case ['tp', x, y]:
-                self.player.pos = pygame.Vector2(int(x), int(y))
-            case ['jumps', amount]:
-                self.player.max_jumps = int(amount)
-                self.player.jumps_remaining = self.player.max_jumps
+                self.level.player.pos = pygame.Vector2(int(x), int(y))
             case ['q']:
                 self.running = False
             case _:
@@ -104,6 +103,9 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.paused = not self.paused 
     
     def handle_resize(self, width, height):
         new_width = width

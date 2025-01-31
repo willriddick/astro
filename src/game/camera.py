@@ -101,7 +101,7 @@ class Camera:
         """Set the camera's position to a target position."""
         self.pos = target_pos
     
-    def move_to(self, target_pos: pygame.Vector2, smoothing=20, factor=20) -> None:
+    def move_to(self, target_pos: pygame.Vector2, smoothing=10, factor=20) -> None:
         """Smoothly interpolate towards the target position using an exponential decay approach."""
         # Calculate dynamic smoothing based on the distance to the target
         distance_to_target = (target_pos - self.pos).length()
@@ -124,7 +124,7 @@ class Camera:
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
             )
-            self.screenshake_intensity * 0.9
+            self.screenshake_intensity *= 0.9
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     

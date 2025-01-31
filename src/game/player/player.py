@@ -2,24 +2,25 @@ import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from .enums import Animations, States
+from src.game.exit import Exit
 
 class Player(PhysicsEntity):
-    GROUND_MOVE_SPEED = 70
+    GROUND_MOVE_SPEED = 80
     GROUND_ACC = (360, 720) # (acceleration, deceleration)
-    AIR_MOVE_SPEED = 80
+    AIR_MOVE_SPEED = 90
     AIR_ACC = (180, 36)
-    PRESSED_LEFT_BUFFER = 80
-    PRESSED_RIGHT_BUFFER = 80
+    PRESSED_LEFT_BUFFER = 120
+    PRESSED_RIGHT_BUFFER = 120
 
-    GRAVITY = 500
-    FALL_SPEED = 192
+    GRAVITY = 485
+    FALL_SPEED = 180
 
-    JUMP_INPUT_BUFFER = 4
-    JUMP_SPEED = 180
+    JUMP_INPUT_BUFFER = 50
+    JUMP_SPEED = 185
     MAX_JUMPS = 1
     COYOTE_BUFFER = 115 # time after falling to allow jump
-    VARIABLE_JUMP_MULTIPLIER = 0.95 # multiplies velocity when releasing jump
-    VARIABLE_JUMP_BUFFER = 200 # time after jumping to allow variable jump
+    VARIABLE_JUMP_MULTIPLIER = 0.93 # multiplies velocity when releasing jump
+    VARIABLE_JUMP_BUFFER = 300 # time after jumping to allow variable jump
 
     SLIDE_INPUT_BUFFER = 230 # amount of time after pressing down to allow slide
     SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
@@ -28,20 +29,20 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 165 # time after wall jumping to push player away from wall
-    WALL_JUMP_SPEED = Vec2(125, 155)
+    WALL_JUMP_DURATION = 1 # time after wall jumping to push player away from wall
+    WALL_JUMP_SPEED = Vec2(110, 160)
     WALL_JUMP_ACC = (8, 8)
     WALL_SLIDE_SPEED = 30
     WALL_SLIDE_GRAVITY = 180
-    WALL_SLIDE_BUFFER = 160 # amount of time after wall sliding to allow wall jump
+    WALL_SLIDE_BUFFER = 150 # amount of time after wall sliding to allow wall jump
 
     ROTATE_DURATION = 180 # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 250
 
-    def __init__(self, level, camera, palette_index: int=1):
+    def __init__(self, level, palette_index: int=1):
         super().__init__(level, size=Vec2(8, 13))
 
-        self.camera = camera
+        self.camera = None
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
 
@@ -73,8 +74,14 @@ class Player(PhysicsEntity):
             WallJump(), Ghost(), Hurt(), Dead(),
         ])
 
-        self.health_component = HealthComponent(3, 1000)
-        self.health_component.collider = Collider(self.level, self.health_component, Vec2(8, 12), Vec2(0, 1))
+        self.collider = Collider(
+            level=self.level, 
+            size=Vec2(8, 12),
+            offset=Vec2(0, 1)
+        )
+        self.collider.add_owner(self)
+
+        self.health_component = HealthComponent(self.collider, 3, 1000)
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
     
@@ -93,10 +100,10 @@ class Player(PhysicsEntity):
         self.health_component.update(pos)
         self.sprite.set_pos(pos)
 
-    def spawn(self, pos: pygame.Vector2):
+    def spawn(self, pos: pygame.Vector2 | None = None):
         self.velocity = pygame.Vector2(0, 0)
+        self.set_pos(pos) if pos else self.set_pos(self.level.spawn_pos)
         self.set_state(States.AIR)
-        self.set_pos(pos)
         self.health_component.reset()
         self.health_component.enable()
     
@@ -106,12 +113,18 @@ class Player(PhysicsEntity):
         self.health_component.update(self.pos)
         self.state_machine.update()
         self.handle_collision(self.level.tilemap)
+
+        if self.collider.get_nearest(Exit):
+            print('EXIT')
     
     def on_damage(self):
         self.set_state(States.HURT)
     
     def on_death(self):
         self.set_state(States.DEAD)
+    
+    def apply_damage(self, damage: int):
+        self.health_component.apply_damage(damage)
     
     def set_state(self, state: 'States'):
         self.state_machine.switch(state)
@@ -134,7 +147,7 @@ class Player(PhysicsEntity):
             self.state_machine.switch(States.JUMP)
        
         if not self.holding_jump and self.variable_jump_timer.is_active and self.velocity.y < 0:
-            self.velocity.y *= (Player.VARIABLE_JUMP_MULTIPLIER / (1 / self.gravity_multiplier))
+            self.velocity.y *= Player.VARIABLE_JUMP_MULTIPLIER
    
     def handle_wall_jump(self):
         if not self.on_ground:

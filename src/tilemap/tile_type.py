@@ -16,8 +16,8 @@ class TileType:
     def __init__(self, 
             name: str,
             images: list[pygame.Surface],
-            autotile: bool = False,
             size: Vec2=Vec2(16, 16),
+            autotile: bool = False,
             collision: bool = False,
             collision_offset: Vec2 = Vec2(0, 0),
         ):
