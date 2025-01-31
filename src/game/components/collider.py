@@ -7,24 +7,20 @@ from ..components import Entity
 class Collider(Entity):
     def __init__(self, size: Vec2, offset: Vec2):
         super().__init__(pygame.Vector2(0, 0), size, offset)
-        self.owners: set[object] = set()
         Level.current.register_collider(self)
-        self.size = size
-        self.layer = 0
+        self.owners: set[object] = set()
         self.enabled = True
-  
-    @property
-    def rect(self) -> pygame.FRect:
-        return pygame.FRect(
-            self.pos.x + self.offset.x,
-            self.pos.y + self.offset.y,
-            self.size.x,
-            self.size.y
+    
+    def update(self, position: pygame.Vector2):
+        self.position = position
+   
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        draw_rect(
+            display=display, 
+            offset=offset, 
+            rect=self.rect,
+            outline_color=(255, 0, 255, 100),
         )
-
-    @property
-    def center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.rect.center)
     
     def add_owner(self, owner: object):
         self.owners.add(owner)
@@ -74,13 +70,3 @@ class Collider(Entity):
                 and filter_(collider)
         ]
    
-    def update(self, pos: pygame.Vector2):
-        self.pos = pos
-   
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        draw_rect(
-            display=display, 
-            offset=offset, 
-            rect=self.rect,
-            outline_color=(255, 0, 255, 100),
-        )

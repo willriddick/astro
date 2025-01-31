@@ -17,7 +17,7 @@ class Air(State):
         nearest = self.owner.collider.get_nearest(Gravity)
         if nearest:
             self.owner.gravity_multiplier = nearest.gravity_multiplier
-            self.owner.velocity_multiplier.x = 0.75
+            self.owner.velocity_multiplier.x = 0.9
         else:
             self.owner.gravity_multiplier = 1
             self.owner.velocity_multiplier.x = 1.0

@@ -11,6 +11,17 @@ class Entity:
     - position (pygame.Vector2): The position of the entity.
     - size (Vec2): The size of the entity.
     - offset (pygame.Vector2): The offset of the entity.
+
+    Properties:
+    - rect (pygame.FRect): The rect of the entity at `position` + `offset` with `size`.
+    - tile_position (Vec2): The tile position of the entity.
+    - center (pygame.Vector2): The center of the entity's rect.
+    - bottom_center (pygame.Vector2): The bottom center of the entity's rect.
+    - sprite (Sprite | None): The sprite of the entity.
+
+    Methods:
+    - update(): Update the entity.
+    - render(display: pygame.Surface, offset: pygame.Vector2): Render the entity's sprite.
     """
     def __init__(self, position: pygame.Vector2, size: Vec2, offset = pygame.Vector2(0, 0)):
         self.position = position

@@ -7,6 +7,9 @@ class DamageComponent:
         self.collider.add_owner(self)
         self.damage = damage
     
+    def update(self, position: pygame.Vector2):
+        self.collider.update(position)
+    
     def enable(self):
         self.collider.enabled = True
 
@@ -17,5 +20,3 @@ class DamageComponent:
     def enabled(self) -> bool:
         return self.collider.enabled
     
-    def update(self, pos: pygame.Vector2):
-        self.collider.update(pos)

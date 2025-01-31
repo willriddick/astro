@@ -6,8 +6,8 @@ class Spike(Entity):
     def __init__(self, position: pygame.Vector2):
         super().__init__(position, Vec2(16, 16))
         self.collider = Collider(
-            size=Vec2(16, 2),
-            offset=Vec2(0, 14)
+            size=Vec2(14, 1),
+            offset=Vec2(1, 15)
         )
         self.collider.add_owner(self)
         self.damage_component = DamageComponent(self.collider, 1)
