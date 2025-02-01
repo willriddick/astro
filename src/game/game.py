@@ -69,9 +69,7 @@ class Game:
     def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.level.player.camera = self.camera
-        self.camera.level = self.level
-        self.camera.boundary = self.level.tilemap.rect
-        self.camera.set_pos(self.level.spawn_pos)
+        self.camera.set_level(self.level)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

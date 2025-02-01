@@ -1,15 +1,17 @@
 import numpy as np
 import pygame
 from src.util import Assets, Vec2, randf, draw_rect
+from src.tilemap import TileMap
 from .level import Level
 from .clock import Clock
 from .debug import Debug
 
 class Camera:
+    FILL_COLOR = (24, 20, 37)
+
     def __init__(self, size: Vec2):
         self.size = size
         self.display = pygame.Surface(size)
-        self.fill_color = (24, 20, 37)
 
         self.offset = pygame.Vector2(0, 0)
         self.pos = pygame.Vector2(0, 0)
@@ -20,10 +22,12 @@ class Camera:
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
 
+        self.tilemap_surface = None
+
     def update(self) -> None:
         """Update the camera and render the display surface."""
         # Clear display surface
-        self.display.fill(self.fill_color)
+        self.display.fill(Camera.FILL_COLOR)
 
         # Update screenshake effect
         self._handle_screenshake()
@@ -34,8 +38,8 @@ class Camera:
             self.clamp_pos.y - self.size.y // 2
         ) + self.screenshake_offset
 
-        # Render the tilemap  
-        self._render_tilemap(Level.current.tilemap)
+        if self.tilemap_surface:
+            self.display.blit(self.tilemap_surface, -self.offset)
     
         # Render debug display information
         if Debug.enabled():
@@ -49,6 +53,12 @@ class Camera:
         if Debug.enabled():
             for collider in Level.current.colliders:
                 collider.render(self.display, -self.offset)
+    
+    def set_level(self, level: Level) -> None:
+        """Set the current level and update the camera's tilemap surface."""
+        self.tilemap_surface = self._render_tilemap(level.tilemap)
+        self.boundary = level.tilemap.rect
+        self.set_pos(level.spawn_pos)
    
     def _debug_display(self):
         text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
@@ -61,7 +71,7 @@ class Camera:
             outline_color=(0, 0, 0, 0)
         )
         self.display.blit(text_surf, (4, 4))
-
+    
     @property
     def debug(self) -> str:
         return (
@@ -126,18 +136,20 @@ class Camera:
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     
-    def _render_tilemap(self, tilemap) -> None:
-        if not tilemap:
-            return
+    def _render_tilemap(self, tilemap: TileMap) -> pygame.Surface:
 
-        tile_size = tilemap.tile_size
-        x_start = int(-self.offset.x // tile_size.x)
-        x_stop = int((self.offset.x + self.display.width) // tile_size.x + 1)
-        y_start = int(-self.offset.y // tile_size.y)
-        y_stop = int((self.offset.y + self.display.height) // tile_size.y + 1)
-        for x in range(x_start, x_stop):
-            for y in range(y_start, y_stop):
-                tile = tilemap.get_tile(Vec2(x, y))
-                if tile:
-                    tile.render(self.display, self.offset)
+        # create a transparent surface the size of our tilemap
+        surface = pygame.Surface(
+            (tilemap.size.x * tilemap.tile_size.x, tilemap.size.y * tilemap.tile_size.y),
+            pygame.SRCALPHA 
+        )
+        surface.fill((0, 0, 0, 0))
+
+        # render all tiles to the surface
+        for tile in tilemap.map.values():
+            if tile:
+                tile.render(surface, pygame.Vector2(0, 0))
+        
+        # return prerendered tilemap surface
+        return surface
     
