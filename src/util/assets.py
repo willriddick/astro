@@ -14,11 +14,15 @@ class Assets:
     ASTEROIDS: list[pygame.Surface] = None
     SPIKE: pygame.Surface = None
     GRAVITY: pygame.Surface = None
+    STARS: pygame.Surface = None
     EXIT: pygame.Surface = None
+    SOUND_TEST: pygame.mixer.Sound = None
 
     @staticmethod
     def load_assets():
-        test_tiles = load_sprite_sheet(load_image('test_tiles.png'), (16,16))
+        test_tiles = load_sprite_sheet(load_image('tiles/test_tiles.png'), (16,16))
+
+        Assets.SOUND_TEST = pygame.mixer.Sound(ASSET_PATH + 'sounds/s1.wav')
 
         Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelKlein.ttf', 9)
         Assets.FONT_ILL = pygame.font.Font(ASSET_PATH + 'fonts/DePixelIllegible.ttf', 8)
@@ -41,7 +45,7 @@ class Assets:
 
         Assets.TILESET.add(TileType(
             name='stone', 
-            images=load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), 
+            images=load_sprite_sheet(load_image('tiles/rock.png'), (16,16)), 
             collision=True,
             autotile=True,
         ))

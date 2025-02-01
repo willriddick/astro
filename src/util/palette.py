@@ -3,7 +3,7 @@ from typing import List
 import pygame
 from .load import load_image
 
-ASSET_PATH = 'assets/'
+IMAGE_PATH = 'assets/images/'
 
 Palette = List[pygame.color.Color]
 
@@ -30,6 +30,6 @@ def load_palette(path: str) -> Palette:
 
 def load_palettes(path: str) -> list[Palette]:
     palettes = []
-    for img_name in sorted(os.listdir(ASSET_PATH + path)):
+    for img_name in sorted(os.listdir(IMAGE_PATH + path)):
         palettes.append(load_palette(path + '/' + img_name))
     return palettes
