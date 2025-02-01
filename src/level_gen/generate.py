@@ -7,68 +7,68 @@ from .path import Path
 from .status import Status
 from .attribute import Attribute
 
-def generate_level(config: Config, _seed: int | None = None) -> LevelMap:
+def generate_level(config: Config, _seed: int | str = None) -> LevelMap:
     """Build a Level instance from a random seed and JSON configuration."""
-    if _seed is not None:
-        seed(_seed)
+    # set seed
+    seed(_seed)
     
-    # Create config and level
+    # create config and level
     level = LevelMap(config)
     
-    # Set ENTRANCE
+    # set ENTRANCE
     start_position = Vec2(randint(0, config.cols - 1), config.rows - 1)
     start_room = _create_room(level, start_position)
     start_room.add_attribute(Attribute.ENTRANCE)
 
-    # Generate main path
+    # generate main path
     _create_path(level, start_room, config.main_length - 1, config.weights) # Subtract 1 because start_room was created already
 
-    # Set EXIT
+    # set EXIT
     end_room = level.paths[0].get_room(-1) # Gets the most recently generated room in path 0
     end_room.add_attribute(Attribute.EXIT)
 
-    # Generate branches
+    # generate branches
     _generate_branches(level, config)
 
-    # Add links
+    # add links
     _generate_bridges(level, config)
 
-    # Add collectables
+    # add collectables
     _generate_items(level, config)
 
-    # Update keys
+    # update keys
     for room in level.get_rooms():
         room.update_key()
 
-    # Return generated level
+    # return generated level
     return level
 
 def _generate_branches(level: LevelMap, config: Config) -> bool:
-    # Get remainging count of rooms to generate
+    # get remainging count of rooms to generate
     count = config.room_count - level.index
 
     while count > 0:
-        # Get length
+        # get length
         rand_length = randint(config.branch_length_range[0], config.branch_length_range[1])
         length = min(count, rand_length)
 
-        # Get rooms that can branch
+        # get rooms that can branch
         rooms = list(filter(Room.is_branchable, level.get_rooms()))
 
-        # If none exist, exit early 
+        # uf none exist, exit early 
         if not rooms:
             return False
 
-        # Chose room to branch from
+        # chose room to branch from
         room = choice(rooms)
         room.add_attribute(Attribute.BRANCH)
 
-        # Generate a branch starting at room
+        # generate a branch starting at room
         _create_path(level, room, length, config.weights)
 
         count = config.room_count - level.index
     
-    # Return true meaning 'count' rooms were generated
+    # return true meaning 'count' rooms were generated
     return True
 
 def _generate_bridges(level: LevelMap, config: Config) -> bool:
@@ -115,28 +115,28 @@ def _create_path(level: LevelMap, start_room: Room, length: int, weights: dict[D
     position = room.position
 
     for _ in range(length):
-        # Get EMPTY directions from the current room
+        # get EMPTY directions from the current room
         available = room.get_directions(Status.EMPTY)
         if not available:
             return path
 
-        # Get a new direction 
+        # get a new direction 
         direction = get_weighted_choice(available, weights)
         if direction is None:
             return path
 
-        # Update position
+        # update position
         position = Vec2.translate(position, direction)
 
-        # Store previous room and direction
+        # store previous room and direction
         prev_room = room 
         prev_dir = direction
 
-        # Create new room
+        # create new room
         room = _create_room(level, position)
         path.add_room(room)
         
-        # If previous room exists, connect room and prev_room
+        # if previous room exists, connect room and prev_room
         if prev_room:
             Room.connect(prev_room, room, prev_dir, Status.LINKED)
     
@@ -161,5 +161,5 @@ def _create_room(level: LevelMap, position: Vec2) -> Room:
     new_room = Room(level.index, position)
     level.index += 1
     level.map[position] = new_room
-    Room.update_adjacents(level, new_room)  # Assuming this updates adjacents in the Level map
+    Room.update_adjacents(level, new_room)
     return new_room

@@ -6,7 +6,6 @@ from .components import Entity
 class StarSpawner():
     def __init__(self):
         self.stars = []
-        self.boundary: pygame.Rect | None = None
         self.buffer = 16
     
     def update(self):
@@ -23,9 +22,6 @@ class StarSpawner():
     
     def clear(self):
         self.starts.clear()
-
-    def set_boundary(self, boundary: pygame.Rect):
-        self.boundary = boundary.inflate(self.buffer, self.buffer)
     
 class Star(Entity):
     def __init__(self):

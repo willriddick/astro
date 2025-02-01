@@ -50,7 +50,7 @@ class Level:
     def get_colliders(self) -> list['Collider']:
         return self.colliders
 
-    def generate(self, config: str, seed  = None) -> None:
+    def generate(self, config: str, seed: int | str = None) -> None:
         from .exit import Exit
 
         level = generate_level(config, seed)

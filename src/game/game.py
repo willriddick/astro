@@ -29,7 +29,6 @@ class Game:
         self.fullscreen = False
         Assets.load_assets()
 
-
         self.level = None
         self.new_level()
     
@@ -75,7 +74,6 @@ class Game:
         self.camera.set_level(self.level)
 
         star_spawner = StarSpawner()
-        star_spawner.set_boundary(self.level.tilemap.rect)
         star_spawner.spawn(17)
         self.level.star_spawner = star_spawner
 
@@ -92,7 +90,7 @@ class Game:
             case ['n']:
                 self.new_level()
             case ['n', seed]:
-                self.new_level(seed)
+                self.new_level(seed=seed)
             case ['p', index]:
                 self.level.player.load_sprite(int(index))
             case ['tp', x, y]:
