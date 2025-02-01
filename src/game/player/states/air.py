@@ -38,6 +38,9 @@ class Air(State):
         # switch states
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
+        
+        if self.owner.drop_down:
+            self.switch(States.DROP)
 
         if self.owner.on_ground:
             if self.timer.is_done:

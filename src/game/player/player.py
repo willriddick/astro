@@ -15,6 +15,9 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
+    DROP_GRAVITY = 600
+    DROP_FALL_SPEED = 220
+
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185
     MAX_JUMPS = 1
@@ -80,10 +83,11 @@ class Player(PhysicsEntity):
         self.health_component.on_death = self.on_death
 
         # setup state machine
-        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Hurt, Dead, Spawn
+        from .states import (Idle, Run, Air, Jump, WallSlide, WallJump, 
+            Ghost, Slide, Hurt, Dead, Spawn, Drop)
         self.state_machine = StateMachine(self, [
             Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
-            WallJump(), Ghost(), Hurt(), Dead(), Spawn()
+            WallJump(), Ghost(), Hurt(), Dead(), Spawn(), Drop(),
         ])
 
     @property

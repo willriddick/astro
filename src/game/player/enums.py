@@ -23,3 +23,4 @@ class States(Enum):
     WALL_JUMP = 6
     HURT = 7
     DEAD = 8
+    DROP = 9
