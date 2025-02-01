@@ -33,6 +33,8 @@ class Level:
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
             Gravity(gravity.pos)
+
+        self.star_spawner = None
         
         self.player = Player()
         self.entities.append(self.player)

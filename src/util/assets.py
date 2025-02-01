@@ -26,6 +26,7 @@ class Assets:
         Assets.PLAYER_SHEET = load_image('player/player.png', False)
         Assets.PLAYER_PALETTES = load_palettes('player/palettes')
 
+        Assets.STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
         Assets.ASTEROIDS = load_images('asteroids', True)
 
         Assets.SPIKE = test_tiles[3]

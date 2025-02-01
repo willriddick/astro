@@ -38,6 +38,10 @@ class Camera:
             self.clamp_pos.y - self.size.y // 2
         ) + self.screenshake_offset
 
+        # Render stars
+        Level.current.star_spawner.render(self.display, -self.offset)
+
+        # Render prerendered tilemap surface
         if self.tilemap_surface:
             self.display.blit(self.tilemap_surface, -self.offset)
     
