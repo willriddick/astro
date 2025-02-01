@@ -30,10 +30,10 @@ class Star(Entity):
             self.image = pygame.transform.flip(self.image, True, False)
 
         self.position = pygame.Vector2(randint(0, 9999), randint(0, 9999))
-        self.depth = randint(5, 60) / 200  # [0.025, .3]
+        self.depth = randint(3, 90) / 300  # [0.01, .3]
 
         # alpha logic: closer stars (higher depth) should be brighter
-        normalized_depth = (self.depth - 0.025) / (0.3 - 0.025)  
+        normalized_depth = (self.depth - 0.01) / (0.3 - 0.01)  
         max_alpha = 240  
         min_alpha = 40 
         alpha = min_alpha + (1 - normalized_depth) * (max_alpha - min_alpha)
