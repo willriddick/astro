@@ -9,7 +9,7 @@ class Drop(State):
         self.dir = 0
     
     def on_enter(self):
-        self.owner.sprite.set_next(Animations.SLIDE)
+        self.owner.sprite.set_next(Animations.DROP)
         self.dir = self.owner.move_dir.x
 
     def update(self):

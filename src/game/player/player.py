@@ -223,3 +223,4 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
         self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
         self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
+        self.sprite.add_animation(Animations.DROP, image_list, 0, range_=(16,17))

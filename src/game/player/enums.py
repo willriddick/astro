@@ -10,6 +10,7 @@ class Animations(Enum):
     BACK = 6
     WALL_SLIDE = 7
     SLIDE = 8
+    DROP = 9
 
 class States(Enum):
     GHOST = -2
