@@ -41,7 +41,7 @@ class Assets:
 
         Assets.TILESET.add(TileType(
             name='stone', 
-            images=load_sprite_sheet(load_image('tileset/template.png'), (16,16)), 
+            images=load_sprite_sheet(load_image('tileset/rock.png'), (16,16)), 
             collision=True,
             autotile=True,
         ))
