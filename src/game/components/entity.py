@@ -55,3 +55,8 @@ class Entity:
     def bottom_center(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.centerx, self.rect.bottom)
     
+    @bottom_center.setter
+    def bottom_center(self, value: pygame.Vector2):
+        self.position.x = value.x - self.size.x // 2
+        self.position.y = value.y - self.size.y
+    

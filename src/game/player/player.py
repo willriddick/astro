@@ -29,9 +29,9 @@ class Player(PhysicsEntity):
     SLIDE_ACC = (180, 180)
     SLIDE_BUFFER = 165 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 1 # time after wall jumping to push player away from wall
+    WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
     WALL_JUMP_SPEED = Vec2(110, 160)
-    WALL_JUMP_ACC = (8, 8)
+    WALL_JUMP_ACC = (150, 8)
     WALL_SLIDE_SPEED = 30
     WALL_SLIDE_GRAVITY = 180
     WALL_SLIDE_BUFFER = 150 # amount of time after wall sliding to allow wall jump
@@ -45,6 +45,7 @@ class Player(PhysicsEntity):
         self.camera = None
         self.move_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
         self.slide_dir = 0
+        self.spawn_position = pygame.Vector2(0, 0)
 
         # jumping and wall sliding
         self.jumps_remaining = 0
@@ -66,14 +67,8 @@ class Player(PhysicsEntity):
         self.facing_dir = 0
         self.last_facing_dir = 1
         self.load_sprite(palette_index)
-
-        # setup state machine
-        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Hurt, Dead
-        self.state_machine = StateMachine(self, [
-            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
-            WallJump(), Ghost(), Hurt(), Dead(),
-        ])
-
+    
+        # setup collider
         self.collider = Collider(
             size=Vec2(8, 12),
             offset=Vec2(0, 1)
@@ -83,7 +78,14 @@ class Player(PhysicsEntity):
         self.health_component = HealthComponent(self.collider, 3, 1000)
         self.health_component.on_damaged = self.on_damage
         self.health_component.on_death = self.on_death
-    
+
+        # setup state machine
+        from .states import Idle, Run, Air, Jump, WallSlide, WallJump, Ghost, Slide, Hurt, Dead, Spawn
+        self.state_machine = StateMachine(self, [
+            Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
+            WallJump(), Ghost(), Hurt(), Dead(), Spawn()
+        ])
+
     @property
     def debug(self) -> str:
         return (
@@ -110,11 +112,8 @@ class Player(PhysicsEntity):
         self.sprite.set_pos(position)
 
     def spawn(self, position: pygame.Vector2 = None):
-        self.velocity = pygame.Vector2(0, 0)
-        self.set_position(position or pygame.Vector2(0, 0))
-        self.set_state(States.AIR)
-        self.health_component.reset()
-        self.health_component.enable()
+        self.spawn_position = position
+        self.set_state(States.SPAWN)
     
     def on_damage(self):
         self.set_state(States.HURT)

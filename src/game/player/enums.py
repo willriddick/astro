@@ -12,7 +12,8 @@ class Animations(Enum):
     SLIDE = 8
 
 class States(Enum):
-    GHOST = -1
+    GHOST = -2
+    SPAWN = -1
     IDLE = 0
     RUN = 1
     JUMP = 2

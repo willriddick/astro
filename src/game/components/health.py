@@ -43,6 +43,7 @@ class HealthComponent(Entity):
 
     def reset(self):
         self.health = self.max_health
+        self.enable()
   
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)

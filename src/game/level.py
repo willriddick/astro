@@ -37,7 +37,7 @@ class Level:
         self.player = Player()
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
-
+    
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
 
