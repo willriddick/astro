@@ -26,13 +26,13 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_MULTIPLIER = 0.93 # multiplies velocity when releasing jump
     VARIABLE_JUMP_BUFFER = 300 # time after jumping to allow variable jump
 
-    SLIDE_DURATION = 260 # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_MULTIPLIER = 1.4 # multiplies velocity when entering slide state
-    SLIDE_SPEED = 100
+    SLIDE_DURATION = 250 # after this time, the player will decelerate to 0
+    INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
+    SLIDE_SPEED = 110
     SLIDE_ACC = (180, 180)
-    SLIDE_BUFFER = 165 # time after landing to allow slide
+    SLIDE_BUFFER = 120 # time after landing to allow slide
 
-    WALL_JUMP_DURATION = 10 # time after wall jumping to push player away from wall
+    WALL_JUMP_DURATION = 10 # time after wall jumping before switching to AIR
     WALL_JUMP_SPEED = Vec2(110, 160)
     WALL_JUMP_ACC = (150, 8)
     WALL_SLIDE_SPEED = 30

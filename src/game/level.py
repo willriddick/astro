@@ -4,6 +4,9 @@ import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2
 from src.tilemap import TileMap
+from src.level_gen import LevelMap
+
+MAPS_PATH = 'assets/maps'
 
 class Level:
     current: 'Level' = None
@@ -50,32 +53,51 @@ class Level:
     def get_colliders(self) -> list['Collider']:
         return self.colliders
 
-    def generate(self, config: str, seed: int | str = None) -> None:
+    def generate(self, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
         from .exit import Exit
 
-        level = generate_level(config, seed)
+        level_map: LevelMap = generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
-        size = "14x10"
 
-        for room in level.map.values():
-            sub, flip = self._get_folder_flip(room.key)
-            map_folder = f'assets/maps/{size}/{sub}'
-            map_paths: list[str] = []
-            for name in os.listdir(map_folder):
-                map_paths.append(map_folder + '/' + name)
+        for y in range(level_map.config.rows):
+            for x in range(level_map.config.cols):
+                room = level_map.get_room_at(Vec2(x, y))
 
-            map_path = random.choice(map_paths)
-            new_map = TileMap.load(map_path, Assets.TILESET)
-            
-            if room.has_attribute(Attribute.ENTRANCE):
-                pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                spawn_tile = new_map.create_tile(Assets.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
-            
-            if room.has_attribute(Attribute.EXIT):
-                pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                exit_tile = new_map.create_tile(Assets.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
+                # if room exists at postion (x, y) in level_map
+                if room is not None:
+                    
+                    sub, flip = self._get_folder_flip(room.key)
+                    map_folder = f'{MAPS_PATH}/{sub}'
+                    map_paths: list[str] = []
+                    for name in os.listdir(map_folder):
+                        map_paths.append(map_folder + '/' + name)
 
-            tilemap.place_tilemap(new_map, room.position, flip)
+                    map_path = random.choice(map_paths)
+                    new_map = TileMap.load(map_path, Assets.TILESET)
+                    
+                    if room.has_attribute(Attribute.ENTRANCE):
+                        pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                        spawn_tile = new_map.create_tile(
+                            Assets.TILESET.get_by('entrance'),
+                            0,
+                            Vec2(pos.x, pos.y - 1)
+                        )
+                    
+                    if room.has_attribute(Attribute.EXIT):
+                        pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                        exit_tile = new_map.create_tile(
+                            Assets.TILESET.get_by('exit'), 
+                            0, 
+                            Vec2(pos.x, pos.y - 1)
+                        )
+
+                    tilemap.place_tilemap(new_map, room.position, flip)
+                else:
+                    # place rect of tiles in empty room slot
+                    tilemap.create_tile_rect(
+                        Assets.TILESET.get_by('stone'), 
+                        pygame.Rect(x * room_size.x, y * room_size.y, room_size.x, room_size.y)
+                    )
         
         self._create_border(tilemap)
         
