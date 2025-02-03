@@ -7,6 +7,7 @@ from .vec2 import Vec2
 ASSET_PATH = 'assets/'
 
 class Assets:
+    ICON: pygame.Surface = None
     FONT: pygame.Font = None
     TILESET = None
     PLAYER_SHEET: pygame.Surface = None
@@ -21,6 +22,8 @@ class Assets:
     @staticmethod
     def load_assets():
         test_tiles = load_sprite_sheet(load_image('tiles/test_tiles.png'), (16,16))
+
+        Assets.ICON = load_image('icon.png', False)
 
         Assets.SOUND_TEST = pygame.mixer.Sound(ASSET_PATH + 'sounds/s1.wav')
 

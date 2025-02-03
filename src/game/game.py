@@ -15,7 +15,6 @@ ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption('Astro')
 
         self.running = False
         self.paused = False
@@ -28,6 +27,9 @@ class Game:
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.fullscreen = False
         Assets.load_assets()
+
+        pygame.display.set_caption('Astro')
+        pygame.display.set_icon(Assets.ICON)
 
         self.level = None
         self.new_level()
@@ -74,7 +76,7 @@ class Game:
         self.camera.set_level(self.level)
 
         star_spawner = StarSpawner()
-        star_spawner.spawn(17)
+        star_spawner.spawn(35)
         self.level.star_spawner = star_spawner
 
     def handle_commands(self):

@@ -16,7 +16,7 @@ class Player(PhysicsEntity):
     FALL_SPEED = 180
 
     DROP_GRAVITY = 600
-    DROP_FALL_SPEED = 220
+    DROP_FALL_SPEED = 320
 
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185

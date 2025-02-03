@@ -1,6 +1,6 @@
-from random import choice, randint
+from random import choice, choices, randint
 import pygame
-from src.util import Assets
+from src.util import Assets, randf
 from .components import Entity
 
 class StarSpawner():
@@ -24,19 +24,27 @@ class StarSpawner():
         self.starts.clear()
     
 class Star(Entity):
+
+    DEPTH = [0.01, 0.2]
+    ALPHA = [40, 220]
+
     def __init__(self):
-        self.image = Assets.STARS[randint(0, len(Assets.STARS) - 1)]
+        weights = [len(Assets.STARS) - i for i in range(len(Assets.STARS))]  # gives higher weights to earlier images
+        self.image = choices(Assets.STARS, weights=weights, k=1)[0]
+
+        # randomly flip the image
         if choice([True, False]):
             self.image = pygame.transform.flip(self.image, True, False)
 
+        # randomly position the image
         self.position = pygame.Vector2(randint(0, 9999), randint(0, 9999))
-        self.depth = randint(3, 90) / 300  # [0.01, .3]
+
+        # randomly select a depth between 0.01
+        self.depth = randf(*self.DEPTH, 0.01)
 
         # alpha logic: closer stars (higher depth) should be brighter
-        normalized_depth = (self.depth - 0.01) / (0.3 - 0.01)  
-        max_alpha = 240  
-        min_alpha = 40 
-        alpha = min_alpha + (1 - normalized_depth) * (max_alpha - min_alpha)
+        normalized_depth = (self.depth - Star.DEPTH[0]) / (Star.DEPTH[1] - Star.DEPTH[0])  
+        alpha = Star.ALPHA[0] + (1 - normalized_depth) * (Star.ALPHA[1] - Star.ALPHA[0])
         self.image.set_alpha(int(alpha))
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):

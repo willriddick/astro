@@ -13,6 +13,7 @@ class Slide(State):
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
         self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
         self.entry_speed = abs(self.owner.velocity.x)
+        self.owner.camera.screenshake(10, 3)
         self.timer.start()
 
     def update(self):

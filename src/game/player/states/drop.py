@@ -21,7 +21,7 @@ class Drop(State):
             self.owner.gravity_multiplier = 1
             self.owner.velocity_multiplier.x = 1.0
 
-        self.owner.apply_gravity(Player.DROP_GRAVITY, Player.DROP_FALL_SPEED * 2)
+        self.owner.apply_gravity(Player.DROP_GRAVITY, Player.DROP_FALL_SPEED)
         self.owner.accelerate_x(self.dir, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
 
         # switch states
@@ -29,6 +29,5 @@ class Drop(State):
             self.switch(States.AIR)
 
         if self.owner.on_ground:
-            self.owner.camera.screenshake(20, 2)
             self.switch(States.SLIDE)
  
