@@ -55,7 +55,7 @@ class Game:
                 for entity in self.level.entities:
                     entity.update()
 
-            # Draw command prompt
+            # draw command prompt
             self.command_prompt.render(self.camera.display)
 
             try:

@@ -25,16 +25,16 @@ class PhysicsEntity(Entity):
             Direction.LEFT: False
         }
    
-    def apply_force(self, force: float, direction: Direction | pygame.Vector2):
+    def apply_force(self, force: float, direction: Direction | pygame.Vector2) -> None:
         self.velocity = force * (direction.vector if isinstance(direction, Direction) else direction)
     
-    def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]):
+    def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]) -> None:
         self.velocity.x = self._acc_dec(self.velocity.x, speed, dir_, acc, self.velocity_multiplier.x)
     
-    def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]):
+    def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]) -> None:
         self.velocity.y = self._acc_dec(self.velocity.y, speed, dir_, acc, self.velocity_multiplier.y)
     
-    def apply_gravity(self, gravity: float, fall_speed: float):
+    def apply_gravity(self, gravity: float, fall_speed: float) -> None:
         self.velocity.y = min(
             fall_speed * self.gravity_multiplier,
             self.velocity.y + (gravity * self.gravity_multiplier * Clock.dt())
@@ -51,7 +51,7 @@ class PhysicsEntity(Entity):
 
         return approach(value, target, step)
 
-    def handle_collision(self):
+    def handle_collision(self) -> None:
         if not self.collision_enabled:
             self.position += self.velocity * Clock.dt()
             return
@@ -98,7 +98,7 @@ class PhysicsEntity(Entity):
         
         self._update_collision_flags(entity_rect, collisions_around)
     
-    def _handle_platform_collision(self): 
+    def _handle_platform_collision(self) -> None: 
         for platform in filter(lambda _tile: _tile.tile_type.name == 'platform', self.tiles_around):
             # If player is below platform, disable collision
             if platform.rect.top < self.rect.bottom:
@@ -109,7 +109,7 @@ class PhysicsEntity(Entity):
                 else:
                     platform.collision = True
 
-    def _update_collision_flags(self, entity_rect: pygame.Rect, collisions_around: list[Tile]):
+    def _update_collision_flags(self, entity_rect: pygame.Rect, collisions_around: list[Tile]) -> None:
         points = {
             Direction.DOWN:  [(entity_rect.left + 1,  entity_rect.bottom + 1),
                               (entity_rect.right - 1, entity_rect.bottom + 1)],

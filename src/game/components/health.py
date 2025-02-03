@@ -34,11 +34,11 @@ class HealthComponent(Entity):
         return self.collider.enabled
     
     @property
-    def vulnerable(self):
+    def vulnerable(self) -> bool:
         return self.invulnerable_timer.is_done
     
     @property
-    def invulnerable(self):
+    def invulnerable(self) -> bool:
         return self.invulnerable_timer.is_active
 
     def reset(self):

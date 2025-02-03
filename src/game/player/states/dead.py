@@ -21,4 +21,4 @@ class Dead(State):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
 
         if self.timer.is_done:
-            self.owner.spawn(self.owner.position)
+            self.owner.spawn(self.owner.spawn_position)

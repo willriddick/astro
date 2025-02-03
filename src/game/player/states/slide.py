@@ -10,7 +10,7 @@ class Slide(State):
 
     def on_enter(self):
         self.owner.sprite.set_animation(Animations.SLIDE)
-        self.owner.camera.screenshake(30, 3)
+        self.owner.camera.screenshake(20, 3)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
         self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
         self.entry_speed = abs(self.owner.velocity.x)
