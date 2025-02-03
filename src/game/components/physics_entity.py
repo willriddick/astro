@@ -16,7 +16,7 @@ class PhysicsEntity(Entity):
         self.tiles_around = []
         self.falling = False
         self.on_ground = False
-        self.drop_down = False
+        self.platform_collision = False
         self.collision_enabled = True
         self.collisions = { 
             Direction.UP: False,
@@ -104,7 +104,7 @@ class PhysicsEntity(Entity):
             if platform.rect.top < self.rect.bottom:
                 platform.collision = False
             else:
-                if self.on_ground and self.drop_down:
+                if self.on_ground and self.platform_collision:
                     platform.collision = False
                 else:
                     platform.collision = True

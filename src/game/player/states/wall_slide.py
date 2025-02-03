@@ -16,7 +16,7 @@ class WallSlide(State):
         self.owner.pressed_right_timer.reset()
     
     def update(self):
-        if self.owner.velocity.y < 0 or self.owner.move_dir.x != self.owner.wall_slide_dir:
+        if self.owner.velocity.y < 0 or self.owner.input_dir.x != self.owner.wall_slide_dir:
             # apply normal gravity if not wall sliding
             self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         else:
@@ -25,11 +25,11 @@ class WallSlide(State):
             self.owner.sprite.set_animation(Animations.WALL_SLIDE)
         
         # use AIR animation if not wall sliding
-        if self.owner.move_dir.x != self.owner.wall_slide_dir:
+        if self.owner.input_dir.x != self.owner.wall_slide_dir:
             self.owner.sprite.set_animation(Animations.AIR_DOWN if self.owner.falling else Animations.AIR_UP)
         
         # update velocity
-        self.owner.accelerate_x(self.owner.move_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
+        self.owner.accelerate_x(self.owner.input_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
         self.owner.handle_wall_jump()
 
         # switch to IDLE or RUN state
