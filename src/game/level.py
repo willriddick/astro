@@ -77,11 +77,24 @@ class Level:
 
             tilemap.place_tilemap(new_map, room.position, flip)
         
+        self._create_border(tilemap)
+        
         self.spawn_pos = spawn_tile.pos
         self.exit_pos = exit_tile.pos
         Exit(self.exit_pos)
 
         return tilemap
+    
+    @staticmethod 
+    def _create_border(tilemap: TileMap) -> None:
+        top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)
+        bottom = pygame.Rect(-1, tilemap.size.y, tilemap.size.x + 2, 1)
+        left = pygame.Rect(-1, -1, 1, tilemap.size.y + 1)
+        right = pygame.Rect(tilemap.size.x, -1, 1, tilemap.size.y + 1)
+        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), top)
+        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), bottom)
+        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), left)
+        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), right)
 
     @staticmethod
     def _get_folder_flip(key: int) -> tuple[str, bool]:

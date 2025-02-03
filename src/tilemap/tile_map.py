@@ -22,13 +22,13 @@ class TileMap:
     def rect(self) -> pygame.Rect:
         return pygame.Rect(0, 0, self.size.x * self.tile_size.x, self.size.y * self.tile_size.y)
 
-    def set_size(self, size: Vec2):
+    def set_size(self, size: Vec2) -> None:
         self.size = size
     
-    def clear(self):
+    def clear(self) -> None:
         self.map = {}
     
-    def render(self, surf: pygame.Surface, offset: pygame.Vector2):
+    def render(self, surf: pygame.Surface, offset: pygame.Vector2) -> None:
         for tile in self.map.values():
             tile.render(surf, offset)
     
@@ -50,12 +50,17 @@ class TileMap:
 
         return new_tile
     
-    def remove_tile(self, tile_pos: Vec2):
+    def create_tile_rect(self, tile: Tile, rect: pygame.Rect) -> None:
+        for y in range(rect.y, rect.y + rect.height):
+            for x in range(rect.x, rect.x + rect.width):
+                self.create_tile(tile, 0, Vec2(x, y))
+    
+    def remove_tile(self, tile_pos: Vec2) -> None:
         if tile := self.get_tile(tile_pos):
             del self.map[tile.tile_pos]
             self._update_autotiles_around(tile_pos)
     
-    def flip_x(self):
+    def flip_x(self) -> None:
         new_map = {}
         for pos, tile in self.map.items():
             new_x = self.size.x - pos.x - 1
@@ -76,13 +81,13 @@ class TileMap:
                     output.append(tile)
         return output
     
-    def place_tile(self, tile: Tile, new_pos: Vec2):
+    def place_tile(self, tile: Tile, new_pos: Vec2) -> None:
         tile.tile_pos = new_pos
         self.map[new_pos] = tile
         if tile.tile_type.autotile:
             self._update_autotiles_around(new_pos)
     
-    def place_tilemap(self, tilemap: 'Tilemap', offset: Vec2, flip: bool):
+    def place_tilemap(self, tilemap: 'Tilemap', offset: Vec2, flip: bool) -> None:
         x_start = offset.x * tilemap.size.x
         y_start = offset.y * tilemap.size.y
         self.size = Vec2(

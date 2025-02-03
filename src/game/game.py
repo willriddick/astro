@@ -96,7 +96,7 @@ class Game:
             case ['p', index]:
                 self.level.player.load_sprite(int(index))
             case ['tp', x, y]:
-                self.level.player.pos = pygame.Vector2(int(x), int(y))
+                self.level.player.set_position(pygame.Vector2(int(x), int(y)))
             case ['q']:
                 self.running = False
             case _:
