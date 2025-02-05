@@ -229,7 +229,7 @@ class Player(PhysicsEntity):
         self.sprite = Sprite(self.position, image_offset=Vec2(4, 5))
         self.sprite.add_animation(Animations.IDLE_A, image_list, 0, range_=(0,1))
         self.sprite.add_animation(Animations.IDLE_B, image_list, 5, range_=(0,4))
-        self.sprite.add_animation(Animations.RUN, image_list, 10, range_=(4,10))
+        self.sprite.add_animation(Animations.RUN, image_list, 12, range_=(4,10))
         self.sprite.add_animation(Animations.AIR_UP, image_list, 0, range_=(10,11))
         self.sprite.add_animation(Animations.AIR_DOWN, image_list, 0, range_=(11,12))
         self.sprite.add_animation(Animations.FRONT, image_list, 0, range_=(12,13))

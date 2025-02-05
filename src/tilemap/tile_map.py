@@ -180,6 +180,8 @@ class TileMap:
             print(f'Tilemap saved to {path}')
         except FileNotFoundError:
             print(f'Save failed... path not found: {path}')
+        except PermissionError:
+            print(f'Save failed... permission error on: {path}')
     
     @staticmethod
     def load(path: str, tileset: TileSet) -> 'TileMap':
@@ -205,3 +207,5 @@ class TileMap:
             return tilemap
         except FileNotFoundError:
             print(f'Load failed... path not found: {path}')
+        except PermissionError:
+            print(f'Load failed... permission error on: {path}')

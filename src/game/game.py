@@ -32,7 +32,7 @@ class Game:
         pygame.display.set_icon(Assets.ICON)
 
         self.level = None
-        self.new_level()
+        self.new_level(map_path='assets/maps/test/0.json')
     
     async def run(self):
         self.running = True
