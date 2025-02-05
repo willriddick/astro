@@ -25,11 +25,10 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_MULTIPLIER = 0.93 # multiplies velocity when releasing jump
     VARIABLE_JUMP_BUFFER = 300 # time after jumping to allow variable jump
 
-    SLIDE_DURATION = 250 # after this time, the player will decelerate to 0
+    SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
     INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
     SLIDE_SPEED = 110
     SLIDE_ACC = (180, 180)
-    SLIDE_BUFFER = 120 # time after landing to allow slide
 
     WALL_JUMP_DURATION = 10 # time after wall jumping before switching to AIR
     WALL_JUMP_SPEED = Vec2(110, 160)
@@ -99,7 +98,7 @@ class Player(PhysicsEntity):
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
         )
     
-    def update(self) -> None:
+    def update(self):
         self.handle_input()
         self.sprite.update(self.position)
         self.health_component.update(self.position)
@@ -109,12 +108,12 @@ class Player(PhysicsEntity):
         if self.collider.get_nearest(Exit):
             print('EXIT')
         
-    def set_position(self, position: pygame.Vector2) -> None:
+    def set_position(self, position: pygame.Vector2):
         self.position = position
         self.health_component.update(position)
         self.sprite.set_pos(position)
 
-    def spawn(self, position: pygame.Vector2 = None):
+    def spawn(self, position: pygame.Vector2):
         self.spawn_position = position
         self.set_state(States.SPAWN)
     

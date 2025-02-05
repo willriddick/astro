@@ -22,7 +22,7 @@ class Game:
 
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
-            pygame.RESIZABLE
+            pygame.SCALED
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.fullscreen = False
@@ -60,7 +60,7 @@ class Game:
 
             try:
                 self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
-                pygame.display.update()
+                pygame.display.flip()
                 Clock.update()
             except KeyboardInterrupt:
                 self.running = False
@@ -84,9 +84,10 @@ class Game:
         if command == '': 
             return
 
+        player = self.level.player
         match command.split():
             case ['g']:
-                self.level.player.toggle_ghost()
+                player.toggle_ghost()
             case ['d']:
                 Debug.toggle()
             case ['n']:
@@ -94,9 +95,13 @@ class Game:
             case ['n', seed]:
                 self.new_level(seed=seed)
             case ['p', index]:
-                self.level.player.load_sprite(int(index))
+                player.load_sprite(int(index))
+            case ['r']:
+                player.spawn(player.spawn_position)
             case ['tp', x, y]:
-                self.level.player.set_position(pygame.Vector2(int(x), int(y)))
+                player.set_position(pygame.Vector2(int(x), int(y)))
+            case ['f']:
+                self.toggle_fullscreen()
             case ['q']:
                 self.running = False
             case _:
@@ -108,9 +113,9 @@ class Game:
         if event.type == pygame.VIDEORESIZE:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
-            self.toggle_fullscreen()
+            self.toggle_fullscreen
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            if event.key == pygame.K_p:
                 self.paused = not self.paused 
     
     def handle_resize(self, width, height):
@@ -123,10 +128,13 @@ class Game:
     
     def toggle_fullscreen(self):
         self.fullscreen = not self.fullscreen
+
         if self.fullscreen:
-            self.window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            size = (0, 0)
+            mode = pygame.FULLSCREEN
         else:
-            self.window = pygame.display.set_mode(
-                (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE), 
-                pygame.RESIZABLE)
+            size = (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE)
+            mode = pygame.RESIZABLE
+
+        self.window = pygame.display.set_mode(size, mode)
     

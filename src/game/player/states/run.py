@@ -5,10 +5,8 @@ from ..enums import Animations, States
 class Run(State):
     def __init__(self):
         super().__init__(States.RUN)
-        self.slide_timer = Timer(Player.SLIDE_BUFFER)
 
     def on_enter(self):
-        self.slide_timer.start()
         self.owner.sprite.set_next(Animations.RUN)
         if self.owner.rotated:
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
