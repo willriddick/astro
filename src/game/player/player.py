@@ -16,8 +16,7 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
-    DROP_GRAVITY = 600
-    DROP_FALL_SPEED = 320
+    DROP_SPEED = 30
 
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185
@@ -59,6 +58,7 @@ class Player(PhysicsEntity):
 
         # inputs
         self.holding_jump = False
+        self.just_pressed_down = False
         self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
         self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
         self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
@@ -180,7 +180,7 @@ class Player(PhysicsEntity):
     
     def handle_collision(self) -> None:
         # if pressing down, drop through platform
-        self.platform_collision = (self.input_dir.y == 1)
+        self.platform_collision = (self.input_dir.y == 1 and self.state_machine.current_state.id != States.SLIDE)
 
         # handle collision
         super().handle_collision()
@@ -194,6 +194,8 @@ class Player(PhysicsEntity):
             int(pressed[pygame.K_d]) - int(pressed[pygame.K_a]),
             int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
         )
+
+        self.just_pressed_down = just_pressed[pygame.K_s]
 
         # update rotated field
         if self.input_dir.x != 0 and self.input_dir.x != self.last_facing_dir:

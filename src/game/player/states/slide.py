@@ -17,13 +17,14 @@ class Slide(State):
         self.timer.start()
 
     def update(self):
-        self.owner.handle_jump()
 
         goal_velocity = 0 if self.timer.is_done else min(Player.SLIDE_SPEED, self.entry_speed)
         self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
     
         if self.owner.input_dir.y != 1:
             self.switch(States.RUN)
-        
+
         if not self.owner.on_ground and self.timer.is_done:
             self.switch(States.AIR)
+        
+        self.owner.handle_jump()

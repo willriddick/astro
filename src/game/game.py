@@ -76,7 +76,7 @@ class Game:
         self.camera.set_level(self.level)
 
         star_spawner = StarSpawner()
-        star_spawner.spawn(35)
+        star_spawner.spawn(40)
         self.level.star_spawner = star_spawner
 
     def handle_commands(self):

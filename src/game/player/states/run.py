@@ -25,14 +25,6 @@ class Run(State):
         if self.owner.input_dir.x != 0:
             self.owner.sprite.flip = self.owner.input_dir.x == -1
 
-        # switch to slide state
-        if (
-            self.slide_timer.is_active  # buffer to slide has not passed
-            and self.owner.input_dir.y == 1  # pressing down
-            and self.owner.state_machine.previous_state.id == States.AIR  # just came from AIR
-        ):
-            self.switch(States.SLIDE)
-        
         # switch states
         if self.owner.velocity.x == 0:
             self.switch(States.IDLE)

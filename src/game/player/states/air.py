@@ -30,7 +30,7 @@ class Air(State):
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
         
-        if self.owner.input_dir.y == 1:
+        if self.owner.just_pressed_down:
             self.switch(States.DROP)
 
         if self.owner.on_ground:

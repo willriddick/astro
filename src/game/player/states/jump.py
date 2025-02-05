@@ -1,10 +1,11 @@
-from src.util import State
+from src.util import State, Timer
 from ..player import Player
 from ..enums import States
 
 class Jump(State):
     def __init__(self):
         super().__init__(States.JUMP)
+        self.timer = Timer(5)
     
     def on_enter(self):
         # special case for coyote time 
@@ -24,5 +25,9 @@ class Jump(State):
             self.owner.variable_jump_timer.start()
         
         # switch to AIR
-        self.switch(States.AIR)
+        self.timer.start()
+    
+    def update(self):
+        if self.timer.is_done:
+            self.switch(States.AIR)
    
