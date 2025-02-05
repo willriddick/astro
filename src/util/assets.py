@@ -36,7 +36,7 @@ class Assets:
         Assets.STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
         Assets.ASTEROIDS = load_images('asteroids', True)
 
-        Assets.SPIKE = test_tiles[3]
+        Assets.SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
         Assets.GRAVITY = test_tiles[4]
 
         from src.tilemap.tile_set import TileSet, TileType
@@ -62,7 +62,7 @@ class Assets:
 
         Assets.TILESET.add(TileType(
             name='spike', 
-            images=[Assets.SPIKE],
+            images=[Assets.SPIKE[0]],
             size=Vec2(16, 2),
         ))
     

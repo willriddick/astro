@@ -14,7 +14,6 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
-        from .spike import Spike
         from .gravity import Gravity
         
         Level.current = self
@@ -30,9 +29,7 @@ class Level:
         else:
             self.tilemap = self.generate(config, seed)
         
-        for spike in self.tilemap.get_tiles_with('spike'):
-            Spike(spike.pos)
-            del spike
+        Level._merge_spikes(self.tilemap)
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
             Gravity(gravity.pos)
@@ -58,54 +55,80 @@ class Level:
 
         level_map: LevelMap = generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
+        self._create_border(tilemap)
 
         for y in range(level_map.config.rows):
             for x in range(level_map.config.cols):
                 room = level_map.get_room_at(Vec2(x, y))
 
+                # if room does not exit at postion (x, y) in level_map, fill 
+                if room is None:
+                    Level._fill_empty_room(tilemap, Vec2(x, y), room_size)
+                    continue
+                
                 # if room exists at postion (x, y) in level_map
-                if room is not None:
-                    
-                    sub, flip = self._get_folder_flip(room.key)
-                    map_folder = f'{MAPS_PATH}/{sub}'
-                    map_paths: list[str] = []
-                    for name in os.listdir(map_folder):
-                        map_paths.append(map_folder + '/' + name)
+                sub, flip = self._get_folder_flip(room.key)
+                map_folder = f'{MAPS_PATH}/{sub}'
+                map_paths: list[str] = []
+                for name in os.listdir(map_folder):
+                    map_paths.append(map_folder + '/' + name)
 
-                    map_path = random.choice(map_paths)
-                    new_map = TileMap.load(map_path, Assets.TILESET)
-                    
-                    if room.has_attribute(Attribute.ENTRANCE):
-                        pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                        spawn_tile = new_map.create_tile(
-                            Assets.TILESET.get_by('entrance'),
-                            0,
-                            Vec2(pos.x, pos.y - 1)
-                        )
-                    
-                    if room.has_attribute(Attribute.EXIT):
-                        pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                        exit_tile = new_map.create_tile(
-                            Assets.TILESET.get_by('exit'), 
-                            0, 
-                            Vec2(pos.x, pos.y - 1)
-                        )
-
-                    tilemap.place_tilemap(new_map, room.position, flip)
-                else:
-                    # place rect of tiles in empty room slot
-                    tilemap.create_tile_rect(
-                        Assets.TILESET.get_by('stone'), 
-                        pygame.Rect(x * room_size.x, y * room_size.y, room_size.x, room_size.y)
+                map_path = random.choice(map_paths)
+                new_map = TileMap.load(map_path, Assets.TILESET)
+                
+                if room.has_attribute(Attribute.ENTRANCE):
+                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                    spawn_tile = new_map.create_tile(
+                        Assets.TILESET.get_by('entrance'),
+                        0,
+                        Vec2(pos.x, pos.y - 1)
                     )
-        
-        self._create_border(tilemap)
+                
+                if room.has_attribute(Attribute.EXIT):
+                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                    exit_tile = new_map.create_tile(
+                        Assets.TILESET.get_by('exit'), 
+                        0, 
+                        Vec2(pos.x, pos.y - 1)
+                    )
+                
+                tilemap.place_tilemap(new_map, room.position, flip)
         
         self.spawn_pos = spawn_tile.pos
         self.exit_pos = exit_tile.pos
         Exit(self.exit_pos)
 
         return tilemap
+    
+    @staticmethod
+    def _merge_spikes(tilemap: TileMap) -> None:
+        from .spike import Spike
+
+        spikes = tilemap.get_tiles_with('spike')
+        print(spikes)
+        spikes.sort(key=lambda s: (s.pos.y, s.pos.x))
+        new_spike = None
+        prev = None
+
+        for spike in spikes:  
+            if new_spike is None:
+                new_spike = Spike(spike.pos)
+
+            if prev is None:
+                prev = spike
+                continue
+
+            print(prev.pos, spike.pos)
+            if (prev.pos.y == spike.pos.y 
+                and prev.pos.x + 16 == spike.pos.x
+            ):
+                new_spike.update_width(new_spike.width + 1)
+                print(new_spike.width)
+            else:
+                new_spike = Spike(spike.pos)
+            
+            prev = spike
+            del spike
     
     @staticmethod 
     def _create_border(tilemap: TileMap) -> None:
@@ -117,6 +140,13 @@ class Level:
         tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), bottom)
         tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), left)
         tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), right)
+    
+    @staticmethod
+    def _fill_empty_room(tilemap: TileMap, pos: Vec2, room_size: Vec2) -> None:
+        tilemap.create_tile_rect(
+            Assets.TILESET.get_by('stone'), 
+            pygame.Rect(pos.x * room_size.x, pos.y * room_size.y, room_size.x, room_size.y)
+        )
 
     @staticmethod
     def _get_folder_flip(key: int) -> tuple[str, bool]:

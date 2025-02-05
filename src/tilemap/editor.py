@@ -181,8 +181,7 @@ class Editor:
     
     def draw_border(self):
         tile_size = Assets.TILESET.tile_size
-        if self.tilemap:
-            size = self.tilemap.size
+        size = self.tilemap.size
         border = pygame.Surface((size.x * tile_size.x, size.y * tile_size.y), pygame.SRCALPHA)
         border.set_alpha(100)
         pygame.draw.rect(
