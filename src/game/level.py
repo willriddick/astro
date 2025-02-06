@@ -114,13 +114,14 @@ class Level:
                 continue  # skip already processed tiles
 
             above, below = False, False
-                
             start_pos = start_tile.pos
-            if above_tile := tilemap.get_tile(Vec2(start_pos.x, start_pos.y - 1)):
+            start_tile_pos = start_tile.tile_pos
+
+            if above_tile := tilemap.get_tile(Vec2(start_tile_pos.x, start_tile_pos.y - 1)):
                 if above_tile.tile_type.name == 'stone':
                     above = True
 
-            if below_tile := tilemap.get_tile(Vec2(start_pos.x, start_pos.y + 1)):
+            if below_tile := tilemap.get_tile(Vec2(start_tile_pos.x, start_tile_pos.y + 1)):
                 if below_tile.tile_type.name == 'stone':
                     below = True
 
@@ -152,7 +153,7 @@ class Level:
                 next_y += 1
             """
 
-            spikes.append(Spike(start_pos, width=width, height=height, above=above, below=below))
+            spikes.append(Spike(start_pos, width, height, above, below))
 
         tilemap.remove_tiles(spike_tiles )
 
