@@ -60,11 +60,25 @@ class VSpike(Spike):
             self.sprite.render(display, offset + pygame.Vector2(0, i * 16))
 
 class CSpike(Spike):
-    def __init__(self, position: pygame.Vector2, above: bool, below: bool, left: bool, right: bool):
+    def __init__(self, position: pygame.Vector2, above: bool, right: bool):
         super().__init__(position, Vec2(16, 16))
-        self.collider = Collider(Vec2(16, 16), Vec2(0, 0))
-        self.collider.add_owner(self)
-        self.damage_component = DamageComponent(self.collider, 1)
+        if above:
+            offset1 = Vec2(0, 0)
+            self.sprite.flip_y = True
+        else:
+            offset1 = Vec2(0, 15)
+        
+        if right:
+            offset2 = Vec2(15, 0)
+            self.sprite.flip_x = True
+        else:
+            offset2 = Vec2(0, 0)
+        
+        self.collider1 = Collider(Vec2(16, 1), offset1)
+        self.collider1.add_owner(self)
+        self.collider2 = Collider(Vec2(1, 16), offset2)
+        self.collider2.add_owner(self)
+        self.damage_component = DamageComponent([self.collider1, self.collider2], 1)
         self.damage_component.update(self.position)
 
         self.sprite.set_frame(2)

@@ -2,21 +2,24 @@ import pygame
 from .collider import Collider
 
 class DamageComponent:
-    def __init__(self, collider: Collider, damage: int):
-        self.collider = collider
-        self.collider.add_owner(self)
+    def __init__(self, colliders: Collider | list[Collider], damage: int):
+        self.colliders = colliders if isinstance(colliders, list) else [colliders]
+        for collider in self.colliders:
+            collider.add_owner(self)
         self.damage = damage
+        self.enabled = True
     
     def update(self, position: pygame.Vector2):
-        self.collider.update(position)
+        for collider in self.colliders:
+            collider.update(position)
     
     def enable(self):
-        self.collider.enabled = True
+        self.enabled = True
+        for collider in self.colliders:
+            collider.enabled = True
 
     def disable(self):
-        self.collider.enabled = False
-    
-    @property
-    def enabled(self) -> bool:
-        return self.collider.enabled
+        self.enabled = False
+        for collider in self.colliders:
+            collider.enabled = False
     

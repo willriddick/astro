@@ -153,9 +153,10 @@ class Level:
                 spikes.append(VSpike(tile.pos, height, is_right_wall))
 
             else:
-                spikes.append(CSpike(tile.pos, is_ceiling, is_floor, is_left_wall, is_right_wall))
+                spikes.append(CSpike(tile.pos, is_ceiling, is_right_wall))
 
         tilemap.remove_tiles(spike_tiles.values())
+        print(spikes)
         return spikes
 
    
