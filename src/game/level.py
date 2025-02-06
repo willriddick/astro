@@ -103,62 +103,62 @@ class Level:
     
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
-        from .spike import Spike
+        from .spike import Spike, HSpike, VSpike, CSpike
         spikes: list[Spike] = []
 
-        spike_tiles = sorted(tilemap.get_tiles_with('spike'), key=lambda s: (s.pos.y, s.pos.x))
+        spike_tiles = {tile.tile_pos: tile for tile in tilemap.get_tiles_with('spike')}
         visited = set()
 
-        for start_tile in spike_tiles:
-            if start_tile.tile_pos in visited:
-                continue  # skip already processed tiles
+        for tile_pos, tile in spike_tiles.items():
+            if tile_pos in visited:
+                continue  # Skip already processed tiles
 
-            above, below = False, False
-            start_pos = start_tile.pos
-            start_tile_pos = start_tile.tile_pos
-
-            if above_tile := tilemap.get_tile(Vec2(start_tile_pos.x, start_tile_pos.y - 1)):
-                if above_tile.tile_type.name == 'stone':
-                    above = True
-
-            if below_tile := tilemap.get_tile(Vec2(start_tile_pos.x, start_tile_pos.y + 1)):
-                if below_tile.tile_type.name == 'stone':
-                    below = True
-
+            x, y = tile_pos.x, tile_pos.y
             width, height = 1, 1
-            visited.add(start_tile.tile_pos)
+            visited.add(tile_pos)
 
-            # horizontal
-            next_x = start_tile.tile_pos.x + 1
-            while (
-                (next_tile := tilemap.get_tile(Vec2(next_x, start_tile.tile_pos.y))) and
-                next_tile.tile_type.name == 'spike' and
-                next_tile.tile_pos not in visited
-            ):
-                width += 1
-                next_x += 1
-                visited.add(next_tile.tile_pos)
-            
-            """
-            # verticle
-            next_y = start_tile.tile_pos.y + 1
-            while (
-                (next_tile := tilemap.get_tile(Vec2(start_tile.tile_pos.x, next_y))) and
-                next_tile.tile_type.name == 'spike' and
-                next_tile.tile_pos not in visited
-            ):
-                height += 1
-                visited.add(next_tile.tile_pos)
-                visited_vertically.add(next_tile.tile_pos)
-                next_y += 1
-            """
+            # Neighbor checks
+            left = Vec2(x - 1, y) in spike_tiles
+            right = Vec2(x + 1, y) in spike_tiles
+            above = Vec2(x, y - 1) in spike_tiles
+            below = Vec2(x, y + 1) in spike_tiles
 
-            spikes.append(Spike(start_pos, width, height, above, below))
+            solid_above = tilemap.get_tile(Vec2(x, y - 1))
+            solid_below = tilemap.get_tile(Vec2(x, y + 1))
+            solid_left = tilemap.get_tile(Vec2(x - 1, y))
+            solid_right = tilemap.get_tile(Vec2(x + 1, y))
 
-        tilemap.remove_tiles(spike_tiles )
+            is_ceiling = solid_above is not None and solid_above.tile_type.name == 'stone' if solid_above else False
+            is_floor = solid_below is not None and solid_below.tile_type.name == 'stone' if solid_below else False
+            is_left_wall = solid_left is not None and solid_left.tile_type.name == 'stone' if solid_left else False
+            is_right_wall = solid_right is not None and solid_right.tile_type.name == 'stone' if solid_right else False
 
+
+            # expand horizontally
+            if (left or right) and not (above or below):
+                next_x = x + 1
+                while Vec2(next_x, y) in spike_tiles and Vec2(next_x, y) not in visited:
+                    width += 1
+                    visited.add(Vec2(next_x, y))
+                    next_x += 1
+                spikes.append(HSpike(tile.pos, width, is_ceiling))
+
+            # expand vertically
+            elif (above or below) and not (left or right):
+                next_y = y + 1
+                while Vec2(x, next_y) in spike_tiles and Vec2(x, next_y) not in visited:
+                    height += 1
+                    visited.add(Vec2(x, next_y))
+                    next_y += 1
+                spikes.append(VSpike(tile.pos, height, is_right_wall))
+
+            else:
+                spikes.append(CSpike(tile.pos, is_ceiling, is_floor, is_left_wall, is_right_wall))
+
+        tilemap.remove_tiles(spike_tiles.values())
         return spikes
 
+   
     @staticmethod 
     def _create_border(tilemap: TileMap) -> None:
         top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)

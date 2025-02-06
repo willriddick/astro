@@ -38,7 +38,7 @@ class Sprite:
         frames, frame_rate = self.get_animation()
         if len(frames) != 1 and frame_rate != 0:
             current_time = pygame.time.get_ticks()
-            time_per_frame = 1000 // frame_rate # Convert FPS to milliseconds per frame
+            time_per_frame = 1000 // frame_rate  # convert FPS to milliseconds per frame
             if current_time - self.last_update_time >= time_per_frame:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
