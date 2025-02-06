@@ -46,8 +46,7 @@ class Star(Entity):
         self.image.fill((r, g, b, 255), special_flags=pygame.BLEND_RGBA_MULT)
 
         # randomly flip the image
-        if choice([True, False]):
-            self.image = pygame.transform.flip(self.image, True, False)
+        self.image = pygame.transform.flip(self.image, choice([True, False]), choice([True, False]))
 
         # randomly position
         self.position = pygame.Vector2(randint(0, 9999), randint(0, 9999))

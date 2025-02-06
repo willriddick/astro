@@ -7,7 +7,7 @@ class WallSlide(State):
         super().__init__(States.WALL_SLIDE)
 
     def on_enter(self):
-        self.owner.sprite.flip = (self.owner.wall_slide_dir == 1)
+        self.owner.sprite.flip_x = (self.owner.wall_slide_dir == 1)
         self.owner.sprite.set_animation(Animations.WALL_SLIDE)
     
     def on_exit(self):

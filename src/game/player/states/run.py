@@ -21,7 +21,7 @@ class Run(State):
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
         
         if self.owner.input_dir.x != 0:
-            self.owner.sprite.flip = self.owner.input_dir.x == -1
+            self.owner.sprite.flip_x = self.owner.input_dir.x == -1
 
         # switch states
         if self.owner.velocity.x == 0:

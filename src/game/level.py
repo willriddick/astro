@@ -29,7 +29,8 @@ class Level:
         else:
             self.tilemap = self.generate(config, seed)
         
-        Level._merge_spikes(self.tilemap)
+        self.spikes = Level._create_spikes(self.tilemap)
+        self.entities.extend(self.spikes)
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
             Gravity(gravity.pos)
@@ -101,35 +102,62 @@ class Level:
         return tilemap
     
     @staticmethod
-    def _merge_spikes(tilemap: TileMap) -> None:
+    def _create_spikes(tilemap: TileMap) -> list['Spike']:
         from .spike import Spike
+        spikes: list[Spike] = []
 
-        spikes = tilemap.get_tiles_with('spike')
-        print(spikes)
-        spikes.sort(key=lambda s: (s.pos.y, s.pos.x))
-        new_spike = None
-        prev = None
+        spike_tiles = sorted(tilemap.get_tiles_with('spike'), key=lambda s: (s.pos.y, s.pos.x))
+        visited = set()
 
-        for spike in spikes:  
-            if new_spike is None:
-                new_spike = Spike(spike.pos)
+        for start_tile in spike_tiles:
+            if start_tile.tile_pos in visited:
+                continue  # skip already processed tiles
 
-            if prev is None:
-                prev = spike
-                continue
+            above, below = False, False
+                
+            start_pos = start_tile.pos
+            if above_tile := tilemap.get_tile(Vec2(start_pos.x, start_pos.y - 1)):
+                if above_tile.tile_type.name == 'stone':
+                    above = True
 
-            print(prev.pos, spike.pos)
-            if (prev.pos.y == spike.pos.y 
-                and prev.pos.x + 16 == spike.pos.x
+            if below_tile := tilemap.get_tile(Vec2(start_pos.x, start_pos.y + 1)):
+                if below_tile.tile_type.name == 'stone':
+                    below = True
+
+            width, height = 1, 1
+            visited.add(start_tile.tile_pos)
+
+            # horizontal
+            next_x = start_tile.tile_pos.x + 1
+            while (
+                (next_tile := tilemap.get_tile(Vec2(next_x, start_tile.tile_pos.y))) and
+                next_tile.tile_type.name == 'spike' and
+                next_tile.tile_pos not in visited
             ):
-                new_spike.update_width(new_spike.width + 1)
-                print(new_spike.width)
-            else:
-                new_spike = Spike(spike.pos)
+                width += 1
+                next_x += 1
+                visited.add(next_tile.tile_pos)
             
-            prev = spike
-            del spike
-    
+            """
+            # verticle
+            next_y = start_tile.tile_pos.y + 1
+            while (
+                (next_tile := tilemap.get_tile(Vec2(start_tile.tile_pos.x, next_y))) and
+                next_tile.tile_type.name == 'spike' and
+                next_tile.tile_pos not in visited
+            ):
+                height += 1
+                visited.add(next_tile.tile_pos)
+                visited_vertically.add(next_tile.tile_pos)
+                next_y += 1
+            """
+
+            spikes.append(Spike(start_pos, width=width, height=height, above=above, below=below))
+
+        tilemap.remove_tiles(spike_tiles )
+
+        return spikes
+
     @staticmethod 
     def _create_border(tilemap: TileMap) -> None:
         top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)
@@ -142,10 +170,10 @@ class Level:
         tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), right)
     
     @staticmethod
-    def _fill_empty_room(tilemap: TileMap, pos: Vec2, room_size: Vec2) -> None:
+    def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
         tilemap.create_tile_rect(
             Assets.TILESET.get_by('stone'), 
-            pygame.Rect(pos.x * room_size.x, pos.y * room_size.y, room_size.x, room_size.y)
+            pygame.Rect(room_pos.x * room_size.x, room_pos.y * room_size.y, room_size.x, room_size.y)
         )
 
     @staticmethod
@@ -166,4 +194,5 @@ class Level:
             case _:
                 folder = str(key)
                 flip = random.choice([True, False])
+            
         return folder, flip

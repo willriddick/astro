@@ -24,7 +24,7 @@ class Air(State):
         self.owner.sprite.set_next(Animations.AIR_UP if self.owner.velocity.y < 0 else Animations.AIR_DOWN)
         
         if self.owner.input_dir.x != 0:
-            self.owner.sprite.flip = self.owner.input_dir.x == -1
+            self.owner.sprite.flip_x = self.owner.input_dir.x == -1
 
         # switch states
         if self.owner.wall_slide_timer.is_active:

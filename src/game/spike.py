@@ -3,24 +3,39 @@ from src.util import Assets, Vec2
 from src.game.components import Entity, Sprite, DamageComponent, Collider
 
 class Spike(Entity):
-    def __init__(self, position: pygame.Vector2):
+    def __init__(
+            self, 
+            position: pygame.Vector2,
+            width: int = 1,
+            height: int = 1,
+            above: bool = False,
+            below: bool = False
+        ):
         super().__init__(position, Vec2(16, 16))
-        self.collider = Collider(
-            size=Vec2(16, 1),
-            offset=Vec2(0, 15)
-        )
+        if height == 1:
+            self.collider = Collider(
+                size=Vec2(16 * width, 1),
+                offset=Vec2(0, 15)
+            )
+        elif width == 1:
+            self.collider = Collider(
+                size=Vec2(1, 16 * height),
+                offset=Vec2(15, 0)
+            )
+        
+        self.width = width 
+        self.height = height
+
         self.collider.add_owner(self)
         self.damage_component = DamageComponent(self.collider, 1)
         self.damage_component.update(self.position)
         
-        #self.sprite = Sprite(self.position)
-        #self.sprite.add_animation(0, Assets.SPIKE)
+        self.sprite = Sprite(self.position)
+        self.sprite.add_animation(0, Assets.SPIKE)
 
-        self.width = 1
+        self.sprite.set_animation(0)
     
-    def update_width(self, value: int):
-        self.width = value
-        self.collider.size = Vec2(value * 16, 1)
+    def render(self, display, offset):
+        for i in range(self.width):
+            self.sprite.render(display, offset + pygame.Vector2(i * self.size.x, 0))
     
-    def update(self):
-        self.damage_component.update(self.postion)

@@ -24,4 +24,4 @@ class Ghost(State):
         self.owner.accelerate_y(self.owner.input_dir.y, Player.AIR_MOVE_SPEED * multiplier, Player.GROUND_ACC * 3 * multiplier)
 
         if self.owner.input_dir.x != 0:
-            self.owner.sprite.flip = self.owner.input_dir.x == -1
+            self.owner.sprite.flip_x = self.owner.input_dir.x == -1

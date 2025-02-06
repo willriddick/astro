@@ -58,7 +58,12 @@ class TileMap:
     def remove_tile(self, tile_pos: Vec2) -> None:
         if tile := self.get_tile(tile_pos):
             del self.map[tile.tile_pos]
-            self._update_autotiles_around(tile_pos)
+            if tile.tile_type.autotile:
+                self._update_autotiles_around(tile_pos)
+    
+    def remove_tiles(self, tiles: list[Tile]) -> None:
+        for tile in tiles:
+            self.remove_tile(tile.tile_pos)
     
     def flip_x(self) -> None:
         new_map = {}
