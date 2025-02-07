@@ -21,9 +21,9 @@ class HSpike(Spike):
 
         collider_size = Vec2(16 * width, 1)
         collider_offset = Vec2(0, 0) if above else Vec2(0, 15)
-
         self.collider = Collider(collider_size, collider_offset)
         self.collider.add_owner(self)
+
         self.damage_component = DamageComponent(self.collider, 1)
         self.damage_component.update(self.position)
 
@@ -41,13 +41,10 @@ class VSpike(Spike):
         self.height = height
 
         collider_size = Vec2(1, 16 * height)
-        if right:
-            collider_offset = Vec2(15, 0)
-        else:
-            collider_offset = Vec2(0, 0)
-
+        collider_offset = Vec2(15, 0) if right else Vec2(0, 0)
         self.collider = Collider(collider_size, collider_offset)
         self.collider.add_owner(self)
+
         self.damage_component = DamageComponent(self.collider, 1)
         self.damage_component.update(self.position)
 

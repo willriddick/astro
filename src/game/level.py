@@ -2,8 +2,8 @@ import os
 import random
 import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
-from src.util import Assets, Vec2
-from src.tilemap import TileMap
+from src.util import Assets, Vec2, Direction
+from src.tilemap import TileMap, Tile
 from src.level_gen import LevelMap
 
 MAPS_PATH = 'assets/maps'
@@ -30,6 +30,7 @@ class Level:
             self.tilemap = self.generate(config, seed)
         
         self.spikes = Level._create_spikes(self.tilemap)
+        print(self.spikes)
         self.entities.extend(self.spikes)
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
@@ -104,62 +105,44 @@ class Level:
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
         from .spike import Spike, HSpike, VSpike, CSpike
-        spikes: list[Spike] = []
+        spikes: set[Spike] = set()
+        horizontal_tiles: set[Tile] = set()
+        vertical_tiles: set[Tile] = set()
+        corner_tiles: set[Tile] = set()
+        
+        spike_tiles = tilemap.get_tiles_with('spike')
+        for tile in spike_tiles:
+            a = []
+            for direction in Direction.cardinals():
+                adj = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y), direction)
+                a.append(bool(adj and adj.tile_type.name == 'spike'))
 
-        spike_tiles = {tile.tile_pos: tile for tile in tilemap.get_tiles_with('spike')}
-        visited = set()
-
-        for tile_pos, tile in spike_tiles.items():
-            if tile_pos in visited:
-                continue  # Skip already processed tiles
-
-            x, y = tile_pos.x, tile_pos.y
-            width, height = 1, 1
-            visited.add(tile_pos)
-
-            # Neighbor checks
-            left = Vec2(x - 1, y) in spike_tiles
-            right = Vec2(x + 1, y) in spike_tiles
-            above = Vec2(x, y - 1) in spike_tiles
-            below = Vec2(x, y + 1) in spike_tiles
-
-            solid_above = tilemap.get_tile(Vec2(x, y - 1))
-            solid_below = tilemap.get_tile(Vec2(x, y + 1))
-            solid_left = tilemap.get_tile(Vec2(x - 1, y))
-            solid_right = tilemap.get_tile(Vec2(x + 1, y))
-
-            is_ceiling = solid_above is not None and solid_above.tile_type.name == 'stone' if solid_above else False
-            is_floor = solid_below is not None and solid_below.tile_type.name == 'stone' if solid_below else False
-            is_left_wall = solid_left is not None and solid_left.tile_type.name == 'stone' if solid_left else False
-            is_right_wall = solid_right is not None and solid_right.tile_type.name == 'stone' if solid_right else False
-
-
-            # expand horizontally
-            if (left or right) and not (above or below):
-                next_x = x + 1
-                while Vec2(next_x, y) in spike_tiles and Vec2(next_x, y) not in visited:
-                    width += 1
-                    visited.add(Vec2(next_x, y))
-                    next_x += 1
-                spikes.append(HSpike(tile.pos, width, is_ceiling))
-
-            # expand vertically
-            elif (above or below) and not (left or right):
-                next_y = y + 1
-                while Vec2(x, next_y) in spike_tiles and Vec2(x, next_y) not in visited:
-                    height += 1
-                    visited.add(Vec2(x, next_y))
-                    next_y += 1
-                spikes.append(VSpike(tile.pos, height, is_right_wall))
-
+            if (a[2] or a[3]) and not (a[0] or a[1]):
+                horizontal_tiles.add(tile)
+            elif (a[0] or a[1]) and not (a[2] or a[3]):
+                vertical_tiles.add(tile)
             else:
-                spikes.append(CSpike(tile.pos, is_ceiling, is_right_wall))
+                corner_tiles.add(tile)
+        
+        visited = set()
+        for tile in sorted(horizontal_tiles, key=lambda tile: tile.tile_pos.x):
+            if tile in visited:
+                continue
+            visited.add(tile)
 
-        tilemap.remove_tiles(spike_tiles.values())
-        print(spikes)
+            width = 1
+            while tilemap.get_tile(Vec2(tile.tile_pos.x + width, tile.tile_pos.y)) in horizontal_tiles:
+                visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x + width, tile.tile_pos.y)))
+                width += 1
+            
+            tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
+            above = tile_above is not None and tile_above.tile_type.name == 'stone'
+            spikes.add(HSpike(tile.pos, width, above))
+
+        # remove tile object from tilemap now that we have created an entity
+        tilemap.remove_tiles(spike_tiles)
         return spikes
 
-   
     @staticmethod 
     def _create_border(tilemap: TileMap) -> None:
         top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)
