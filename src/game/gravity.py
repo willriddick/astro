@@ -1,15 +1,18 @@
-from src.util import Vec2
+from src.util import Vec2, draw_rect
 from .components import Entity, Collider
 
 class Gravity(Entity):
-    def __init__(self, position):
-        super().__init__(position, Vec2(16, 16))
-        self.gravity_multiplier = 0.5
-
-        self.collider = Collider(
-            size=Vec2(16, 16), 
-            offset=Vec2(0, 0)
-        )
+    def __init__(self, position, size: Vec2, multipier: float = 0.5):
+        super().__init__(position, size)
+        self.gravity_multiplier = multipier
+        self.collider = Collider(size)
         self.collider.add_owner(self)
         self.collider.update(self.position)
     
+    def render(self, display, offset):
+        draw_rect(
+            display=display,
+            offset=offset,
+            rect=self.collider.rect,
+            fill_color=(80, 0, 150, 80),
+        )

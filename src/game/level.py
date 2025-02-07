@@ -4,7 +4,7 @@ import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2, Direction
 from src.tilemap import TileMap, Tile
-from src.level_gen import LevelMap
+from src.level_gen import LevelMap, Room
 
 MAPS_PATH = 'assets/maps'
 
@@ -14,7 +14,6 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
-        from .gravity import Gravity
         
         Level.current = self
 
@@ -25,16 +24,13 @@ class Level:
         self.exit_pos = pygame.Vector2(0, 0)
 
         if map_path:
-            self.tilemap = TileMap.load(map_path, Assets.TILESET)
+            self.tilemap = self.load_room(map_path)
         else:
             self.tilemap = self.generate(config, seed)
         
         self.spikes = Level._create_spikes(self.tilemap)
         self.entities.extend(self.spikes)
         
-        for gravity in self.tilemap.get_tiles_with('gravity'):
-            Gravity(gravity.pos)
-
         self.star_spawner = None
         
         self.player = Player()
@@ -52,8 +48,6 @@ class Level:
         return self.colliders
 
     def generate(self, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
-        from .exit import Exit
-
         level_map: LevelMap = generate_level(config, seed)
         tilemap = TileMap(Assets.TILESET, size=Vec2(0, 0))
         self._create_border(tilemap)
@@ -73,33 +67,53 @@ class Level:
                 map_paths: list[str] = []
                 for name in os.listdir(map_folder):
                     map_paths.append(map_folder + '/' + name)
-
-                map_path = random.choice(map_paths)
-                new_map = TileMap.load(map_path, Assets.TILESET)
-                
-                if room.has_attribute(Attribute.ENTRANCE):
-                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                    spawn_tile = new_map.create_tile(
-                        Assets.TILESET.get_by('entrance'),
-                        0,
-                        Vec2(pos.x, pos.y - 1)
-                    )
-                
-                if room.has_attribute(Attribute.EXIT):
-                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                    exit_tile = new_map.create_tile(
-                        Assets.TILESET.get_by('exit'), 
-                        0, 
-                        Vec2(pos.x, pos.y - 1)
-                    )
-                
+                new_map = self.load_room(random.choice(map_paths)), 
                 tilemap.place_tilemap(new_map, room.position, flip)
         
-        self.spawn_pos = spawn_tile.pos
-        self.exit_pos = exit_tile.pos
-        Exit(self.exit_pos)
-
         return tilemap
+    
+    def load_room(self, map_path: str, room: Room = None) -> TileMap:
+        from .gravity import Gravity
+        from .exit import Exit
+
+        new_map = TileMap.load(map_path, Assets.TILESET)
+
+        if room:
+            entrance_tile = Assets.TILESET.get_by('entrance')
+            exit_tile = Assets.TILESET.get_by('entrance')
+
+            if room.has_attribute(Attribute.ENTRANCE):
+                pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                spawn_tile = new_map.create_tile(entrance_tile, 0, Vec2(pos.x, pos.y - 1))
+            
+            if room.has_attribute(Attribute.EXIT):
+                pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                exit_tile = new_map.create_tile(exit_tile, 0, Vec2(pos.x, pos.y - 1))
+            
+            self.spawn_pos = spawn_tile.pos
+            self.exit_pos = exit_tile.pos
+            Exit(self.exit_pos)
+        
+        gravity_tiles = sorted(new_map.get_tiles_with('gravity'), key=lambda tile: tile.tile_pos.x)
+        visited = set()
+        for tile in gravity_tiles:
+            if tile in visited:
+                continue
+            visited.add(tile)
+
+            size = Vec2(0, 0)
+            min_distance = 100000
+            for other in gravity_tiles:    
+                if other is not tile and tile.pos.distance_to(other.pos) < min_distance:
+                    min_distance = tile.pos.distance_to(other.pos)
+                    size = Vec2(abs(tile.pos.x - other.pos.x) + 16, abs(tile.pos.y - other.pos.y) + 16)
+                    visited.add(other)
+            
+            self.entities.append(Gravity(tile.pos, size))
+
+        new_map.remove_tiles(gravity_tiles)
+
+        return new_map
     
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
