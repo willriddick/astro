@@ -27,9 +27,9 @@ class StarSpawner():
 class Star(Entity):
 
     DEPTH = [0.01, 0.2]
-    ALPHA = [30, 210]
-    TINT_BASE = 230
-    TINT_VARIATION = 25
+    ALPHA = [30, 190]
+    TINT_BASE = 220
+    TINT_VARIATION = 35
     WEIGHTS: list[int] = []
 
     def __init__(self):
