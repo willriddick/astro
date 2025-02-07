@@ -138,6 +138,23 @@ class Level:
             tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
             above = tile_above is not None and tile_above.tile_type.name == 'stone'
             spikes.add(HSpike(tile.pos, width, above))
+        
+        visited.clear()
+        for tile in sorted(vertical_tiles, key=lambda tile: tile.tile_pos.y):
+            if tile in visited:
+                continue
+            visited.add(tile)
+
+            height = 1
+            while tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y + height)) in vertical_tiles:
+                visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y + height)))
+                height += 1
+            
+            tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
+            right = tile_right is not None and tile_right.tile_type.name == 'stone'
+            spikes.add(VSpike(tile.pos, height, right))
+
+
 
         # remove tile object from tilemap now that we have created an entity
         tilemap.remove_tiles(spike_tiles)
