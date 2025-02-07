@@ -30,7 +30,6 @@ class Level:
             self.tilemap = self.generate(config, seed)
         
         self.spikes = Level._create_spikes(self.tilemap)
-        print(self.spikes)
         self.entities.extend(self.spikes)
         
         for gravity in self.tilemap.get_tiles_with('gravity'):
@@ -104,12 +103,18 @@ class Level:
     
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
+        """
+        Queues for the spike tiles within a TileMap and creates Spike entities for each grouping
+        based on three sets, horizontal, vertical, and corner tiles. This greatly reduces the 
+        entity/collider count by creating a single entity for a grouping of spikes.
+        """
         from .spike import Spike, HSpike, VSpike, CSpike
         spikes: set[Spike] = set()
         horizontal_tiles: set[Tile] = set()
         vertical_tiles: set[Tile] = set()
         corner_tiles: set[Tile] = set()
         
+        # categorize all spikes into three sets: horizontal, vertical, and corner
         spike_tiles = tilemap.get_tiles_with('spike')
         for tile in spike_tiles:
             a = []
@@ -124,6 +129,7 @@ class Level:
             else:
                 corner_tiles.add(tile)
         
+        # create merged spike entities for horizontal set
         visited = set()
         for tile in sorted(horizontal_tiles, key=lambda tile: tile.tile_pos.x):
             if tile in visited:
@@ -139,6 +145,7 @@ class Level:
             above = tile_above is not None and tile_above.tile_type.name == 'stone'
             spikes.add(HSpike(tile.pos, width, above))
         
+        # create merged spike entities for vertical set
         visited.clear()
         for tile in sorted(vertical_tiles, key=lambda tile: tile.tile_pos.y):
             if tile in visited:
@@ -154,7 +161,13 @@ class Level:
             right = tile_right is not None and tile_right.tile_type.name == 'stone'
             spikes.add(VSpike(tile.pos, height, right))
 
-
+        # create spike entities for corner set
+        for tile in corner_tiles:
+            tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
+            above = tile_above is not None and tile_above.tile_type.name == 'stone'
+            tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
+            right = tile_right is not None and tile_right.tile_type.name == 'stone'
+            spikes.add(CSpike(tile.pos, above, right))
 
         # remove tile object from tilemap now that we have created an entity
         tilemap.remove_tiles(spike_tiles)
