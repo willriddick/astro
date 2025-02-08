@@ -13,9 +13,8 @@ class Assets:
     PLAYER_SHEET: pygame.Surface = None
     PLAYER_PALETTES: list[Palette] = None
     ASTEROIDS: list[pygame.Surface] = None
-    SPIKE: pygame.Surface = None
-    GRAVITY: pygame.Surface = None
-    STARS: pygame.Surface = None
+    SPIKE: list[pygame.Surface] = None
+    STARS: list[pygame.Surface] = None
     EXIT: pygame.Surface = None
     SOUND_TEST: pygame.mixer.Sound = None
 
@@ -34,17 +33,15 @@ class Assets:
         Assets.PLAYER_PALETTES = load_palettes('player/palettes')
 
         Assets.STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
-        Assets.ASTEROIDS = load_images('asteroids', True)
+        Assets.ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
 
         Assets.SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
-        Assets.GRAVITY = test_tiles[4]
 
         from src.tilemap.tile_set import TileSet, TileType
         Assets.TILESET = TileSet(Vec2(16, 16))
 
         Assets.TILESET.add(TileType('entrance', [test_tiles[0]],))
         Assets.TILESET.add(TileType('exit', [test_tiles[1]],))
-        Assets.TILESET.add(TileType('gravity', [Assets.GRAVITY]))
 
         Assets.TILESET.add(TileType(
             name='stone', 

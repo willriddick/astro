@@ -41,7 +41,7 @@ class VSpike(Spike):
         self.height = height
 
         collider_size = Vec2(1, 16 * height)
-        collider_offset = Vec2(15, 0) if right else Vec2(0, 0)
+        collider_offset = Vec2(14, 0) if right else Vec2(2, 0)
         self.collider = Collider(collider_size, collider_offset)
         self.collider.add_owner(self)
 
@@ -66,10 +66,10 @@ class CSpike(Spike):
             offset1 = Vec2(0, 15)
         
         if right:
-            offset2 = Vec2(15, 0)
+            offset2 = Vec2(14, 0)
             self.sprite.flip_x = True
         else:
-            offset2 = Vec2(0, 0)
+            offset2 = Vec2(2, 0)
         
         self.collider1 = Collider(Vec2(16, 1), offset1)
         self.collider1.add_owner(self)

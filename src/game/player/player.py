@@ -69,7 +69,7 @@ class Player(PhysicsEntity):
         self.load_sprite(palette_index)
     
         # setup collider
-        self.collider = Collider(size=Vec2(6, 10), offset=Vec2(1, 3))
+        self.collider = Collider(size=Vec2(6, 13), offset=Vec2(1, 0))
         self.collider.add_owner(self)
 
         self.health_component = HealthComponent(self.collider, 3, 1000)
