@@ -7,6 +7,7 @@ from .vec2 import Vec2
 ASSET_PATH = 'assets/'
 
 class Assets:
+    ICON: pygame.Surface = None
     FONT: pygame.Font = None
     TILESET = None
     PLAYER_SHEET: pygame.Surface = None
@@ -14,11 +15,17 @@ class Assets:
     ASTEROIDS: list[pygame.Surface] = None
     SPIKE: pygame.Surface = None
     GRAVITY: pygame.Surface = None
+    STARS: pygame.Surface = None
     EXIT: pygame.Surface = None
+    SOUND_TEST: pygame.mixer.Sound = None
 
     @staticmethod
     def load_assets():
-        test_tiles = load_sprite_sheet(load_image('test_tiles.png'), (16,16))
+        test_tiles = load_sprite_sheet(load_image('tiles/test_tiles.png'), (16,16))
+
+        Assets.ICON = load_image('icon.png', False)
+
+        Assets.SOUND_TEST = pygame.mixer.Sound(ASSET_PATH + 'sounds/s1.wav')
 
         Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelKlein.ttf', 9)
         Assets.FONT_ILL = pygame.font.Font(ASSET_PATH + 'fonts/DePixelIllegible.ttf', 8)
@@ -26,9 +33,10 @@ class Assets:
         Assets.PLAYER_SHEET = load_image('player/player.png', False)
         Assets.PLAYER_PALETTES = load_palettes('player/palettes')
 
+        Assets.STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
         Assets.ASTEROIDS = load_images('asteroids', True)
 
-        Assets.SPIKE = test_tiles[3]
+        Assets.SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
         Assets.GRAVITY = test_tiles[4]
 
         from src.tilemap.tile_set import TileSet, TileType
@@ -40,7 +48,7 @@ class Assets:
 
         Assets.TILESET.add(TileType(
             name='stone', 
-            images=load_sprite_sheet(load_image('tileset/template.png'), (16,16)), 
+            images=load_sprite_sheet(load_image('tiles/rock.png'), (16,16)), 
             collision=True,
             autotile=True,
         ))
@@ -54,7 +62,7 @@ class Assets:
 
         Assets.TILESET.add(TileType(
             name='spike', 
-            images=[Assets.SPIKE],
+            images=[Assets.SPIKE[0]],
             size=Vec2(16, 2),
         ))
     

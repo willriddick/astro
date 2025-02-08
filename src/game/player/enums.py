@@ -10,9 +10,11 @@ class Animations(Enum):
     BACK = 6
     WALL_SLIDE = 7
     SLIDE = 8
+    DROP = 9
 
 class States(Enum):
-    GHOST = -1
+    GHOST = -2
+    SPAWN = -1
     IDLE = 0
     RUN = 1
     JUMP = 2
@@ -22,3 +24,4 @@ class States(Enum):
     WALL_JUMP = 6
     HURT = 7
     DEAD = 8
+    DROP = 9

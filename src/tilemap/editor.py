@@ -1,3 +1,4 @@
+import os
 import sys
 import pygame
 from src.util import Assets, Vec2, CommandPrompt
@@ -6,6 +7,8 @@ from .tile_type import TileType
 
 RENDER_SCALE = 3
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
+
+MAP_PATH = os.path.join('assets', 'maps')
 
 class Editor:
     
@@ -135,10 +138,12 @@ class Editor:
                 if self.last_path:
                     TileMap.save(self.tilemap, self.last_path)
             case ['save' | 's', path]:
-                TileMap.save(self.tilemap, path)
+                TileMap.save(self.tilemap, os.path.join(MAP_PATH, path))
             case ['load' | 'l', path]:
-                self.last_path = f'assets/maps/{path}'
-                self.tilemap = TileMap.load(self.last_path, Assets.TILESET)
+                self.last_path = os.path.join(MAP_PATH, path)
+                tilemap = TileMap.load(self.last_path, Assets.TILESET)
+                if tilemap:
+                    self.tilemap = tilemap
             case ['clear' | 'c']: 
                 self.tilemap.clear()
                 print(f'Tilemap cleared')

@@ -18,7 +18,7 @@ class Idle(State):
         if self.animation_timer.is_done:
             self.owner.sprite.set_animation(Animations.IDLE_B)
 
-        if self.owner.move_dir.x != 0:
+        if self.owner.input_dir.x != 0:
             self.switch(States.RUN)
         
         if not self.owner.on_ground:

@@ -1,13 +1,13 @@
 import pygame
-from src.tilemap import TileMap, Tile
+from src.tilemap import Tile
 from src.util import approach, Direction, Vec2
+from ..level import Level
 from .entity import Entity
 from ..clock import Clock
 
 class PhysicsEntity(Entity):
-    def __init__(self, level: 'Level', size: Vec2, pos = pygame.Vector2(0, 0)):
-        super().__init__(level, pos)
-        self.size = size
+    def __init__(self, position: pygame.Vector2, size: Vec2):
+        super().__init__(position, size)
         self.velocity = pygame.Vector2(0, 0)
         self.velocity_multiplier = pygame.Vector2(1, 1)
         self.gravity_multiplier = 1
@@ -16,7 +16,7 @@ class PhysicsEntity(Entity):
         self.tiles_around = []
         self.falling = False
         self.on_ground = False
-        self.drop_down = False
+        self.platform_collision = False
         self.collision_enabled = True
         self.collisions = { 
             Direction.UP: False,
@@ -25,24 +25,16 @@ class PhysicsEntity(Entity):
             Direction.LEFT: False
         }
    
-    @property
-    def rect(self) -> pygame.FRect:
-        return pygame.FRect(self.pos.x, self.pos.y, self.size.x, self.size.y)
-
-    @property
-    def center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.rect.center)
-    
-    def apply_force(self, force: float, direction: Direction | pygame.Vector2):
+    def apply_force(self, force: float, direction: Direction | pygame.Vector2) -> None:
         self.velocity = force * (direction.vector if isinstance(direction, Direction) else direction)
     
-    def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]):
+    def accelerate_x(self, dir_: int, speed: float, acc: tuple[float, float]) -> None:
         self.velocity.x = self._acc_dec(self.velocity.x, speed, dir_, acc, self.velocity_multiplier.x)
     
-    def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]):
+    def accelerate_y(self, dir_: int, speed: float, acc: tuple[float, float]) -> None:
         self.velocity.y = self._acc_dec(self.velocity.y, speed, dir_, acc, self.velocity_multiplier.y)
     
-    def apply_gravity(self, gravity: float, fall_speed: float):
+    def apply_gravity(self, gravity: float, fall_speed: float) -> None:
         self.velocity.y = min(
             fall_speed * self.gravity_multiplier,
             self.velocity.y + (gravity * self.gravity_multiplier * Clock.dt())
@@ -59,14 +51,14 @@ class PhysicsEntity(Entity):
 
         return approach(value, target, step)
 
-    def handle_collision(self, tilemap: TileMap):
+    def handle_collision(self) -> None:
         if not self.collision_enabled:
-            self.pos += (self.velocity * Clock.dt())
+            self.position += self.velocity * Clock.dt()
             return
 
         # Update tile position
-        tile_pos = Vec2(int(self.pos.x) // tilemap.tile_size.x, int(self.pos.y) // tilemap.tile_size.y)
-        self.tiles_around = tilemap.get_tiles_around(tile_pos)
+        tilemap = Level.current.tilemap
+        self.tiles_around = tilemap.get_tiles_around(self.tile_position)
 
         # Handle platform collision
         self._handle_platform_collision() 
@@ -75,49 +67,49 @@ class PhysicsEntity(Entity):
         collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position
-        self.pos.y += (self.velocity.y * Clock.dt())
+        self.position.y += self.velocity.y * Clock.dt()
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
             if entity_rect.colliderect(rect):
                 if self.velocity.y > 0:
                     entity_rect.bottom = rect.top
-                    self.pos.y = entity_rect.y
+                    self.position.y = entity_rect.y
                     self.velocity.y = 0
                 if self.velocity.y < 0:
                     entity_rect.top = rect.bottom
-                    self.pos.y = entity_rect.y
+                    self.position.y = entity_rect.y
                     self.velocity.y *= 0.85
 
         # Update x position
-        self.pos.x += (self.velocity.x * Clock.dt())
+        self.position.x += self.velocity.x * Clock.dt() 
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
             if entity_rect.colliderect(rect):
                 if self.velocity.x > 0:
                     entity_rect.right = rect.left
-                    self.pos.x = entity_rect.x
+                    self.position.x = entity_rect.x
                     self.velocity.x = 0
                 if self.velocity.x < 0:
                     entity_rect.left = rect.right
-                    self.pos.x = entity_rect.x
+                    self.position.x = entity_rect.x
                     self.velocity.x = 0
         
         self._update_collision_flags(entity_rect, collisions_around)
     
-    def _handle_platform_collision(self): 
+    def _handle_platform_collision(self) -> None: 
         for platform in filter(lambda _tile: _tile.tile_type.name == 'platform', self.tiles_around):
             # If player is below platform, disable collision
             if platform.rect.top < self.rect.bottom:
                 platform.collision = False
             else:
-                if self.on_ground and self.drop_down:
+                if self.on_ground and self.platform_collision:
                     platform.collision = False
                 else:
                     platform.collision = True
 
-    def _update_collision_flags(self, entity_rect: pygame.Rect, collisions_around: list[Tile]):
+    def _update_collision_flags(self, entity_rect: pygame.Rect, collisions_around: list[Tile]) -> None:
         points = {
             Direction.DOWN:  [(entity_rect.left + 1,  entity_rect.bottom + 1),
                               (entity_rect.right - 1, entity_rect.bottom + 1)],

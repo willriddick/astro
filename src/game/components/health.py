@@ -1,5 +1,6 @@
 import pygame
 from src.util import Timer
+from .damage import DamageComponent
 from .entity import Entity
 from .collider import Collider
 
@@ -15,17 +16,13 @@ class HealthComponent(Entity):
         self.on_death = lambda: None
         self.on_damaged = lambda: None
     
-    def update(self, pos: pygame.Vector2):
-        self.collider.update(pos)
-    
-    @property
-    def vulnerable(self):
-        return self.invulnerable_timer.is_done
-    
-    @property
-    def invulnerable(self):
-        return self.invulnerable_timer.is_active
-    
+    def update(self, position: pygame.Vector2):
+        self.collider.update(position)
+
+        self.nearest = self.collider.get_nearest(DamageComponent)
+        if self.nearest:
+            self.apply_damage(self.nearest.damage)
+
     def enable(self):
         self.collider.enabled = True
 
@@ -35,9 +32,18 @@ class HealthComponent(Entity):
     @property
     def enabled(self) -> bool:
         return self.collider.enabled
+    
+    @property
+    def vulnerable(self) -> bool:
+        return self.invulnerable_timer.is_done
+    
+    @property
+    def invulnerable(self) -> bool:
+        return self.invulnerable_timer.is_active
 
     def reset(self):
         self.health = self.max_health
+        self.enable()
   
     def heal(self, amount: int):
         self.health = min(self.max_health, self.health + amount)

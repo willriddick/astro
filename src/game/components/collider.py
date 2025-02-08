@@ -1,30 +1,27 @@
 from typing import Callable
 import pygame
 from src.util import Vec2, draw_rect
+from src.game.level import Level
+from ..components import Entity
 
-class Collider:
-    def __init__(self, level: 'Level', size: Vec2, offset: Vec2):
-        self.level = level
-        self.owners: set[object] = set()
-        self.level.register_collider(self)
-        self.size = size
+class Collider(Entity):
+    def __init__(self, size: Vec2, offset = pygame.Vector2(0, 0)):
+        super().__init__(pygame.Vector2(0, 0), size)
+        Level.current.register_collider(self)
         self.offset = offset
-        self.layer = 0
+        self.owners: set[object] = set()
         self.enabled = True
-        self.pos = pygame.Vector2(0, 0)
-  
-    @property
-    def rect(self) -> pygame.FRect:
-        return pygame.FRect(
-            self.pos.x + self.offset.x,
-            self.pos.y + self.offset.y,
-            self.size.x,
-            self.size.y
+    
+    def update(self, position: pygame.Vector2):
+        self.position = position + self.offset
+   
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        draw_rect(
+            display=display, 
+            offset=offset, 
+            rect=self.rect,
+            outline_color=(255, 0, 255, 100),
         )
-
-    @property
-    def center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.rect.center)
     
     def add_owner(self, owner: object):
         self.owners.add(owner)
@@ -67,20 +64,10 @@ class Collider:
             return []
 
         return [
-            collider for collider in self.level.colliders
+            collider for collider in Level.current.colliders
             if collider.enabled
-            and collider is not self
-            and self.rect.colliderect(collider.rect)
-            and filter_(collider)
+                and collider is not self
+                and self.rect.colliderect(collider.rect)
+                and filter_(collider)
         ]
    
-    def update(self, pos: pygame.Vector2):
-        self.pos = pos
-   
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        draw_rect(
-            display=display, 
-            offset=offset, 
-            rect=self.rect,
-            outline_color=(255, 0, 255, 100),
-        )

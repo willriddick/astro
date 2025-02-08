@@ -21,3 +21,5 @@ ENV/
 # Ignore exports
 /exports/
 /build/
+/dist/
+/main.spec

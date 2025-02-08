@@ -8,3 +8,5 @@ from .wall_jump import WallJump
 from .ghost import Ghost
 from .hurt import Hurt
 from .dead import Dead
+from .spawn import Spawn
+from .drop import Drop

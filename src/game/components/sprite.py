@@ -9,7 +9,8 @@ class Sprite:
         self.pos = pygame.math.Vector2(pos)
         self.offset = image_offset
         self.alpha = 255
-        self.flip = False
+        self.flip_x = False
+        self.flip_y = False
 
         self.animations: dict[Enum, tuple[list[pygame.Surface], int]] = {} # id: (frames, frame_rate)
         self.current = 0
@@ -26,7 +27,6 @@ class Sprite:
         self.alpha_timer = Timer(0)
         self.alpha_speed = 0
         self.alpha_range = (0, 255)
-    
    
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
@@ -38,11 +38,20 @@ class Sprite:
         frames, frame_rate = self.get_animation()
         if len(frames) != 1 and frame_rate != 0:
             current_time = pygame.time.get_ticks()
-            time_per_frame = 1000 // frame_rate # Convert FPS to milliseconds per frame
+            time_per_frame = 1000 // frame_rate  # convert FPS to milliseconds per frame
             if current_time - self.last_update_time >= time_per_frame:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
     
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        display.blit( 
+            self.get_surface(),
+            (
+                self.pos.x - self.offset.x + offset.x, 
+                self.pos.y - self.offset.y + offset.y
+            )
+        )
+
     def reset(self):
         self.next_timer.reset()
         self.flash_timer.reset()
@@ -90,7 +99,7 @@ class Sprite:
             self.next_animation = id_
         else:
             self.set_animation(id_)
-    
+
     def flash(self, duration: int, color = pygame.Color(255, 255, 255), blend = pygame.BLEND_RGB_ADD):
         """Flashes the sprite with a given color for the specified duration in frames."""
         self.flash_timer.start(duration)
@@ -104,9 +113,8 @@ class Sprite:
         self.alpha_range = alpha_range
     
     def get_surface(self) -> pygame.Surface:
-        surface = self.get_animation()[0][self.frame]
-        if self.flip:
-            surface = pygame.transform.flip(surface, True, False)
+        frame = self.get_animation()[0][self.frame]
+        surface = pygame.transform.flip(frame, self.flip_x, self.flip_y)
 
         if self.flash_timer.is_active and self.flash_color:
             surface = surface.copy()
@@ -120,12 +128,3 @@ class Sprite:
             surface.set_alpha(self.alpha)
 
         return surface
-
-    def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        display.blit( 
-            self.get_surface(),
-            (
-                self.pos.x - self.offset.x + offset.x, 
-                self.pos.y - self.offset.y + offset.y
-            )
-        )

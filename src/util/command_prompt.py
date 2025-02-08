@@ -4,7 +4,7 @@ from .vec2 import Vec2
 from .assets import Assets
 from .draw import draw_rect
 
-RECT_COLOR = pygame.Color(0, 40, 80, 100)
+RECT_COLOR = pygame.Color(0, 40, 80, 50)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:

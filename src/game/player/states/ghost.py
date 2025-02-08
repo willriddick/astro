@@ -20,8 +20,8 @@ class Ghost(State):
     def update(self):
         multiplier = 3 if self.owner.holding_jump else 1
             
-        self.owner.accelerate_x(self.owner.move_dir.x, Player.AIR_MOVE_SPEED * multiplier, Player.GROUND_ACC * 3 * multiplier) 
-        self.owner.accelerate_y(self.owner.move_dir.y, Player.AIR_MOVE_SPEED * multiplier, Player.GROUND_ACC * 3 * multiplier)
+        self.owner.accelerate_x(self.owner.input_dir.x, Player.AIR_MOVE_SPEED * multiplier, Player.GROUND_ACC * 3 * multiplier) 
+        self.owner.accelerate_y(self.owner.input_dir.y, Player.AIR_MOVE_SPEED * multiplier, Player.GROUND_ACC * 3 * multiplier)
 
-        if self.owner.move_dir.x != 0:
-            self.owner.sprite.flip = self.owner.move_dir.x == -1
+        if self.owner.input_dir.x != 0:
+            self.owner.sprite.flip_x = self.owner.input_dir.x == -1
