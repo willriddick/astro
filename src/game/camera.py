@@ -34,9 +34,9 @@ class Camera:
 
         # Calculate the offset from the in-game position
         self.offset = pygame.Vector2(
-            self.clamp_pos.x - self.size.x // 2,
-            self.clamp_pos.y - self.size.y // 2
-        ) + self.screenshake_offset
+            round(self.clamp_pos.x - self.size.x // 2 + self.screenshake_offset.x),
+            round(self.clamp_pos.y - self.size.y // 2 + self.screenshake_offset.y)
+        )
 
         # Render stars
         Level.current.star_spawner.render(self.display, -self.offset)
