@@ -78,6 +78,7 @@ class Game:
         star_spawner = StarSpawner()
         star_spawner.spawn(50)
         self.level.star_spawner = star_spawner
+        print(self.level.entities)
 
     def handle_commands(self):
         command = self.command_prompt.pop_command()

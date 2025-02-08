@@ -54,4 +54,10 @@ class Entity:
     @property
     def bottom_center(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.centerx, self.rect.bottom)
+
+    def __str__(self) -> str:
+        return f'{self.__class__.__name__}:{self.position}'
+   
+    def __repr__(self):
+        return self.__str__()
     
