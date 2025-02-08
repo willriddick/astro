@@ -1,7 +1,6 @@
 import pygame
 from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, draw_rect
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
-from src.game.gravity import Gravity
 from src.game.exit import Exit
 from .enums import Animations, States
 
@@ -160,19 +159,6 @@ class Player(PhysicsEntity):
         
         if self.jump_input_timer.is_active and self.wall_slide_timer.is_active:
             self.state_machine.switch(States.WALL_JUMP)
-    
-    def apply_gravity(self, gravity, fall_speed) -> None:
-        # update gravity multiplier
-        nearest = self.collider.get_nearest(Gravity)
-        if nearest:
-            self.gravity_multiplier = nearest.gravity_multiplier
-            self.velocity_multiplier.x = 0.9
-        else:
-            self.gravity_multiplier = 1
-            self.velocity_multiplier.x = 1.0
-        
-        # handle gravity
-        super().apply_gravity(gravity, fall_speed)
     
     def handle_collision(self) -> None:
         # if pressing down, drop through platform
