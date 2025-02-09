@@ -4,37 +4,74 @@ import pygame
 
 SOUND_PATH = os.path.join('assets', 'sounds')
 
-class Sounds:
+class SoundManager:
+    """
+    A class to manage loading and playing sounds.
+    """
     def __init__(self):
         self.sounds: dict[str, list[pygame.mixer.Sound]] = {}
     
-    def play(self, name: str, pitch_index: int = None):
+    def play(self, name: str, vol: float = None, pitch_index: int = None):
+        """
+        Play a sound from the dictionary.
+
+        Args:
+            name (str): The name of the sound.
+            vol (float): Will play sound at volume, then reset to original volume.
+            pitch_index (int): The index of the pitch-shifted sound to play. If 
+                None, a random sound is played.
+        """
         assert name in self.sounds, f'Sound "{name}" not found'
         sound_list = self.sounds[name]
-
-        if len(sound_list) == 1:
-            sound_list[0].play()
-            return
+        selection = None
 
         if pitch_index is None:
-            sound_list[np.random.randint(0, len(sound_list))].play()
-            return
-    
-        index = min(pitch_index, len(sound_list) - 1)
-        sound_list[index].play()
-    
-    def add(self, name: str, volume: float = 1.0, pitch_min: float = 1.0, pitch_max: float = 1.0, pitch_step: float = 1.0):
-        sound = load_sound(name)
+            if len(sound_list) == 1:
+                selection = sound_list[0]
+            else:
+                selection = sound_list[np.random.randint(0, len(sound_list))]
+        else: 
+            index = min(pitch_index, len(sound_list) - 1)
+            selection = sound_list[index]
+        
+        if vol is not None:
+            orig_vol = selection.get_volume()
+            selection.set_volume(vol)
+            selection.play()
+            selection.set_volume(orig_vol)
+        else:
+            selection.play()
+        
+    def add(self, 
+            name: str, 
+            path: str = '',
+            vol: float = 1.0,
+            p_min: float = 0.9,
+            p_max: float = 1.1,
+            p_step: float = 0.05
+        ):
+        """
+        Add a sound to the dictionary with optional pitch shifting.
 
-        if pitch_min == 1 and pitch_max == 1:
-            sound.set_volume(volume)
+        Args:
+            name (str): The name of the sound.
+            path (str): The path to the sound file, by default, this is the same as the name.
+            vol (float): The volume of the sound.
+            p_min (float): The minimum pitch shift factor.
+            p_max (float): The maximum pitch shift factor.
+            p_step (float): The step size between pitch
+        """
+        sound = load_sound(name if path == '' else path)
+
+        if p_min == 1 and p_max == 1:
+            sound.set_volume(vol)
             self.sounds[name] = [sound]
             return
 
         list = []
-        for pitch in np.arange(pitch_min, pitch_max, pitch_step):
+        for pitch in np.arange(p_min, p_max, p_step):
             new_sound = change_pitch(sound, pitch)
-            new_sound.set_volume(volume)
+            new_sound.set_volume(vol)
             list.append(new_sound)
 
         self.sounds[name] = list

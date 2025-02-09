@@ -1,6 +1,6 @@
 import pygame
 
-from .sound import Sounds
+from .sound import SoundManager
 from .load import load_image, load_images, load_sprite_sheet 
 from .palette import Palette, load_palettes
 from .vec2 import Vec2
@@ -19,7 +19,7 @@ class Assets:
     EXIT: pygame.Surface = None
     SOUND_TEST: pygame.mixer.Sound = None
 
-    SOUNDS: dict[str, pygame.mixer.Sound] = {}
+    SOUNDS: SoundManager = None
 
     @staticmethod
     def load_assets():
@@ -40,13 +40,14 @@ class Assets:
 
     @staticmethod
     def load_sounds():
-        Assets.SOUNDS = Sounds()
-        Assets.SOUNDS.add('jump', volume=0.13, pitch_min=0.8, pitch_max=1.2, pitch_step=0.05)
-        Assets.SOUNDS.add('land', 0.6, 0.9, 1.1, 0.05)
-        Assets.SOUNDS.add('drop', 0.35, 0.9, 1.1, 0.05)
-        Assets.SOUNDS.add('teleport', 0.2, 0.9, 1.1, 0.05)
-        Assets.SOUNDS.add('hurt', 0.25, 0.9, 1.1, 0.05)
-        Assets.SOUNDS.add('dead', 1.2, 0.9, 1.1, 0.05)
+        Assets.SOUNDS = SoundManager()
+        Assets.SOUNDS.add(name='jump', vol=0.13, p_min=0.8, p_max=1.2, p_step=0.05)
+        Assets.SOUNDS.add(name='wall_jump', path="jump", vol=0.13, p_min=0.8, p_max=1.8, p_step=0.05)
+        Assets.SOUNDS.add('land', vol=0.6)
+        Assets.SOUNDS.add('drop', vol=0.35)
+        Assets.SOUNDS.add('teleport', vol=0.2)
+        Assets.SOUNDS.add('hurt', vol=0.25)
+        Assets.SOUNDS.add('dead', vol=1.2)
     
     @staticmethod
     def load_tileset():

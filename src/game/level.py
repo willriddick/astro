@@ -82,9 +82,9 @@ class Level:
                     pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
                     self.spawn_tile = new_map.create_tile(Assets.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
                 
-                if room.has_attribute(Attribute.EXIT):
-                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                    self.exit_tile = new_map.create_tile(Assets.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
+                #if room.has_attribute(Attribute.EXIT):
+                #    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                #    self.exit_tile = new_map.create_tile(Assets.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
 
                 tilemap.place_tilemap(new_map, room.position, flip)
                

@@ -10,7 +10,7 @@ class WallJump(State):
     def on_enter(self):
         self.timer.start()
 
-        Assets.SOUNDS.play('jump', pitch_index=self.owner.consecutive_wall_jumps)
+        Assets.SOUNDS.play('wall_jump', pitch_index=self.owner.consecutive_wall_jumps)
         self.owner.consecutive_wall_jumps += 1
 
         self.owner.sprite.set_animation(Animations.AIR_UP)
