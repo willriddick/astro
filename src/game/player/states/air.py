@@ -37,7 +37,7 @@ class Air(State):
 
         if self.owner.on_ground:
             if self.owner.velocity.y >= 0:
-                Assets.SOUNDS['land'].play()
+                Assets.SOUNDS.play('land')
 
             if self.timer.is_done:
                 self.owner.camera.screenshake(30, 3)

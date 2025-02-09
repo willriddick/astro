@@ -1,5 +1,21 @@
+import os
 import numpy as np
 import pygame
+
+SOUND_PATH = os.path.join('assets', 'sounds')
+
+class Sounds:
+    def __init__(self):
+        self.sounds = {}
+    
+    def play(self, name: str):
+        self.sounds[name].play()
+    
+    def load(self, name: str, volume: float = 1.0):
+        path = os.path.join(SOUND_PATH, f'{name}.wav')
+        sound = pygame.mixer.Sound(path)
+        sound.set_volume(volume)
+        self.sounds[name] = sound
 
 def change_pitch(sound: pygame.mixer.Sound, pitch_factor: float) -> pygame.mixer.Sound:
     """ Change pitch of a pygame sound by resampling the NumPy array. """

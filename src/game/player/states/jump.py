@@ -24,7 +24,7 @@ class Jump(State):
             self.owner.coyote_timer.reset()
             self.owner.variable_jump_timer.start()
         
-        Assets.SOUNDS['jump'].play()
+        Assets.SOUNDS.play('jump')
         
         # switch to AIR
         self.timer.start()

@@ -101,7 +101,7 @@ class Game:
                 player.spawn(player.spawn_position)
             case ['tp', x, y]:
                 player.set_position(pygame.Vector2(int(x), int(y)))
-                Assets.SOUNDS['teleport'].play()
+                Assets.SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
             case ['q']:

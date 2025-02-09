@@ -9,7 +9,7 @@ class WallJump(State):
     
     def on_enter(self):
         self.timer.start()
-        Assets.SOUNDS['jump'].play()
+        Assets.SOUNDS.play('jump')
         self.owner.sprite.set_animation(Animations.AIR_UP)
         self.owner.sprite.flip_x = (self.owner.wall_slide_dir == 1)
         self.owner.velocity.x = Player.WALL_JUMP_SPEED.x * -self.owner.wall_slide_dir * self.owner.velocity_multiplier.x
