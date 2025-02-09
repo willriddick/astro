@@ -32,8 +32,8 @@ class Air(State):
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
         
-        if self.owner.just_pressed_down:
-            self.switch(States.DROP)
+        if self.owner.just_pressed_down and self.owner.fuel > Player.BOOST_DOWN_COST:
+            self.switch(States.BOOST_DOWN)
 
         if self.owner.on_ground:
             if self.owner.velocity.y >= 0:

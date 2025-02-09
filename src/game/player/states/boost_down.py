@@ -2,18 +2,22 @@ from src.util import State
 from ..player import Player
 from ..enums import Animations, States
 
-class Drop(State):
+class BoostDown(State):
     def __init__(self):
-        super().__init__(States.DROP)
+        super().__init__(States.BOOST_DOWN)
         self.dir = 0
     
     def on_enter(self):
-        self.owner.velocity.y = max(self.owner.velocity.y + Player.DROP_SPEED, Player.DROP_SPEED)
-        self.owner.sprite.set_next(Animations.DROP)
+        self.owner.velocity.y = max(self.owner.velocity.y + Player.INITIAL_BOOST_DOWN, Player.INITIAL_BOOST_DOWN)
+        self.owner.fuel -= Player.BOOST_DOWN_COST
+        self.owner.sprite.set_next(Animations.BOOST_DOWN)
         self.dir = self.owner.input_dir.x
+    
+    def on_exit(self):
+        self.owner.refuel_timer.start()
 
     def update(self):
-        self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
+        self.owner.apply_gravity(Player.GRAVITY, Player.BOOST_DOWN_SPEED)
         self.owner.accelerate_x(self.dir, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
 
         # switch states

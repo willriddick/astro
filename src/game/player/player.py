@@ -16,15 +16,19 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
-    MAX_FUEL = 90
+    MAX_FUEL = 100
     REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
     REFUEL_RATE = 40  # rate of refueling (fuel per second)
 
+    INITIAL_BOOST_UP = 5
     BOOST_SPEED = 50
     BOOST_ACC = 100
     BOOST_MOVE_SPEED = 50
-    BOOST_MOVE_ACC = Vec2(50, 30)
-    DROP_SPEED = 30
+    BOOST_MOVE_ACC = Vec2(100, 20)
+
+    INITIAL_BOOST_DOWN = 40
+    BOOST_DOWN_COST = 20
+    BOOST_DOWN_SPEED = 200
 
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185
@@ -90,11 +94,14 @@ class Player(PhysicsEntity):
         self.health_component.on_death = self.on_death
 
         # setup state machine
-        from .states import (Idle, Run, Air, Jump, WallSlide, WallJump, 
-            Ghost, Slide, Hurt, Dead, Spawn, Drop, BoostUp)
+        from .states import (
+            Idle, Run, Air, Jump, WallSlide, WallJump, 
+            Ghost, Slide, Hurt, Dead, Spawn, BoostUp, BoostDown
+        )
         self.state_machine = StateMachine(self, [
             Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
-            WallJump(), Ghost(), Hurt(), Dead(), Spawn(), Drop(), BoostUp(),
+            WallJump(), Ghost(), Hurt(), Dead(), Spawn(), BoostUp(),
+            BoostDown(), 
         ])
 
     @property
@@ -148,9 +155,10 @@ class Player(PhysicsEntity):
     
     def handle_fuel(self):
         if (
-            self.refuel_timer.is_done 
+            self.state_machine.current_state.id != States.BOOST_UP
+            and self.state_machine.current_state.id != States.BOOST_DOWN
+            and self.refuel_timer.is_done 
             and self.fuel != Player.MAX_FUEL
-            and self.state_machine.current_state.id != States.BOOST_UP
         ):
             self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * Clock.dt())
     
@@ -241,7 +249,8 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
         self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
         self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.add_animation(Animations.DROP, image_list, 0, range_=(16,17))
+        self.sprite.add_animation(Animations.BOOST_UP, image_list, 0, range_=(16,17))
+        self.sprite.add_animation(Animations.BOOST_DOWN, image_list, 0, range_=(16,17))
     
     def render_ui(self, display: pygame.Surface):
         self.draw_fuel_bar(display, Vec2(10, 10), self.fuel, Player.MAX_FUEL)

@@ -9,8 +9,8 @@ class BoostUp(State):
         self.dir = 0
     
     def on_enter(self):
-        self.owner.sprite.set_next(Animations.DROP)
-        self.owner.velocity.y = min(self.owner.velocity.y, -Player.BOOST_SPEED/3)
+        self.owner.sprite.set_next(Animations.BOOST_UP)
+        self.owner.velocity.y = min(self.owner.velocity.y, -Player.INITIAL_BOOST_UP)
     
     def on_exit(self):
         self.owner.refuel_timer.start()
