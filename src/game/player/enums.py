@@ -25,3 +25,4 @@ class States(Enum):
     HURT = 7
     DEAD = 8
     DROP = 9
+    BOOST_UP = 10

@@ -47,6 +47,8 @@ class Player(PhysicsEntity):
         self.slide_dir = 0
         self.spawn_position = pygame.Vector2(0, 0)
 
+        self.just_boosted_timer = Timer(1000)
+
         # jumping and wall sliding
         self.jumps_remaining = 0
         self.coyote_timer = Timer(Player.COYOTE_BUFFER)
@@ -78,10 +80,10 @@ class Player(PhysicsEntity):
 
         # setup state machine
         from .states import (Idle, Run, Air, Jump, WallSlide, WallJump, 
-            Ghost, Slide, Hurt, Dead, Spawn, Drop)
+            Ghost, Slide, Hurt, Dead, Spawn, Drop, BoostUp)
         self.state_machine = StateMachine(self, [
             Idle(), Run(), Jump(), Air(), Slide(), WallSlide(), 
-            WallJump(), Ghost(), Hurt(), Dead(), Spawn(), Drop(),
+            WallJump(), Ghost(), Hurt(), Dead(), Spawn(), Drop(), BoostUp(),
         ])
 
     @property

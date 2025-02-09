@@ -26,6 +26,9 @@ class Air(State):
             self.owner.sprite.flip_x = self.owner.input_dir.x == -1
 
         # switch states
+        if self.owner.input_dir.y == -1 and self.owner.just_boosted_timer.is_done:
+            self.switch(States.BOOST_UP)
+
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
         
