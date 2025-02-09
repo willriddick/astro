@@ -55,6 +55,7 @@ class Player(PhysicsEntity):
         self.variable_jump_timer = Timer(Player.VARIABLE_JUMP_BUFFER)
         self.wall_slide_dir = 0
         self.wall_slide_timer = Timer(Player.WALL_SLIDE_BUFFER)
+        self.consecutive_wall_jumps = 0
 
         # inputs
         self.holding_jump = False
@@ -148,7 +149,9 @@ class Player(PhysicsEntity):
             self.velocity.y *= Player.VARIABLE_JUMP_MULTIPLIER
    
     def handle_wall_jump(self):
-        if not self.on_ground:
+        if self.on_ground:
+            self.consecutive_wall_jumps = 0
+        else:
             if self.collisions[Direction.RIGHT] and self.pressed_right_timer.is_active:
                 self.wall_slide_timer.start()
                 self.wall_slide_dir = 1

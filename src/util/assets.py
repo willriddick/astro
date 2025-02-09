@@ -41,12 +41,12 @@ class Assets:
     @staticmethod
     def load_sounds():
         Assets.SOUNDS = Sounds()
-        Assets.SOUNDS.load('jump', 0.18)
-        Assets.SOUNDS.load('land', 0.6)
-        Assets.SOUNDS.load('drop', 0.35)
-        Assets.SOUNDS.load('teleport', 0.2)
-        Assets.SOUNDS.load('hurt', 0.25)
-        Assets.SOUNDS.load('dead', 1.2)
+        Assets.SOUNDS.add('jump', volume=0.13, pitch_min=0.8, pitch_max=1.2, pitch_step=0.05)
+        Assets.SOUNDS.add('land', 0.6, 0.9, 1.1, 0.05)
+        Assets.SOUNDS.add('drop', 0.35, 0.9, 1.1, 0.05)
+        Assets.SOUNDS.add('teleport', 0.2, 0.9, 1.1, 0.05)
+        Assets.SOUNDS.add('hurt', 0.25, 0.9, 1.1, 0.05)
+        Assets.SOUNDS.add('dead', 1.2, 0.9, 1.1, 0.05)
     
     @staticmethod
     def load_tileset():
