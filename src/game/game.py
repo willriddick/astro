@@ -101,6 +101,7 @@ class Game:
                 player.spawn(player.spawn_position)
             case ['tp', x, y]:
                 player.set_position(pygame.Vector2(int(x), int(y)))
+                Assets.SOUNDS['teleport'].play()
             case ['f']:
                 self.toggle_fullscreen()
             case ['q']:
@@ -115,9 +116,6 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                self.paused = not self.paused 
     
     def handle_resize(self, width, height):
         new_width = width

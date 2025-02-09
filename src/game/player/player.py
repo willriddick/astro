@@ -1,5 +1,5 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, draw_rect
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.exit import Exit
 from .enums import Animations, States
@@ -141,6 +141,7 @@ class Player(PhysicsEntity):
        
         if self.jump_input_timer.is_active and self.jumps_remaining:
             self.state_machine.switch(States.JUMP)
+            Assets.SOUNDS['jump'].play()
        
         if not self.holding_jump and self.variable_jump_timer.is_active and self.velocity.y < 0:
             self.velocity.y *= Player.VARIABLE_JUMP_MULTIPLIER

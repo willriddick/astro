@@ -1,4 +1,4 @@
-from src.util import State, Timer
+from src.util import State, Timer, Assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -9,15 +9,15 @@ class Slide(State):
         self.timer = Timer(Player.SLIDE_DURATION)
 
     def on_enter(self):
+        Assets.SOUNDS['drop'].play()
         self.owner.sprite.set_animation(Animations.SLIDE)
-        self.owner.camera.screenshake(20, 3)
+        self.owner.camera.screenshake(20, 2)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
         self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
         self.entry_speed = abs(self.owner.velocity.x)
         self.timer.start()
 
     def update(self):
-
         goal_velocity = 0 if self.timer.is_done else min(Player.SLIDE_SPEED, self.entry_speed)
         self.owner.accelerate_x(self.owner.slide_dir, goal_velocity, Player.SLIDE_ACC)
     

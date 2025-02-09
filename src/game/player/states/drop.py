@@ -1,4 +1,4 @@
-from src.util import State, Direction
+from src.util import State 
 from ..player import Player
 from ..enums import Animations, States
 

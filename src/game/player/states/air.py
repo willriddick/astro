@@ -1,5 +1,4 @@
-import pygame
-from src.util import State, Timer
+from src.util import State, Timer, Assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -34,8 +33,11 @@ class Air(State):
             self.switch(States.DROP)
 
         if self.owner.on_ground:
+            if self.owner.velocity.y >= 0:
+                Assets.SOUNDS['land'].play()
+
             if self.timer.is_done:
-                self.owner.camera.screenshake(20, 2)
+                self.owner.camera.screenshake(30, 3)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)

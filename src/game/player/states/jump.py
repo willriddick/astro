@@ -1,4 +1,4 @@
-from src.util import State, Timer
+from src.util import State, Timer, Assets
 from ..player import Player
 from ..enums import States
 
@@ -23,6 +23,8 @@ class Jump(State):
             self.owner.jump_input_timer.reset()
             self.owner.coyote_timer.reset()
             self.owner.variable_jump_timer.start()
+        
+        Assets.SOUNDS['jump'].play()
         
         # switch to AIR
         self.timer.start()

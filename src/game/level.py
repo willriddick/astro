@@ -4,7 +4,7 @@ import pygame
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2, Direction
 from src.tilemap import TileMap, Tile
-from src.level_gen import LevelMap, Room
+from src.level_gen import LevelMap
 
 MAPS_PATH = 'assets/maps'
 
