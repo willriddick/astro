@@ -1,5 +1,4 @@
 import pygame
-from .vec2 import Vec2
 
 def draw_rect(
         display: pygame.Surface,

@@ -112,7 +112,6 @@ class Player(PhysicsEntity):
             f'state: {self.state_machine.current_state.name}\n'
             f'vel:{self.velocity.x:4.0f} {self.velocity.y:4.0f}\n'
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
-            f'fuel: {self.fuel}\n'
         )
     
     def update(self):

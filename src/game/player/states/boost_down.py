@@ -1,4 +1,4 @@
-from src.util import State 
+from src.util import State, Assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -8,6 +8,7 @@ class BoostDown(State):
         self.dir = 0
     
     def on_enter(self):
+        Assets.SOUNDS.play('boost')
         self.owner.velocity.y = max(self.owner.velocity.y + Player.INITIAL_BOOST_DOWN, Player.INITIAL_BOOST_DOWN)
         self.owner.fuel -= Player.BOOST_DOWN_COST
         self.owner.sprite.set_next(Animations.BOOST_DOWN)
