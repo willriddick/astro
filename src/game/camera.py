@@ -44,7 +44,7 @@ class Camera:
         # Render prerendered tilemap surface
         if self.tilemap_surface:
             self.display.blit(self.tilemap_surface, -self.offset)
-    
+        
         # Render debug display information
         if Debug.enabled():
             self._debug_display()
@@ -57,6 +57,9 @@ class Camera:
         if Debug.enabled():
             for collider in Level.current.colliders:
                 collider.render(self.display, -self.offset)
+        
+        # 
+        Level.current.player.render_ui(self.display)
     
     def set_level(self, level: Level) -> None:
         """Set the current level and update the camera's tilemap surface."""

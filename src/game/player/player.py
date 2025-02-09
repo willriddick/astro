@@ -1,7 +1,8 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, draw_rect
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.exit import Exit
+from src.game.clock import Clock
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -15,6 +16,14 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
+    MAX_FUEL = 90
+    REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
+    REFUEL_RATE = 40  # rate of refueling (fuel per second)
+
+    BOOST_SPEED = 50
+    BOOST_ACC = 100
+    BOOST_MOVE_SPEED = 50
+    BOOST_MOVE_ACC = Vec2(50, 30)
     DROP_SPEED = 30
 
     JUMP_INPUT_BUFFER = 50
@@ -47,7 +56,8 @@ class Player(PhysicsEntity):
         self.slide_dir = 0
         self.spawn_position = pygame.Vector2(0, 0)
 
-        self.just_boosted_timer = Timer(1000)
+        self.fuel = Player.MAX_FUEL 
+        self.refuel_timer = Timer(Player.REFUEL_TIME)
 
         # jumping and wall sliding
         self.jumps_remaining = 0
@@ -95,6 +105,7 @@ class Player(PhysicsEntity):
             f'state: {self.state_machine.current_state.name}\n'
             f'vel:{self.velocity.x:4.0f} {self.velocity.y:4.0f}\n'
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
+            f'fuel: {self.fuel}\n'
         )
     
     def update(self):
@@ -103,9 +114,7 @@ class Player(PhysicsEntity):
         self.health_component.update(self.position)
         self.state_machine.update()
         self.handle_collision()
-
-        if self.collider.get_nearest(Exit):
-            print('EXIT')
+        self.handle_fuel()
         
     def set_position(self, position: pygame.Vector2):
         self.position = position
@@ -136,6 +145,14 @@ class Player(PhysicsEntity):
             self.set_state(States.AIR)
         else:
             self.set_state(States.GHOST)
+    
+    def handle_fuel(self):
+        if (
+            self.refuel_timer.is_done 
+            and self.fuel != Player.MAX_FUEL
+            and self.state_machine.current_state.id != States.BOOST_UP
+        ):
+            self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * Clock.dt())
     
     def handle_jump(self):
         if self.on_ground:
@@ -225,3 +242,21 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
         self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.add_animation(Animations.DROP, image_list, 0, range_=(16,17))
+    
+    def render_ui(self, display: pygame.Surface):
+        self.draw_fuel_bar(display, Vec2(10, 10), self.fuel, Player.MAX_FUEL)
+    
+    def draw_fuel_bar(self, display: pygame.Surface, position: Vec2, fuel: int, max_fuel: int):
+        """Draw a fuel bar at the given position."""
+        bar_width = 4
+        bar_height = 16
+        
+        fuel_percentage = max(fuel / max_fuel, 0)  # Clamp between 0 and 1
+        fuel_fill_height = int(bar_height * fuel_percentage)
+        
+        # Position the fuel fill at the bottom (so it grows upwards)
+        fill_position = pygame.Vector2(0, bar_height - fuel_fill_height)
+        draw_rect(display, position + fill_position, pygame.Rect(0, 0, bar_width, fuel_fill_height), fill_color=pygame.Color(255, 165, 0, 255))
+
+        # Draw the outline
+        draw_rect(display, position, pygame.Rect(0, 0, bar_width, bar_height), outline_color=pygame.Color(255, 255, 255, 255), line_width=1)

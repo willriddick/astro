@@ -1,4 +1,5 @@
-from src.util import State, Timer, approach
+from src.util import State, approach
+from src.game.clock import Clock
 from ..player import Player
 from ..enums import Animations, States
 
@@ -9,19 +10,22 @@ class BoostUp(State):
     
     def on_enter(self):
         self.owner.sprite.set_next(Animations.DROP)
-        self.dir = self.owner.input_dir.x
+        self.owner.velocity.y = min(self.owner.velocity.y, -Player.BOOST_SPEED/3)
     
     def on_exit(self):
-        self.owner.just_boosted_timer.start()
-
+        self.owner.refuel_timer.start()
+    
     def update(self):
-        self.owner.velocity.y = approach(self.owner.velocity.y, -200, 0.5)
-        self.owner.accelerate_x(self.dir, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
+        self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_MOVE_SPEED, Player.BOOST_MOVE_ACC)
+
+        self.owner.fuel = approach(self.owner.fuel, 0, 100 * Clock.dt())
+        self.owner.accelerate_y(-1, Player.BOOST_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
+        self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_SPEED)
 
         # switch states
-        if self.owner.on_ground:
-            self.switch(States.SLIDE)
-        
         if self.owner.input_dir.y != -1:
+            self.switch(States.AIR)
+        
+        if self.owner.fuel <= 0:
             self.switch(States.AIR)
         
