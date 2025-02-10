@@ -32,6 +32,22 @@ class TileMap:
         for tile in self.map.values():
             tile.render(surf, offset)
     
+    def get_surface(self) -> pygame.Surface:
+        # create a transparent surface the size of our tilemap
+        surface = pygame.Surface(
+            (self.size.x * self.tile_size.x, self.size.y * self.tile_size.y),
+            pygame.SRCALPHA 
+        )
+        surface.fill((0, 0, 0, 0))
+
+        # render all tiles to the surface
+        for tile in self.map.values():
+            if tile:
+                tile.render(surface, pygame.Vector2(0, 0))
+        
+        # return prerendered tilemap surface
+        return surface
+    
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
         return self.map.get(Vec2.translate(tile_pos, offset))
     

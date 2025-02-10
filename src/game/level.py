@@ -17,6 +17,8 @@ class Level:
         
         Level.current = self
 
+        self.background_color = (24, 20, 37)
+
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
 
@@ -31,6 +33,7 @@ class Level:
             self.tilemap = self.generate(config, seed)
         
         Level._create_border(self.tilemap)
+        self.tilemap_surface = self.tilemap.get_surface()
         
         if self.spawn_tile:
             self.spawn_pos = self.spawn_tile.pos
@@ -52,6 +55,21 @@ class Level:
         
         self.star_spawner.update()
     
+    def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
+        # background
+        display.fill(self.background_color)
+
+        # display stars
+        self.star_spawner.render(display, offset)
+
+        # display prerendered tilemap surface
+        if self.tilemap_surface:
+            display.blit(self.tilemap_surface, offset)
+        
+        # display all entities relative to the offset
+        for entity in Level.current.entities:
+            entity.render(display, offset)
+
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
 

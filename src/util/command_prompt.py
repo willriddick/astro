@@ -64,7 +64,7 @@ class CommandPrompt:
                 case _:
                     self.handle_character_input(event)
 
-        # Enabled prompt with K_SLASH
+        # enabled prompt with K_SLASH
         if (not self.enabled 
             and event.type == pygame.KEYDOWN 
             and event.key == pygame.K_SLASH):

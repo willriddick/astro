@@ -1,14 +1,11 @@
 import numpy as np
 import pygame
 from src.util import Assets, Vec2, randf, draw_rect
-from src.tilemap import TileMap
 from .level import Level
 from .clock import Clock
 from .debug import Debug
 
 class Camera:
-    FILL_COLOR = (24, 20, 37)
-
     def __init__(self, size: Vec2):
         self.size = size
         self.display = pygame.Surface(size)
@@ -22,49 +19,34 @@ class Camera:
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
 
-        self.tilemap_surface = None
-
     def update(self) -> None:
         """Update the camera and render the display surface."""
-        # Clear display surface
-        self.display.fill(Camera.FILL_COLOR)
+        # clear display surface
+        self.display.fill((0, 0, 0))
 
-        # Update screenshake effect
+        # update screenshake effect
         self._handle_screenshake()
 
-        # Calculate the offset from the in-game position
+        # calculate the offset from the in-game position
         self.offset = pygame.Vector2(
             round(self.clamp_pos.x - self.size.x // 2),
             round(self.clamp_pos.y - self.size.y // 2)
         ) + self.screenshake_offset
 
-        # Render stars
-        Level.current.star_spawner.render(self.display, -self.offset)
+        # render the current level
+        Level.current.render(self.display, -self.offset)
 
-        # Render prerendered tilemap surface
-        if self.tilemap_surface:
-            self.display.blit(self.tilemap_surface, -self.offset)
-        
-        # Render debug display information
+        # render debug display
         if Debug.enabled():
             self._debug_display()
 
-        # Render all entities relative to the offset
-        for entity in Level.current.entities:
-            entity.render(self.display, -self.offset)
-
-        # Render debug shapes like colliders
-        if Debug.enabled():
-            for collider in Level.current.colliders:
-                collider.render(self.display, -self.offset)
-        
     def set_level(self, level: Level) -> None:
         """Set the current level and update the camera's tilemap surface."""
-        self.tilemap_surface = self._render_tilemap(level.tilemap)
         self.boundary = level.tilemap.rect
         self.set_pos(level.spawn_pos)
    
     def _debug_display(self):
+        # display debug information
         text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
@@ -75,6 +57,10 @@ class Camera:
             outline_color=(0, 0, 0, 0)
         )
         self.display.blit(text_surf, (4, 4))
+
+        # display colliders 
+        for collider in Level.current.colliders:
+            collider.render(self.display, -self.offset)
     
     @property
     def debug(self) -> str:
@@ -139,21 +125,4 @@ class Camera:
             self.screenshake_intensity *= 0.9
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
-    
-    def _render_tilemap(self, tilemap: TileMap) -> pygame.Surface:
-
-        # create a transparent surface the size of our tilemap
-        surface = pygame.Surface(
-            (tilemap.size.x * tilemap.tile_size.x, tilemap.size.y * tilemap.tile_size.y),
-            pygame.SRCALPHA 
-        )
-        surface.fill((0, 0, 0, 0))
-
-        # render all tiles to the surface
-        for tile in tilemap.map.values():
-            if tile:
-                tile.render(surface, pygame.Vector2(0, 0))
-        
-        # return prerendered tilemap surface
-        return surface
     
