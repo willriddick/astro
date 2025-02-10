@@ -9,7 +9,7 @@ class Slide(State):
         self.timer = Timer(Player.SLIDE_DURATION)
 
     def on_enter(self):
-        Assets.SOUNDS.play('drop')
+        Assets.SOUNDS.play('slide')
         self.owner.sprite.set_animation(Animations.SLIDE)
         self.owner.camera.screenshake(20, 2)
         self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1

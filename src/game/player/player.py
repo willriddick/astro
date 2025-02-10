@@ -16,6 +16,9 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
+    FUEL_UI_COLOR = (237, 118, 20)
+    FUEL_UI_ALPHA = 60
+    FUEL_UI_OFFSET = pygame.Vector2(-2, -7)
     MAX_FUEL = 100
     REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
     REFUEL_RATE = 40  # rate of refueling (fuel per second)
@@ -191,10 +194,13 @@ class Player(PhysicsEntity):
             self.wall_slide_timer.reset()
         
         if self.jump_input_timer.is_active and self.wall_slide_timer.is_active:
+            # if player is holding down, wall jump down by redirecting to BOOST_DOWN state
             if self.input_dir.y == 1:
-                self.velocity.x = Player.WALL_JUMP_SPEED.x * -self.wall_slide_dir * self.velocity_multiplier.x
+                self.velocity.x = Player.WALL_JUMP_SPEED.x * -self.wall_slide_dir * self.velocity_multiplier.x 
+                self.velocity.y = -80  # upper velocity to reduce speed of downward boost
                 self.state_machine.switch(States.BOOST_DOWN)
             else:
+                # other wise, send to wall jump state
                 self.state_machine.switch(States.WALL_JUMP)
     
     def handle_collision(self) -> None:
@@ -267,15 +273,15 @@ class Player(PhysicsEntity):
         bar_width = 10
         fuel_percentage = max(self.fuel / Player.MAX_FUEL, 0)
         fuel_fill_width = int(bar_width * fuel_percentage)
-        offset += self.position + pygame.Vector2(-2, -7)
+        offset += self.position + Player.FUEL_UI_OFFSET
 
         # oosition the fuel fill at the bottom and expand symmetrically
         surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
-        surface.set_alpha(70)
+        surface.set_alpha(Player.FUEL_UI_ALPHA)
 
         center_x = bar_width // 2
         left_x = center_x - (fuel_fill_width // 2)
         right_x = center_x + (fuel_fill_width // 2)
 
-        pygame.draw.line(surface, pygame.Color(255, 255, 255), (left_x, 0), (right_x, 0))
+        pygame.draw.line(surface, Player.FUEL_UI_COLOR, (left_x, 0), (right_x, 0))
         display.blit(surface, offset)
