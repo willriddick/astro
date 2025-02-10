@@ -191,7 +191,11 @@ class Player(PhysicsEntity):
             self.wall_slide_timer.reset()
         
         if self.jump_input_timer.is_active and self.wall_slide_timer.is_active:
-            self.state_machine.switch(States.WALL_JUMP)
+            if self.input_dir.y == 1:
+                self.velocity.x = Player.WALL_JUMP_SPEED.x * -self.wall_slide_dir * self.velocity_multiplier.x
+                self.state_machine.switch(States.BOOST_DOWN)
+            else:
+                self.state_machine.switch(States.WALL_JUMP)
     
     def handle_collision(self) -> None:
         # if pressing down, drop through platform
