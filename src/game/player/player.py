@@ -33,30 +33,30 @@ class Player(PhysicsEntity):
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185
     MAX_JUMPS = 1
-    COYOTE_BUFFER = 115 # time after falling to allow jump
-    VARIABLE_JUMP_MULTIPLIER = 0.93 # multiplies velocity when releasing jump
-    VARIABLE_JUMP_BUFFER = 300 # time after jumping to allow variable jump
+    COYOTE_BUFFER = 115  # time after falling to allow jump
+    VARIABLE_JUMP_MULTIPLIER = 0.93  # multiplies velocity when releasing jump
+    VARIABLE_JUMP_BUFFER = 300  # time after jumping to allow variable jump
 
-    SLIDE_DURATION = 200 # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_MULTIPLIER = 1.3 # multiplies velocity when entering slide state
+    SLIDE_DURATION = 200  # after this time, the player will decelerate to 0
+    INITIAL_SLIDE_MULTIPLIER = 1.35  # multiplies velocity when entering slide state
     SLIDE_SPEED = 110
     SLIDE_ACC = (180, 180)
 
-    WALL_JUMP_DURATION = 10 # time after wall jumping before switching to AIR
+    WALL_JUMP_DURATION = 10  # time after wall jumping before switching to AIR
     WALL_JUMP_SPEED = Vec2(110, 160)
     WALL_JUMP_ACC = (150, 8)
     WALL_SLIDE_SPEED = 30
     WALL_SLIDE_GRAVITY = 180
-    WALL_SLIDE_BUFFER = 150 # amount of time after wall sliding to allow wall jump
+    WALL_SLIDE_BUFFER = 150  # amount of time after wall sliding to allow wall jump
 
-    ROTATE_DURATION = 180 # time to play FRONT animation when rotating
+    ROTATE_DURATION = 180  # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 250
 
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
         self.camera = None
-        self.input_dir = pygame.Vector2(1, 0) # starts at one because the player is facing right
+        self.input_dir = pygame.Vector2(1, 0)  # starts at one because the player is facing right
         self.slide_dir = 0
         self.spawn_position = pygame.Vector2(0, 0)
 
@@ -113,6 +113,10 @@ class Player(PhysicsEntity):
             f'vel:{self.velocity.x:4.0f} {self.velocity.y:4.0f}\n'
             f'cols: {' '.join(dir_.name[0] for dir_, val in self.collisions.items() if val)}\n'
         )
+    
+    def render(self, display: pygame.Surface, offset: pygame.Vector2):
+        super().render(display, offset)
+        self.draw_fuel_bar(display, offset)
     
     def update(self):
         self.handle_input()
@@ -250,21 +254,24 @@ class Player(PhysicsEntity):
         self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
         self.sprite.add_animation(Animations.BOOST_UP, image_list, 0, range_=(16,17))
         self.sprite.add_animation(Animations.BOOST_DOWN, image_list, 0, range_=(16,17))
-    
-    def render_ui(self, display: pygame.Surface):
-        self.draw_fuel_bar(display, Vec2(10, 10), self.fuel, Player.MAX_FUEL)
-    
-    def draw_fuel_bar(self, display: pygame.Surface, position: Vec2, fuel: int, max_fuel: int):
-        """Draw a fuel bar at the given position."""
-        bar_width = 4
-        bar_height = 16
-        
-        fuel_percentage = max(fuel / max_fuel, 0)  # Clamp between 0 and 1
-        fuel_fill_height = int(bar_height * fuel_percentage)
-        
-        # Position the fuel fill at the bottom (so it grows upwards)
-        fill_position = pygame.Vector2(0, bar_height - fuel_fill_height)
-        draw_rect(display, position + fill_position, pygame.Rect(0, 0, bar_width, fuel_fill_height), fill_color=pygame.Color(255, 165, 0, 255))
 
-        # Draw the outline
-        draw_rect(display, position, pygame.Rect(0, 0, bar_width, bar_height), outline_color=pygame.Color(255, 255, 255, 255), line_width=1)
+    def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
+        """Draw a fuel bar expanding symmetrically from the center."""
+        if self.fuel == 0 or self.fuel == Player.MAX_FUEL:
+            return
+
+        bar_width = 10
+        fuel_percentage = max(self.fuel / Player.MAX_FUEL, 0)
+        fuel_fill_width = int(bar_width * fuel_percentage)
+        offset += self.position + pygame.Vector2(-2, -7)
+
+        # oosition the fuel fill at the bottom and expand symmetrically
+        surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
+        surface.set_alpha(70)
+
+        center_x = bar_width // 2
+        left_x = center_x - (fuel_fill_width // 2)
+        right_x = center_x + (fuel_fill_width // 2)
+
+        pygame.draw.line(surface, pygame.Color(255, 255, 255), (left_x, 0), (right_x, 0))
+        display.blit(surface, offset)

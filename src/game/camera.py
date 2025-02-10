@@ -58,9 +58,6 @@ class Camera:
             for collider in Level.current.colliders:
                 collider.render(self.display, -self.offset)
         
-        # 
-        Level.current.player.render_ui(self.display)
-    
     def set_level(self, level: Level) -> None:
         """Set the current level and update the camera's tilemap surface."""
         self.tilemap_surface = self._render_tilemap(level.tilemap)
