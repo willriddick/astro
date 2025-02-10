@@ -4,7 +4,7 @@ from .vec2 import Vec2
 from .assets import Assets
 from .draw import draw_rect
 
-RECT_COLOR = pygame.Color(0, 40, 80, 50)
+RECT_COLOR = pygame.Color(0, 40, 80, 80)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 
 class CommandPrompt:
@@ -97,13 +97,18 @@ class CommandPrompt:
             self.cursor_index = min(self.cursor_index + 1, len(self.input))
 
     def handle_backspace(self, event):
+        # if input is empty, disable prompt
+        if not self.input:
+            self.disable()
+
+        # if pressing ctrl, delete until the next word boundary
         if event.mod & pygame.KMOD_CTRL:
-            # Delete until the next word boundary (space or underscore)
+            # delete until the next word boundary (space or underscore)
             if self.cursor_index > 0:
                 while self.cursor_index > 0 and self.input[self.cursor_index - 1] not in (' ', '_'):
                     self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
                     self.cursor_index -= 1
-                # Remove the space or underscore if present
+                # demove the space or underscore if present
                 if self.cursor_index > 0 and self.input[self.cursor_index - 1] in (' ', '_'):
                     self.input = self.input[:self.cursor_index - 1] + self.input[self.cursor_index:]
                     self.cursor_index -= 1

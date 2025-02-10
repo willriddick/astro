@@ -7,6 +7,7 @@ from .clock import Clock
 from .level import Level
 from .camera import Camera
 from .stars import StarSpawner
+from .settings import Settings
 
 WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
@@ -17,7 +18,6 @@ class Game:
         pygame.init()
 
         self.running = False
-        self.paused = False
         self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
@@ -25,8 +25,12 @@ class Game:
             pygame.SCALED
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
-        self.fullscreen = False
-        Assets.load_assets()
+
+        Settings.load()
+        if Settings.fullscreen:
+            self.toggle_fullscreen()
+
+        Assets.load()
 
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(Assets.ICON)
@@ -47,13 +51,9 @@ class Game:
                 self.command_prompt.handle_event(event)
             
             self.handle_commands()
-
-            if not self.command_prompt.enabled and not self.paused:
-                self.camera.update()
-                self.camera.move_to(self.level.player.center)
-                self.level.star_spawner.update()
-                for entity in self.level.entities:
-                    entity.update()
+            self.level.update()
+            self.camera.move_to(self.level.player.center)
+            self.camera.update()
 
             # draw command prompt
             self.command_prompt.render(self.camera.display)
@@ -126,9 +126,9 @@ class Game:
         self.window = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
     
     def toggle_fullscreen(self):
-        self.fullscreen = not self.fullscreen
+        Settings.fullscreen = not Settings.fullscreen
 
-        if self.fullscreen:
+        if Settings.fullscreen:
             size = (0, 0)
             mode = pygame.FULLSCREEN
         else:

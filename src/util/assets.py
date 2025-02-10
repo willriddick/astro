@@ -22,7 +22,7 @@ class Assets:
     SOUNDS: SoundManager = None
 
     @staticmethod
-    def load_assets():
+    def load():
         Assets.ICON = load_image('icon.png', False)
 
         Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelKlein.ttf', 9)
@@ -35,11 +35,11 @@ class Assets:
         Assets.ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
         Assets.SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
 
-        Assets.load_sounds()
-        Assets.load_tileset()
+        Assets._load_sounds()
+        Assets._load_tileset()
 
     @staticmethod
-    def load_sounds():
+    def _load_sounds():
         Assets.SOUNDS = SoundManager()
         Assets.SOUNDS.add(name='jump', vol=0.13, p_min=0.8, p_max=1.2, p_step=0.05)
         Assets.SOUNDS.add(name='wall_jump', path="jump", vol=0.13, p_min=0.8, p_max=1.8, p_step=0.05)
@@ -51,7 +51,7 @@ class Assets:
         Assets.SOUNDS.add('dead', vol=1.4)
     
     @staticmethod
-    def load_tileset():
+    def _load_tileset():
         from src.tilemap.tile_set import TileSet, TileType
         Assets.TILESET = TileSet(Vec2(16, 16))
 

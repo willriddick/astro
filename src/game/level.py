@@ -46,6 +46,12 @@ class Level:
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
     
+    def update(self) -> None:
+        for entity in self.entities:
+            entity.update()
+        
+        self.star_spawner.update()
+    
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
 
