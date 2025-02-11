@@ -22,7 +22,7 @@ class StarSpawner():
             self.stars.append(Star())
     
     def clear(self):
-        self.starts.clear()
+        self.stars.clear()
     
 class Star(Entity):
 

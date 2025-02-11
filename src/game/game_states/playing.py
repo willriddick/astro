@@ -6,10 +6,7 @@ class Playing(State):
         super().__init__(GameStates.PLAYING)
 
     def on_enter(self):
-        pass
-
-    def on_exit(self):
-        pass
+        self.owner.camera.boundary = self.owner.level.tilemap.rect
 
     def update(self):
         self.owner.level.update()

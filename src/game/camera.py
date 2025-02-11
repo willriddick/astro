@@ -14,6 +14,7 @@ class Camera:
         self.offset = pygame.Vector2(0, 0)
         self.pos = pygame.Vector2(0, 0)
         self.smoothing = 0.0
+        self.boundary: pygame.Rect = None
 
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = 0
@@ -79,7 +80,7 @@ class Camera:
     
     @property
     def clamp_pos(self) -> pygame.Vector2:
-        if not Level.current:
+        if not self.boundary:
             return self.pos
         
         # Half the width and height of the boundary (use float division for precision)

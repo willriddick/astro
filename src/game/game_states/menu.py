@@ -1,6 +1,8 @@
+from random import randint, choice
 import pygame
 from src.util import State, Assets
 from .game_states import GameStates
+from src.game.stars import StarSpawner
 
 class Menu(State):
     def __init__(self):
@@ -13,16 +15,30 @@ class Menu(State):
         self.buttons = ['Play', 'Settings', 'Quit']
         self.selected_index = 0
 
-    def on_enter(self):
-        pass
+        self.star_spawner = StarSpawner()
 
+        self.camera_movement: pygame.Vector2 = None
+        self.background_color = (24, 20, 37)
+
+    def on_enter(self):
+        self.star_spawner.spawn(30)
+        self.owner.camera.boundary = None
+        self.camera_movement = pygame.Vector2(
+            choice([-1, 1]) * randint(25, 35), 
+            choice([-1, 1]) * randint(10, 20)
+        )
+    
     def on_exit(self):
-        pass
+        self.star_spawner.clear()
 
     def update(self):
         self.owner.camera.set_render_callback(self.render)
+        self.owner.camera.move_to(self.owner.camera.pos + self.camera_movement)
+
         self.get_input()
         self.selected_index = (self.selected_index + self.input_dir.y) % len(self.buttons)
+        if self.input_dir.y != 0:
+            Assets.SOUNDS.play('select')
 
         if self.input_select:
             match self.selected_index:
@@ -34,8 +50,12 @@ class Menu(State):
                     self.owner.running = False
     
     def render(self, display, offset):
-        display.fill((0, 0, 0))
+        display.fill(self.background_color)
 
+        # display stars
+        self.star_spawner.render(display, offset)
+
+        # display menu
         text = ''
         for i, button in enumerate(self.buttons):
             text += f'> {button}\n' if i == self.selected_index else f'{button}\n'

@@ -33,7 +33,7 @@ class Game:
         self.command_prompt = CommandPrompt()
 
         from .game_states import Menu, Playing
-        self.state_machine = StateMachine(self, [Playing(), Menu()])
+        self.state_machine = StateMachine(self, [Menu(), Playing()])
 
         self.level = None
         self.new_level()
