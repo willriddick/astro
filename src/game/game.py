@@ -49,11 +49,11 @@ class Game:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
-            self.handle_commands()
-            
             self.state_machine.update()
+            self.camera.update()
 
-            # draw command prompt
+            # handle commmands and draw command prompt
+            self.handle_commands()
             self.command_prompt.render(self.camera.display)
 
             try:

@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+from typing import Callable
 from src.util import Assets, Vec2, randf, draw_rect
 from .level import Level
 from .clock import Clock
@@ -18,6 +19,8 @@ class Camera:
         self.screenshake_timer = 0
         self.screenshake_intensity = 0
 
+        self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
+
     def update(self) -> None:
         """Update the camera and render the display surface."""
         # clear display surface
@@ -32,13 +35,17 @@ class Camera:
             round(self.clamp_pos.y - self.size.y // 2)
         ) + self.screenshake_offset
 
-        # render the current level
-        Level.current.render(self.display, -self.offset)
+        # render the callback
+        self.render_callback(self.display, -self.offset)
 
         # render debug display
         if Debug.enabled():
             self._debug_display()
-
+    
+    def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
+        """Set a new render function for the camera."""
+        self.render_callback = callback
+    
     def _debug_display(self):
         # display debug information
         text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
@@ -52,10 +59,6 @@ class Camera:
         )
         self.display.blit(text_surf, (4, 4))
 
-        # display colliders 
-        for collider in Level.current.colliders:
-            collider.render(self.display, -self.offset)
-    
     @property
     def debug(self) -> str:
         return (
@@ -120,4 +123,7 @@ class Camera:
             self.screenshake_intensity *= 0.9
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
+    
+    def get_blank(self) -> pygame.Surface:
+        return pygame.Surface(self.size)
     

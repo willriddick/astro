@@ -1,6 +1,7 @@
 import os
 import random
 import pygame
+from src.game.debug import Debug
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2, Direction
 from src.tilemap import TileMap, Tile
@@ -72,6 +73,11 @@ class Level:
         # display all entities relative to the offset
         for entity in Level.current.entities:
             entity.render(display, offset)
+        
+        # debug display colliders 
+        if Debug.enabled():
+            for collider in Level.current.colliders:
+                collider.render(display, offset)
 
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
