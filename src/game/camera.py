@@ -13,7 +13,6 @@ class Camera:
         self.offset = pygame.Vector2(0, 0)
         self.pos = pygame.Vector2(0, 0)
         self.smoothing = 0.0
-        self.boundary: pygame.Rect | None = None
 
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = 0
@@ -40,11 +39,6 @@ class Camera:
         if Debug.enabled():
             self._debug_display()
 
-    def set_level(self, level: Level) -> None:
-        """Set the current level and update the camera's tilemap surface."""
-        self.boundary = level.tilemap.rect
-        self.set_pos(level.spawn_pos)
-   
     def _debug_display(self):
         # display debug information
         text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
@@ -82,7 +76,7 @@ class Camera:
     
     @property
     def clamp_pos(self) -> pygame.Vector2:
-        if not self.boundary:
+        if not Level.current:
             return self.pos
         
         # Half the width and height of the boundary (use float division for precision)
@@ -90,8 +84,9 @@ class Camera:
         h_height = self.size.y / 2
 
         # Ensure the position stays within the clamped bounds
-        clamped_x = max(self.boundary.left + h_width, min(self.pos.x, self.boundary.right - h_width))
-        clamped_y = max(self.boundary.top + h_height, min(self.pos.y, self.boundary.bottom - h_height))
+        boundary = Level.current.tilemap.rect
+        clamped_x = max(boundary.left + h_width, min(self.pos.x, boundary.right - h_width))
+        clamped_y = max(boundary.top + h_height, min(self.pos.y, boundary.bottom - h_height))
         
         return pygame.Vector2(clamped_x, clamped_y)
     

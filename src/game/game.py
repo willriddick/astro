@@ -6,7 +6,6 @@ from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-from .stars import StarSpawner
 from .settings import Settings
 
 WINDOW_SCALE = 4
@@ -16,9 +15,9 @@ ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 class Game:
     def __init__(self):
         pygame.init()
+        Settings.load()
 
         self.running = False
-        self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
@@ -26,14 +25,11 @@ class Game:
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
-        Settings.load()
-        if Settings.fullscreen:
-            self.toggle_fullscreen()
-
         Assets.load()
-
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(Assets.ICON)
+
+        self.command_prompt = CommandPrompt()
 
         self.level = None
         self.new_level()
@@ -73,11 +69,7 @@ class Game:
     def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.level.player.camera = self.camera
-        self.camera.set_level(self.level)
-
-        star_spawner = StarSpawner()
-        star_spawner.spawn(50)
-        self.level.star_spawner = star_spawner
+        self.camera.set_pos(self.level.spawn_pos)
         print(self.level.entities)
 
     def handle_commands(self):

@@ -14,6 +14,7 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
+        from .stars import StarSpawner
         
         Level.current = self
 
@@ -33,7 +34,6 @@ class Level:
             self.tilemap = self.generate(config, seed)
         
         Level._create_border(self.tilemap)
-        self.tilemap_surface = self.tilemap.get_surface()
         
         if self.spawn_tile:
             self.spawn_pos = self.spawn_tile.pos
@@ -43,11 +43,14 @@ class Level:
         self.spikes = Level._create_spikes(self.tilemap)
         self.entities.extend(self.spikes)
         
-        self.star_spawner = None
+        self.star_spawner = StarSpawner()
+        self.star_spawner.spawn(50)
         
         self.player = Player()
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
+
+        self.tilemap_surface = self.tilemap.get_surface()
     
     def update(self) -> None:
         for entity in self.entities:
