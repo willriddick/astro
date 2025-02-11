@@ -5,9 +5,10 @@ from src.util import Assets, randf
 from .components import Entity
 
 class StarSpawner():
-    def __init__(self):
+    def __init__(self, invert_depth: bool = False, buffer: int = 16):
+        self.invert_depth = invert_depth
+        self.buffer = buffer
         self.stars = []
-        self.buffer = 16
     
     def update(self):
         for star in self.stars:
@@ -17,22 +18,24 @@ class StarSpawner():
         for star in self.stars:
             star.render(display, offset)
     
-    def spawn(self, count: int, invert_depth: bool = False):
+    def spawn(self, count: int):
         for _ in range(count):
-            self.stars.append(Star(invert_depth))
+            self.stars.append(Star(self))
     
     def clear(self):
         self.stars.clear()
     
 class Star(Entity):
 
-    DEPTH = [0.01, 0.2]
-    ALPHA = [30, 190]
+    DEPTH = [0.05, 0.3]
+    ALPHA = [20, 200]
     TINT_BASE = 220
     TINT_VARIATION = 35
     WEIGHTS: list[int] = []
 
-    def __init__(self, invert_depth: bool = True):
+    def __init__(self, spawner: StarSpawner):
+        self.spawner = spawner
+
         # select a star image
         self.image = choices(Assets.STARS, weights=self.weights, k=1)[0].copy()
 
@@ -54,8 +57,7 @@ class Star(Entity):
         # select a depth between 0.01
         # this number affects parallax speed and alpha
         self.depth = randf(*self.DEPTH, 0.01)
-        if invert_depth:
-            self.depth = max(Star.DEPTH) + min(Star.DEPTH) - self.depth
+        self.inverted_depth = max(self.DEPTH) + min(self.DEPTH) - self.depth
 
         # alpha logic: closer stars (higher depth) should be brighter
         normalized_depth = (self.depth - Star.DEPTH[0]) / (Star.DEPTH[1] - Star.DEPTH[0])  
@@ -76,7 +78,8 @@ class Star(Entity):
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         # parallax effect: closer stars move more, distant stars move less
-        render_pos = (self.position + offset) * self.depth
+        depth = self.inverted_depth if self.spawner.invert_depth else self.depth
+        render_pos = (self.position + offset) * depth
         width, height = self.image.get_size()
         display.blit(
             self.image, 

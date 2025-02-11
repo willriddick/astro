@@ -15,13 +15,13 @@ class Menu(State):
         self.buttons = ['Play', 'Settings', 'Quit']
         self.selected_index = 0
 
-        self.star_spawner = StarSpawner()
+        self.star_spawner = StarSpawner(invert_depth=True)
 
         self.camera_movement: pygame.Vector2 = None
         self.background_color = (24, 20, 37)
 
     def on_enter(self):
-        self.star_spawner.spawn(30, invert_depth=False)
+        self.star_spawner.spawn(30)
         self.owner.camera.boundary = None
         self.camera_movement = pygame.Vector2(
             choice([-1, 1]) * randint(25, 35), 
