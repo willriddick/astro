@@ -1,7 +1,7 @@
 import asyncio
 import sys
 import pygame
-from src.util import Assets, CommandPrompt, Vec2
+from src.util import Assets, CommandPrompt, Vec2, StateMachine
 from .debug import Debug
 from .clock import Clock
 from .level import Level
@@ -29,6 +29,9 @@ class Game:
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(Assets.ICON)
 
+        from .game_states import Playing
+        self.state_machine = StateMachine(self, [Playing()])
+
         self.command_prompt = CommandPrompt()
 
         self.level = None
@@ -46,10 +49,7 @@ class Game:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
             
-            self.handle_commands()
-            self.level.update()
-            self.camera.move_to(self.level.player.center)
-            self.camera.update()
+            self.state_machine.update()
 
             # draw command prompt
             self.command_prompt.render(self.camera.display)
