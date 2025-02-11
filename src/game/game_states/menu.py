@@ -7,6 +7,8 @@ class Menu(State):
         super().__init__(GameStates.MENU)
 
         self.input_dir = pygame.Vector2(0, 0)
+        self.input_select = False 
+        self.input_back = False 
 
         self.buttons = ['Play', 'Settings', 'Quit']
         self.selected_index = 0
@@ -21,6 +23,15 @@ class Menu(State):
         self.owner.camera.set_render_callback(self.render)
         self.get_input()
         self.selected_index = (self.selected_index + self.input_dir.y) % len(self.buttons)
+
+        if self.input_select:
+            match self.selected_index:
+                case 0:
+                    self.owner.state_machine.switch(GameStates.PLAYING)
+                case 1:
+                    self.owner.state_machine.switch(GameStates.SETTINGS)
+                case 2:
+                    self.owner.running = False
     
     def render(self, display, offset):
         display.fill((0, 0, 0))
@@ -40,3 +51,5 @@ class Menu(State):
             int(just_pressed[pygame.K_d]) - int(just_pressed[pygame.K_a]),
             int(just_pressed[pygame.K_s]) - int(just_pressed[pygame.K_w])
         )
+
+        self.input_select = just_pressed[pygame.K_RETURN]
