@@ -1,8 +1,8 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, draw_rect
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
-from src.game.exit import Exit
 from src.game.clock import Clock
+from src.game.debug import Debug
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -122,6 +122,7 @@ class Player(PhysicsEntity):
         self.draw_fuel_bar(display, offset)
     
     def update(self):
+        Debug.add_display(self.debug)
         self.handle_input()
         self.sprite.update(self.position)
         self.health_component.update(self.position)

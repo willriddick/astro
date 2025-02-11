@@ -1,9 +1,9 @@
 from src.util import State
 from .game_states import GameStates
 
-class Playing(State):
+class Menu(State):
     def __init__(self):
-        super().__init__(GameStates.PLAYING)
+        super().__init__(GameStates.MENU)
 
     def on_enter(self):
         pass
@@ -12,6 +12,4 @@ class Playing(State):
         pass
 
     def update(self):
-        self.owner.level.update()
-        self.owner.camera.move_to(self.owner.level.player.center)
         self.owner.camera.update()

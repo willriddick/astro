@@ -2,6 +2,7 @@ import asyncio
 import sys
 import pygame
 from src.util import Assets, CommandPrompt, Vec2, StateMachine
+from .game_states import GameStates
 from .debug import Debug
 from .clock import Clock
 from .level import Level
@@ -29,10 +30,10 @@ class Game:
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(Assets.ICON)
 
-        from .game_states import Playing
-        self.state_machine = StateMachine(self, [Playing()])
-
         self.command_prompt = CommandPrompt()
+
+        from .game_states import Menu, Playing
+        self.state_machine = StateMachine(self, [Playing(), Menu()])
 
         self.level = None
         self.new_level()
@@ -43,11 +44,12 @@ class Game:
         while self.running:
             Debug.update()
             Debug.add_display(f'fps: {Clock.fps()}')
-            Debug.add_display(self.level.player.debug)
 
             for event in pygame.event.get():
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
+
+            self.handle_commands()
             
             self.state_machine.update()
 
@@ -79,10 +81,10 @@ class Game:
 
         player = self.level.player
         match command.split():
-            case ['g']:
-                player.toggle_ghost()
             case ['d']:
                 Debug.toggle()
+            case ['g']:
+                player.toggle_ghost()
             case ['n']:
                 self.new_level()
             case ['n', seed]:
@@ -96,6 +98,8 @@ class Game:
                 Assets.SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
+            case ['gs', state]:
+                self.state_machine.switch(list(GameStates)[int(state)])
             case ['q']:
                 self.running = False
             case _:
