@@ -21,7 +21,7 @@ class Menu(State):
         self.background_color = (24, 20, 37)
 
     def on_enter(self):
-        self.star_spawner.spawn(30)
+        self.star_spawner.spawn(30, invert_depth=False)
         self.owner.camera.boundary = None
         self.camera_movement = pygame.Vector2(
             choice([-1, 1]) * randint(25, 35), 

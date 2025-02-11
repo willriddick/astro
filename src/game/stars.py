@@ -17,9 +17,9 @@ class StarSpawner():
         for star in self.stars:
             star.render(display, offset)
     
-    def spawn(self, count: int):
+    def spawn(self, count: int, invert_depth: bool = False):
         for _ in range(count):
-            self.stars.append(Star())
+            self.stars.append(Star(invert_depth))
     
     def clear(self):
         self.stars.clear()
@@ -32,7 +32,7 @@ class Star(Entity):
     TINT_VARIATION = 35
     WEIGHTS: list[int] = []
 
-    def __init__(self):
+    def __init__(self, invert_depth: bool = True):
         # select a star image
         self.image = choices(Assets.STARS, weights=self.weights, k=1)[0].copy()
 
@@ -54,6 +54,8 @@ class Star(Entity):
         # select a depth between 0.01
         # this number affects parallax speed and alpha
         self.depth = randf(*self.DEPTH, 0.01)
+        if invert_depth:
+            self.depth = max(Star.DEPTH) + min(Star.DEPTH) - self.depth
 
         # alpha logic: closer stars (higher depth) should be brighter
         normalized_depth = (self.depth - Star.DEPTH[0]) / (Star.DEPTH[1] - Star.DEPTH[0])  
