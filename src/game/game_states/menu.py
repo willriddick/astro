@@ -1,10 +1,10 @@
 from random import randint, choice
-from typing import Callable
 import pygame
 from src.util import State, Assets
 from .game_states import GameStates
 from src.game.stars import StarSpawner
 from src.game.settings import Settings
+from src.game.button import Button, ToggleButton, SliderButton
 
 class Menu(State):
     def __init__(self):
@@ -19,7 +19,7 @@ class Menu(State):
         self.input_back = False 
 
         self.selected_page = 0
-        self.selected_index = 0
+        self.hovered_index = 0
         self.current_buttons: list[Button] = []
 
         self.pages = [
@@ -55,13 +55,13 @@ class Menu(State):
         self.get_input()
 
         self.current_buttons = self.pages[self.selected_page]
-        self.selected_index = int((self.selected_index + self.input_dir.y) % len(self.current_buttons))
+        self.hovered_index = int((self.hovered_index + self.input_dir.y) % len(self.current_buttons))
 
         if self.input_dir.y != 0:
             Assets.SOUNDS.play('blip')
 
         if self.input_select:
-            self.current_buttons[self.selected_index].select()
+            self.current_buttons[self.hovered_index].select()
     
     def render(self, display, offset):
         display.fill(self.background_color)
@@ -70,12 +70,14 @@ class Menu(State):
         self.star_spawner.render(display, offset)
 
         # display menu
-        text = ''
-        for i, button in enumerate(self.current_buttons):
-            text += f'> {button}\n' if i == self.selected_index else f'{button}\n'
+        for index, button in enumerate(self.current_buttons):
+            if index == self.hovered_index:
+                button.hovered = True
+            else:
+                button.hovered = False
 
-        text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
-        display.blit(text_surf, (16, 16))
+            surface = button.get_surface()
+            display.blit(surface, (16, 16 + self.current_buttons.index(button) * 16))
 
     def get_input(self):
         just_pressed = pygame.key.get_just_pressed()
@@ -90,12 +92,12 @@ class Menu(State):
     
     def _switch_to_settings(self):
         self.selected_page = 1
-        self.selected_index = 0
+        self.hovered_index = 0
         Assets.SOUNDS.play('select')
 
     def _switch_to_main(self):
         self.selected_page = 0
-        self.selected_index = 0
+        self.hovered_index = 0
         Settings.save()
         Assets.SOUNDS.play('select')
     
@@ -115,39 +117,3 @@ class Menu(State):
     def _quit(self):
         self.owner.running = False
         Assets.SOUNDS.play('select')
-
-class Button():
-    def __init__(self, text: str, callback: callable):
-        self.text = text
-        self.callback = callback
-    
-    def select(self):
-        self.callback()
-    
-    def __str__(self):
-        return self.text
-
-class ToggleButton(Button):
-    def __init__(self, text: str, callback: Callable[[bool], None], state=False):
-        super().__init__(text, callback)
-        self.state = state
-    
-    def select(self):
-        self.state = not self.state
-        self.callback(self.state)
-    
-    def __str__(self):
-        return self.text + ('  [ON]' if self.state else '  [OFF]')
-    
-class SliderButton(Button):
-    def __init__(self, text: str, callback: Callable[[int], None], value: int = 5, max_value: int = 10):
-        super().__init__(text, callback)
-        self.value = value
-        self.max_value = max_value
-    
-    def select(self):
-        self.value = (self.value + 1) % (self.max_value + 1)
-        self.callback(self.value)
-    
-    def __str__(self):
-        return f'{self.text}   [{self.value}]'
