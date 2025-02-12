@@ -8,17 +8,30 @@ class Menu(State):
     def __init__(self):
         super().__init__(GameStates.MENU)
 
+        self.background_color = (24, 20, 37)
+        self.star_spawner = StarSpawner(invert_depth=True)
+        self.camera_movement: pygame.Vector2 = None
+
         self.input_dir = pygame.Vector2(0, 0)
         self.input_select = False 
         self.input_back = False 
 
-        self.buttons = ['Play', 'Settings', 'Quit']
+        self.selected_page = 0
         self.selected_index = 0
+        self.current_buttons: list[Button] = []
 
-        self.star_spawner = StarSpawner(invert_depth=True)
-
-        self.camera_movement: pygame.Vector2 = None
-        self.background_color = (24, 20, 37)
+        self.pages = [
+            [
+                Button('Play', lambda: self.owner.state_machine.switch(GameStates.PLAYING)),
+                Button('Settings', self._switch_to_settings), 
+                Button('Quit', lambda: setattr(self.owner, 'running', False))
+            ],
+            [
+                Button('Test', lambda: print('Test 1')),
+                Button('Test 2', lambda: print('Test 2')),
+                Button('Back', self._switch_to_main)
+            ]
+        ]
 
     def on_enter(self):
         self.star_spawner.spawn(30)
@@ -36,18 +49,16 @@ class Menu(State):
         self.owner.camera.move_to(self.owner.camera.pos + self.camera_movement)
 
         self.get_input()
-        self.selected_index = (self.selected_index + self.input_dir.y) % len(self.buttons)
+
+        self.current_buttons = self.pages[self.selected_page]
+        self.selected_index = int((self.selected_index + self.input_dir.y) % len(self.current_buttons))
+
         if self.input_dir.y != 0:
-            Assets.SOUNDS.play('select')
+            Assets.SOUNDS.play('blip')
 
         if self.input_select:
-            match self.selected_index:
-                case 0:
-                    self.owner.state_machine.switch(GameStates.PLAYING)
-                case 1:
-                    self.owner.state_machine.switch(GameStates.SETTINGS)
-                case 2:
-                    self.owner.running = False
+            Assets.SOUNDS.play('select')
+            self.current_buttons[self.selected_index].select()
     
     def render(self, display, offset):
         display.fill(self.background_color)
@@ -57,8 +68,8 @@ class Menu(State):
 
         # display menu
         text = ''
-        for i, button in enumerate(self.buttons):
-            text += f'> {button}\n' if i == self.selected_index else f'{button}\n'
+        for i, button in enumerate(self.current_buttons):
+            text += f'> {button.text}\n' if i == self.selected_index else f'{button.text}\n'
 
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         display.blit(text_surf, (16, 16))
@@ -73,3 +84,21 @@ class Menu(State):
         )
 
         self.input_select = just_pressed[pygame.K_RETURN]
+    
+    def _switch_to_settings(self):
+        self.selected_page = 1
+        self.selected_index = 0
+
+    def _switch_to_main(self):
+        self.selected_page = 0
+        self.selected_index = 0
+
+
+class Button():
+    def __init__(self, text: str, callback: callable):
+        self.text = text
+        self.callback = callback
+    
+    def select(self):
+        self.callback()
+

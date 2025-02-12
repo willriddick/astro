@@ -44,7 +44,7 @@ class Level:
         self.spikes = Level._create_spikes(self.tilemap)
         self.entities.extend(self.spikes)
         
-        self.star_spawner = StarSpawner()
+        self.star_spawner = StarSpawner(invert_depth=True)
         self.star_spawner.spawn(50)
         
         self.player = Player()

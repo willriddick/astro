@@ -49,7 +49,8 @@ class Assets:
         Assets.SOUNDS.add('teleport', vol=0.2)
         Assets.SOUNDS.add('hurt', vol=0.25)
         Assets.SOUNDS.add('dead', vol=1.4)
-        Assets.SOUNDS.add('select', vol=0.3)
+        Assets.SOUNDS.add('select', vol=0.2)
+        Assets.SOUNDS.add('blip', vol=0.2)
     
     @staticmethod
     def _load_tileset():

@@ -23,6 +23,8 @@ class BoostUp(State):
         self.owner.accelerate_y(-1, Player.BOOST_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
         self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_SPEED)
 
+        self.owner.handle_wall_jump()
+
         # switch states
         if self.owner.input_dir.y != -1:
             self.switch(States.AIR)
