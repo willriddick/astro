@@ -1,8 +1,10 @@
 from random import randint, choice
+from typing import Callable
 import pygame
 from src.util import State, Assets
 from .game_states import GameStates
 from src.game.stars import StarSpawner
+from src.game.settings import Settings
 
 class Menu(State):
     def __init__(self):
@@ -22,13 +24,15 @@ class Menu(State):
 
         self.pages = [
             [
-                Button('Play', lambda: self.owner.state_machine.switch(GameStates.PLAYING)),
+                Button('Play', self._play),
                 Button('Settings', self._switch_to_settings), 
-                Button('Quit', lambda: setattr(self.owner, 'running', False))
+                Button('Quit', self._quit)
             ],
             [
-                Button('Test', lambda: print('Test 1')),
-                Button('Test 2', lambda: print('Test 2')),
+                ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), Settings.get_fullscreen()),
+                SliderButton('Master Volume', lambda x: self._set_volume('master', x), Settings.get_master_volume()),
+                SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), Settings.get_sfx_volume()),
+                SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.get_music_volume()),
                 Button('Back', self._switch_to_main)
             ]
         ]
@@ -57,7 +61,6 @@ class Menu(State):
             Assets.SOUNDS.play('blip')
 
         if self.input_select:
-            Assets.SOUNDS.play('select')
             self.current_buttons[self.selected_index].select()
     
     def render(self, display, offset):
@@ -69,7 +72,7 @@ class Menu(State):
         # display menu
         text = ''
         for i, button in enumerate(self.current_buttons):
-            text += f'> {button.text}\n' if i == self.selected_index else f'{button.text}\n'
+            text += f'> {button}\n' if i == self.selected_index else f'{button}\n'
 
         text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
         display.blit(text_surf, (16, 16))
@@ -88,11 +91,30 @@ class Menu(State):
     def _switch_to_settings(self):
         self.selected_page = 1
         self.selected_index = 0
+        Assets.SOUNDS.play('select')
 
     def _switch_to_main(self):
         self.selected_page = 0
         self.selected_index = 0
-
+        Settings.save()
+        Assets.SOUNDS.play('select')
+    
+    def _set_volume(self, type: str, value: int):
+        if type == 'master':
+            Settings.set_master_volume(value)
+        elif type == 'sfx':
+            Settings.set_sfx_volume(value)
+        else:
+            Settings.set_music_volume(value)
+        Assets.SOUNDS.play('blip', pitch_index=value)
+    
+    def _play(self):
+        self.owner.state_machine.switch(GameStates.PLAYING)
+        Assets.SOUNDS.play('select')
+    
+    def _quit(self):
+        self.owner.running = False
+        Assets.SOUNDS.play('select')
 
 class Button():
     def __init__(self, text: str, callback: callable):
@@ -101,4 +123,31 @@ class Button():
     
     def select(self):
         self.callback()
+    
+    def __str__(self):
+        return self.text
 
+class ToggleButton(Button):
+    def __init__(self, text: str, callback: Callable[[bool], None], state=False):
+        super().__init__(text, callback)
+        self.state = state
+    
+    def select(self):
+        self.state = not self.state
+        self.callback(self.state)
+    
+    def __str__(self):
+        return self.text + ('  [ON]' if self.state else '  [OFF]')
+    
+class SliderButton(Button):
+    def __init__(self, text: str, callback: Callable[[int], None], value: int = 5, max_value: int = 10):
+        super().__init__(text, callback)
+        self.value = value
+        self.max_value = max_value
+    
+    def select(self):
+        self.value = (self.value + 1) % (self.max_value + 1)
+        self.callback(self.value)
+    
+    def __str__(self):
+        return f'{self.text}   [{self.value}]'

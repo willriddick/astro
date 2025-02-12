@@ -122,9 +122,12 @@ class Game:
         self.window = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
     
     def toggle_fullscreen(self):
-        Settings.fullscreen = not Settings.fullscreen
+        self.set_fullscreen(not Settings.get_fullscreen())
 
-        if Settings.fullscreen:
+    def set_fullscreen(self, value: bool):
+        Settings.set_fullscreen(value)
+
+        if value:
             size = (0, 0)
             mode = pygame.FULLSCREEN
         else:
