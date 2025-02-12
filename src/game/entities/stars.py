@@ -2,7 +2,7 @@ from math import sqrt, floor
 from random import choice, choices, randint
 import pygame
 from src.util import Assets, randf
-from .components import Entity
+from src.game.components import Entity
 
 class StarSpawner():
     def __init__(self, invert_depth: bool = False, buffer: int = 16):

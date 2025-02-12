@@ -1,5 +1,5 @@
-from src.util import Assets, Vec2
-from .components import Sprite, Entity, Collider
+from src.util import Vec2
+from src.game.components import Entity, Collider
 
 class Exit(Entity):
     def __init__(self, position):

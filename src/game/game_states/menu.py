@@ -2,7 +2,7 @@ from random import randint, choice
 import pygame
 from src.util import State, Assets
 from .game_states import GameStates
-from src.game.stars import StarSpawner
+from src.game.entities import StarSpawner
 from src.game.settings import Settings
 from src.game.button import Button, ToggleButton, SliderButton
 

@@ -15,7 +15,7 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
-        from .stars import StarSpawner
+        from src.game.entities import StarSpawner
         
         Level.current = self
 
@@ -130,7 +130,7 @@ class Level:
         based on three sets, horizontal, vertical, and corner tiles. This greatly reduces the 
         entity/collider count by creating a single entity for a grouping of spikes.
         """
-        from .spike import Spike, HSpike, VSpike, CSpike
+        from src.game.entities import Spike, HSpike, VSpike, CSpike
         spikes: set[Spike] = set()
         horizontal_tiles: set[Tile] = set()
         vertical_tiles: set[Tile] = set()
