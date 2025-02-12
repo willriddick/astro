@@ -3,10 +3,16 @@ import pygame
 from src.util.assets import Assets
 
 class Button():
+
     def __init__(self, text: str, callback: callable):
         self.text = text
         self.callback = callback
         self.hovered = False
+        self.x_offset = 0
+        self.target_offset = 0 
+
+        self.HOVERED_COLOR = Assets.PALETTE[34]
+        self.DEFAULT_COLOR = Assets.PALETTE[5]
     
     def __str__(self):
         return self.text
@@ -15,8 +21,11 @@ class Button():
         self.callback()
     
     def get_surface(self) -> pygame.Surface:
-        color = Assets.PALETTE[32] if self.hovered else Assets.PALETTE[6]
+        color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
         return Assets.FONT.render(f'{self}', antialias=False, color=color)
+    
+    def update(self):
+        self.x_offset += (self.target_offset - self.x_offset) * 0.2
 
 class ToggleButton(Button):
     def __init__(self, text: str, callback: Callable[[bool], None], state=False):

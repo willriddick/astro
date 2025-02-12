@@ -65,19 +65,16 @@ class Menu(State):
     
     def render(self, display, offset):
         display.fill(self.background_color)
-
-        # display stars
         self.star_spawner.render(display, offset)
 
         # display menu
         for index, button in enumerate(self.current_buttons):
-            if index == self.hovered_index:
-                button.hovered = True
-            else:
-                button.hovered = False
+            button.hovered = index == self.hovered_index
+            button.target_offset = 10 if button.hovered else 0  # Move right when hovered
+            button.update()
 
             surface = button.get_surface()
-            display.blit(surface, (16, 16 + self.current_buttons.index(button) * 16))
+            display.blit(surface, (16 + button.x_offset, 16 + self.current_buttons.index(button) * 16))
 
     def get_input(self):
         just_pressed = pygame.key.get_just_pressed()
