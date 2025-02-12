@@ -1,8 +1,8 @@
 import pygame
 
 from .sound import SoundManager
-from .load import load_image, load_images, load_sprite_sheet 
-from .palette import Palette, load_palettes
+from .load import load_image, load_sprite_sheet 
+from .palette import Palette, load_palette, load_palettes
 from .vec2 import Vec2
 
 ASSET_PATH = 'assets/'
@@ -10,9 +10,10 @@ ASSET_PATH = 'assets/'
 class Assets:
     ICON: pygame.Surface = None
     FONT: pygame.Font = None
-    TILESET = None
+    PALETTE: Palette = None
     PLAYER_SHEET: pygame.Surface = None
     PLAYER_PALETTES: list[Palette] = None
+    TILESET = None
     ASTEROIDS: list[pygame.Surface] = None
     SPIKE: list[pygame.Surface] = None
     STARS: list[pygame.Surface] = None
@@ -24,6 +25,8 @@ class Assets:
     @staticmethod
     def load():
         Assets.ICON = load_image('icon.png', False)
+
+        Assets.PALETTE = load_palette('endesga-64.png')
 
         Assets.FONT = pygame.font.Font(ASSET_PATH + 'fonts/DePixelKlein.ttf', 9)
         Assets.FONT_ILL = pygame.font.Font(ASSET_PATH + 'fonts/DePixelIllegible.ttf', 8)
@@ -50,7 +53,7 @@ class Assets:
         Assets.SOUNDS.add('hurt', vol=0.25)
         Assets.SOUNDS.add('dead', vol=1.4)
         Assets.SOUNDS.add('blip', vol=0.2, p_min=0.5, p_max=1.5, p_step=0.1)
-        Assets.SOUNDS.add('select', vol=0.2)
+        Assets.SOUNDS.add('select', vol=0.15)
     
     @staticmethod
     def _load_tileset():
