@@ -10,6 +10,7 @@ class Settings:
     master_volume: int = 5
     sfx_volume: int = 5
     music_volume: int = 5
+    fuel_ui_alpha: int = 3
 
     _instance = None  # Class-level variable to hold the instance
 
@@ -66,6 +67,10 @@ class Settings:
     @classmethod
     def get_music_volume(cls):
         return cls._instance.music_volume
+    
+    @classmethod
+    def get_fuel_ui_alpha(cls):
+        return cls._instance.fuel_ui_alpha
 
     # Setter methods
     @classmethod
@@ -91,3 +96,7 @@ class Settings:
     @classmethod
     def set_music_volume(cls, value: int):
         cls._instance.music_volume = value
+
+    @classmethod
+    def set_fuel_ui_alpha(cls, value: int):
+        cls._instance.fuel_ui_alpha = value

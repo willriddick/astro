@@ -22,6 +22,7 @@ class MainMenu(State):
                 ],
                 [
                     ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), Settings.get_fullscreen()),
+                    SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), Settings.get_fuel_ui_alpha()),
                     SliderButton('Master Volume', lambda x: self._set_volume('master', x), Settings.get_master_volume()),
                     SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), Settings.get_sfx_volume()),
                     SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.get_music_volume()),
@@ -67,6 +68,9 @@ class MainMenu(State):
         else:
             Settings.set_music_volume(value)
         Settings.save()
+    
+    def _set_fuel_ui_alpha(self, value: int):
+        Settings.set_fuel_ui_alpha(value)
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)

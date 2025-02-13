@@ -3,6 +3,7 @@ from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_pa
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.clock import Clock
 from src.game.debug import Debug
+from src.game.settings import Settings
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -17,21 +18,24 @@ class Player(PhysicsEntity):
     FALL_SPEED = 180
 
     FUEL_UI_COLOR_INDEX = 13
-    FUEL_UI_ALPHA = 80
-    FUEL_UI_OFFSET = pygame.Vector2(-2, -6)
+    FUEL_UI_OFFSET = pygame.Vector2(-2, -8)
     MAX_FUEL = 100
     REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
     REFUEL_RATE = 40  # rate of refueling (fuel per second)
 
-    INITIAL_BOOST_UP = 5
-    BOOST_SPEED = 50
     BOOST_ACC = 100
-    BOOST_MOVE_SPEED = 50
-    BOOST_MOVE_ACC = Vec2(100, 20)
 
+    BOOST_UP_COST = 10  # minimum fuel required to boost up and display UI
+    INITIAL_BOOST_UP = 5
+    BOOST_UP_SPEED = 50
+    BOOST_UP_MOVE_SPEED = 50
+    BOOST_UP_MOVE_ACC = Vec2(100, 20)
+
+    BOOST_DOWN_COST = 25
     INITIAL_BOOST_DOWN = 40
-    BOOST_DOWN_COST = 20
     BOOST_DOWN_SPEED = 200
+    BOOST_DOWN_MOVE_SPEED = 75
+    BOOST_DOWN_MOVE_ACC = Vec2(180, 20)
 
     JUMP_INPUT_BUFFER = 50
     JUMP_SPEED = 185
@@ -171,6 +175,13 @@ class Player(PhysicsEntity):
         ):
             self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * Clock.dt())
     
+    def handle_boost(self):
+        if self.input_dir.y == -1 and self.fuel >= Player.BOOST_UP_COST:
+            self.set_state(States.BOOST_UP)
+
+        if self.just_pressed_down and self.fuel > Player.BOOST_DOWN_COST:
+            self.set_state(States.BOOST_DOWN)
+
     def handle_jump(self):
         if self.on_ground:
             self.coyote_timer.start()
@@ -273,7 +284,7 @@ class Player(PhysicsEntity):
 
     def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
         """Draw a fuel bar expanding symmetrically from the center."""
-        if self.fuel == 0 or self.fuel == Player.MAX_FUEL:
+        if self.fuel < Player.BOOST_UP_COST or self.fuel == Player.MAX_FUEL:
             return
 
         bar_width = 10
@@ -283,7 +294,8 @@ class Player(PhysicsEntity):
 
         # oosition the fuel fill at the bottom and expand symmetrically
         surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
-        surface.set_alpha(Player.FUEL_UI_ALPHA)
+        alpha = 255 * (Settings.get_fuel_ui_alpha() / 10)
+        surface.set_alpha(alpha)
 
         center_x = bar_width // 2
         left_x = center_x - (fuel_fill_width // 2)

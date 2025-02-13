@@ -19,7 +19,7 @@ class BoostDown(State):
 
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.BOOST_DOWN_SPEED)
-        self.owner.accelerate_x(self.dir, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
+        self.owner.accelerate_x(self.dir, Player.BOOST_DOWN_MOVE_SPEED, Player.BOOST_DOWN_MOVE_ACC)
 
         # switch states
         if not self.owner.input_dir.y == 1:

@@ -17,6 +17,8 @@ class Air(State):
         self.owner.handle_wall_jump()
         self.owner.accelerate_x(self.owner.input_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
 
+        self.owner.handle_boost()
+
         # handle rotation animation
         if self.owner.rotated:
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.AIR_ROTATE_DURATION)
@@ -26,14 +28,8 @@ class Air(State):
             self.owner.sprite.flip_x = self.owner.input_dir.x == -1
 
         # switch states
-        if self.owner.input_dir.y == -1 and self.owner.fuel:
-            self.switch(States.BOOST_UP)
-
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
-        
-        if self.owner.just_pressed_down and self.owner.fuel > Player.BOOST_DOWN_COST:
-            self.switch(States.BOOST_DOWN)
 
         if self.owner.on_ground:
             if self.owner.velocity.y >= 0:

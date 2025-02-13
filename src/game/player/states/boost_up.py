@@ -17,11 +17,11 @@ class BoostUp(State):
         self.owner.refuel_timer.start()
     
     def update(self):
-        self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_MOVE_SPEED, Player.BOOST_MOVE_ACC)
+        self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_UP_MOVE_SPEED, Player.BOOST_UP_MOVE_ACC)
 
         self.owner.fuel = approach(self.owner.fuel, 0, 100 * Clock.dt())
-        self.owner.accelerate_y(-1, Player.BOOST_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
-        self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_SPEED)
+        self.owner.accelerate_y(-1, Player.BOOST_UP_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
+        self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_UP_SPEED)
 
         self.owner.handle_wall_jump()
 
