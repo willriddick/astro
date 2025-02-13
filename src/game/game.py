@@ -25,6 +25,7 @@ class Game:
             pygame.SCALED
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        self.set_fullscreen(Settings.get_fullscreen())
 
         Assets.load()
         pygame.display.set_caption('Astro')

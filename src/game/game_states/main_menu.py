@@ -1,6 +1,6 @@
 from random import randint, choice
 import pygame
-from src.util import State
+from src.util import State, Vec2
 from src.game.menu import Menu, Button, ToggleButton, SliderButton
 from src.game.entities import StarSpawner
 from src.game.settings import Settings
@@ -9,25 +9,27 @@ from .game_states import GameStates
 class MainMenu(State):
     def __init__(self):
         super().__init__(GameStates.MAIN_MENU)
-
         self.background_color = (24, 20, 37)
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
-        self.menu = Menu(pages = [
-            [
-                Button('Play', self._play),
-                Button('Settings', self._switch_to_settings), 
-                Button('Quit', self._quit)
+        self.menu = Menu(
+            pages = [
+                [
+                    Button('Play', self._play),
+                    Button('Settings', self._switch_to_settings), 
+                    Button('Quit', self._quit)
+                ],
+                [
+                    ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), Settings.get_fullscreen()),
+                    SliderButton('Master Volume', lambda x: self._set_volume('master', x), Settings.get_master_volume()),
+                    SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), Settings.get_sfx_volume()),
+                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.get_music_volume()),
+                    Button('Back', self._switch_to_main)
+                ]
             ],
-            [
-                ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), Settings.get_fullscreen()),
-                SliderButton('Master Volume', lambda x: self._set_volume('master', x), Settings.get_master_volume()),
-                SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), Settings.get_sfx_volume()),
-                SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.get_music_volume()),
-                Button('Back', self._switch_to_main)
-            ]
-        ])
+            position=Vec2(16, 180 - 16),
+        )
     
     def on_enter(self):
         self.star_spawner.spawn(30)

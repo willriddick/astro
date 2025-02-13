@@ -1,10 +1,12 @@
 import pygame
-from src.util import Assets
+from src.util import Assets, Vec2
 from .button import Button
 
 class Menu():
-    def __init__(self, pages: list[list[Button]]):
+    def __init__(self, pages: list[list[Button]], position = Vec2(16, 16), draw_direction = -1):
         self.pages = pages
+        self.position = position
+        self.draw_direction = draw_direction
 
         self.input_dir = pygame.Vector2(0, 0)
         self.input_select = False 
@@ -13,15 +15,18 @@ class Menu():
         self.selected_page = 0
         self.hovered_index = 0
         self.current_buttons: list[Button] = []
+        self.page_height = 0
+
+        self.change_page(0)
     
     def change_page(self, page_index: int):
         self.selected_page = page_index % len(self.pages)
         self.hovered_index = 0
+        self.current_buttons = self.pages[self.selected_page]
+        self.page_height = len(self.current_buttons) * self.current_buttons[0].SURFACE_SIZE.y
 
     def update(self):
         self.get_input()
-
-        self.current_buttons = self.pages[self.selected_page]
         self.hovered_index = int((self.hovered_index + self.input_dir.y) % len(self.current_buttons))
 
         if self.input_dir.y != 0:
@@ -30,11 +35,18 @@ class Menu():
         if self.input_select:
             self.current_buttons[self.hovered_index].select()
     
-    def render(self, display, offset):
+    def render(self, display, _):
         for index, button in enumerate(self.current_buttons):
             button.update(hovered=index == self.hovered_index)
             surface = button.get_surface()
-            display.blit(surface, (16, 16 + self.current_buttons.index(button) * 16))
+            y_pos = self.position.y + (index * button.SURFACE_SIZE.y)
+
+            if self.draw_direction == 1:  # top-to-bottom
+                y_pos = self.position.y + (index * button.SURFACE_SIZE.y)
+            else:  # bottom-to-top
+                y_pos = self.position.y - self.page_height + (index * button.SURFACE_SIZE.y)
+
+            display.blit(surface, (self.position.x, y_pos))
 
     def get_input(self):
         just_pressed = pygame.key.get_just_pressed()
