@@ -1,6 +1,6 @@
 import pygame
 from typing import Callable
-from src.util import Vec2
+from src.util import Assets, Vec2
 from .button import Button
 
 class SliderButton(Button):
@@ -19,6 +19,7 @@ class SliderButton(Button):
     
     def select(self):
         self.value = (self.value + 1) % (self.max_value + 1)
+        Assets.SOUNDS.play('blip', pitch_index=self.value)
         self.callback(self.value)
     
     def update(self, hovered: bool):

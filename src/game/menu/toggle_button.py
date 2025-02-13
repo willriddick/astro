@@ -1,6 +1,6 @@
 import pygame
 from typing import Callable
-from src.util import Vec2
+from src.util import Assets, Vec2
 from .button import Button
 
 class ToggleButton(Button):
@@ -14,6 +14,7 @@ class ToggleButton(Button):
     
     def select(self):
         self.state = not self.state
+        Assets.SOUNDS.play('blip', pitch_index=Assets.SOUNDS.get_count('blip') if self.state else 0)
         self.callback(self.state)
     
     def get_surface(self):

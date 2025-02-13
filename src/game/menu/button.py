@@ -21,6 +21,7 @@ class Button():
         return self.text
    
     def select(self):
+        Assets.SOUNDS.play('select')
         self.callback()
     
     def update(self, hovered: bool):

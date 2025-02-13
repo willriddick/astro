@@ -11,6 +11,9 @@ class SoundManager:
     def __init__(self):
         self.sounds: dict[str, list[pygame.mixer.Sound]] = {}
     
+    def get_count(self, name: str) -> int:
+        return len(self.sounds[name])
+    
     def play(self, name: str, vol: float = None, pitch_index: int = None):
         """
         Play a sound from the dictionary.
