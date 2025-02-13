@@ -34,8 +34,8 @@ class Level:
         else:
             self.tilemap = self.generate(config, seed)
         
-        Level._create_border(self.tilemap)
-        
+        self.tilemap.create_border(Assets.TILESET.get_by('stone'))
+
         if self.spawn_tile:
             self.spawn_pos = self.spawn_tile.pos
         if self.exit_tile:
@@ -194,17 +194,6 @@ class Level:
         # remove tile object from tilemap now that we have created an entity
         tilemap.remove_tiles(spike_tiles)
         return spikes
-
-    @staticmethod 
-    def _create_border(tilemap: TileMap) -> None:
-        top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)
-        bottom = pygame.Rect(-1, tilemap.size.y, tilemap.size.x + 2, 1)
-        left = pygame.Rect(-1, -1, 1, tilemap.size.y + 1)
-        right = pygame.Rect(tilemap.size.x, -1, 1, tilemap.size.y + 1)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), top)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), bottom)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), left)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), right)
     
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:

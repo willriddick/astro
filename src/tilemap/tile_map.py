@@ -38,7 +38,6 @@ class TileMap:
             (self.size.x * self.tile_size.x, self.size.y * self.tile_size.y),
             pygame.SRCALPHA 
         )
-        surface.fill((0, 0, 0, 0))
 
         # render all tiles to the surface
         for tile in self.map.values():
@@ -122,6 +121,16 @@ class TileMap:
         for tile in tilemap.map.values():
             new_pos = Vec2(x_start + tile.tile_pos.x, y_start + tile.tile_pos.y)
             self.place_tile(tile, new_pos)
+    
+    def create_border(self, type: TileType, width: int = 1) -> None:
+        top = pygame.Rect(-width, -width, self.size.x + width, width)
+        bottom = pygame.Rect(-width, self.size.y, self.size.x + width + 1, width)
+        left = pygame.Rect(-width, -width, width, self.size.y + width)
+        right = pygame.Rect(self.size.x, -width, width, self.size.y + width)
+        self.create_tile_rect(type, top)
+        self.create_tile_rect(type, bottom)
+        self.create_tile_rect(type, left)
+        self.create_tile_rect(type, right)
 
     def _update_autotiles_around(self, tile_pos: Vec2):
         for direction in Direction:
