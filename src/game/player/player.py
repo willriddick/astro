@@ -81,6 +81,7 @@ class Player(PhysicsEntity):
 
         # inputs
         self.holding_jump = False
+        self.just_pressed_up = False
         self.just_pressed_down = False
         self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
         self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
@@ -176,11 +177,18 @@ class Player(PhysicsEntity):
             self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * Clock.dt())
     
     def handle_boost(self):
-        if self.input_dir.y == -1 and self.fuel >= Player.BOOST_UP_COST:
-            self.set_state(States.BOOST_UP)
+        if self.input_dir.y == -1:
+            if self.fuel >= Player.BOOST_UP_COST:
+                self.set_state(States.BOOST_UP)
+        
+        if self.fuel < Player.BOOST_UP_COST and self.just_pressed_up:
+            Assets.SOUNDS.play('cant_boost')
 
-        if self.just_pressed_down and self.fuel > Player.BOOST_DOWN_COST:
-            self.set_state(States.BOOST_DOWN)
+        if self.just_pressed_down:
+            if self.fuel > Player.BOOST_DOWN_COST:
+                self.set_state(States.BOOST_DOWN)
+            else:
+                Assets.SOUNDS.play('cant_boost')
 
     def handle_jump(self):
         if self.on_ground:
@@ -234,6 +242,7 @@ class Player(PhysicsEntity):
             int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
         )
 
+        self.just_pressed_up = just_pressed[pygame.K_w]
         self.just_pressed_down = just_pressed[pygame.K_s]
 
         # update rotated field

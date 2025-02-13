@@ -48,6 +48,7 @@ class Assets:
         Assets.SOUNDS.add(name='wall_jump', path="jump", vol=0.13, p_min=0.7, p_max=1.8, p_step=0.05)
         Assets.SOUNDS.add('land', vol=0.35)
         Assets.SOUNDS.add('boost', vol=0.4)
+        Assets.SOUNDS.add('cant_boost', vol=0.4)
         Assets.SOUNDS.add('slide', vol=0.35)
         Assets.SOUNDS.add('teleport', vol=0.2)
         Assets.SOUNDS.add('hurt', vol=0.25)
