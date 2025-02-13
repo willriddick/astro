@@ -69,12 +69,9 @@ class Menu(State):
 
         # display menu
         for index, button in enumerate(self.current_buttons):
-            button.hovered = index == self.hovered_index
-            button.target_offset = 10 if button.hovered else 0  # Move right when hovered
-            button.update()
-
+            button.update(hovered=index == self.hovered_index)
             surface = button.get_surface()
-            display.blit(surface, (16 + button.x_offset, 16 + self.current_buttons.index(button) * 16))
+            display.blit(surface, (16, 16 + self.current_buttons.index(button) * 16))
 
     def get_input(self):
         just_pressed = pygame.key.get_just_pressed()
