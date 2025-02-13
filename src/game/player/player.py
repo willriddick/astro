@@ -1,5 +1,5 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach
+from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.clock import Clock
 from src.game.debug import Debug
@@ -16,9 +16,9 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
-    FUEL_UI_COLOR = (237, 118, 20)
-    FUEL_UI_ALPHA = 60
-    FUEL_UI_OFFSET = pygame.Vector2(-2, -7)
+    FUEL_UI_COLOR_INDEX = 13
+    FUEL_UI_ALPHA = 80
+    FUEL_UI_OFFSET = pygame.Vector2(-2, -6)
     MAX_FUEL = 100
     REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
     REFUEL_RATE = 40  # rate of refueling (fuel per second)
@@ -63,6 +63,7 @@ class Player(PhysicsEntity):
         self.slide_dir = 0
         self.spawn_position = pygame.Vector2(0, 0)
 
+        self.fuel_ui_color = None
         self.fuel = Player.MAX_FUEL 
         self.refuel_timer = Timer(Player.REFUEL_TIME)
 
@@ -83,6 +84,7 @@ class Player(PhysicsEntity):
 
         # setup sprite
         self.palette_index = palette_index
+        self.palette: Palette = None
         self.rotated = False
         self.facing_dir = 0
         self.last_facing_dir = 1
@@ -245,11 +247,14 @@ class Player(PhysicsEntity):
     
     def load_sprite(self, palette_index: int):
         self.palette_index = palette_index % len(Assets.PLAYER_PALETTES)
+        self.palette = Assets.PLAYER_PALETTES[self.palette_index]
+
+        self.fuel_ui_color = self.palette[Player.FUEL_UI_COLOR_INDEX]
 
         sheet = swap_palette(
             Assets.PLAYER_SHEET,
             Assets.PLAYER_PALETTES[0],
-            Assets.PLAYER_PALETTES[self.palette_index],
+            self.palette,
         )
         image_list = load_sprite_sheet(sheet, (16, 18))
         
@@ -284,5 +289,5 @@ class Player(PhysicsEntity):
         left_x = center_x - (fuel_fill_width // 2)
         right_x = center_x + (fuel_fill_width // 2)
 
-        pygame.draw.line(surface, Player.FUEL_UI_COLOR, (left_x, 0), (right_x, 0))
+        pygame.draw.line(surface, self.fuel_ui_color, (left_x, 0), (right_x, 0))
         display.blit(surface, offset)
