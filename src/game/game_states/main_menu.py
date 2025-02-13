@@ -66,6 +66,7 @@ class MainMenu(State):
             Settings.set_sfx_volume(value)
         else:
             Settings.set_music_volume(value)
+        Settings.save()
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)

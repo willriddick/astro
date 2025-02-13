@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pygame
+from src.game.settings import Settings
 
 SOUND_PATH = os.path.join('assets', 'sounds')
 
@@ -11,16 +12,27 @@ class SoundManager:
     def __init__(self):
         self.sounds: dict[str, list[pygame.mixer.Sound]] = {}
     
+    @property
+    def master_volume(self) -> float:
+        return Settings.get_master_volume() / 10
+
+    @property
+    def sfx_volume(self) -> float:
+        return (Settings.get_master_volume() / 10) * self.master_volume
+
+    @property
+    def music_volume(self) -> float:
+        return (Settings.get_music_volume() / 10) * self.master_volume
+    
     def get_count(self, name: str) -> int:
         return len(self.sounds[name])
     
-    def play(self, name: str, vol: float = None, pitch_index: int = None):
+    def play(self, name: str, pitch_index: int = None):
         """
         Play a sound from the dictionary.
 
         Args:
             name (str): The name of the sound.
-            vol (float): Will play sound at volume, then reset to original volume.
             pitch_index (int): The index of the pitch-shifted sound to play. If 
                 None, a random sound is played.
         """
@@ -37,14 +49,8 @@ class SoundManager:
             index = min(pitch_index, len(sound_list) - 1)
             selection = sound_list[index]
         
-        if vol is not None:
-            orig_vol = selection.get_volume()
-            selection.set_volume(vol)
-            selection.play()
-            selection.set_volume(orig_vol)
-        else:
-            selection.play()
-        
+        selection.play()
+    
     def add(self, 
             name: str, 
             path: str = '',
@@ -67,8 +73,8 @@ class SoundManager:
         sound = load_sound(name if path == '' else path)
 
         if p_min == 1 and p_max == 1:
-            sound.set_volume(vol)
             self.sounds[name] = [sound]
+            sound.set_volume(vol)
             return
 
         list = []
