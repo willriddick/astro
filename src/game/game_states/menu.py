@@ -4,7 +4,7 @@ from src.util import State, Assets
 from .game_states import GameStates
 from src.game.entities import StarSpawner
 from src.game.settings import Settings
-from src.game.button import Button, ToggleButton, SliderButton
+from src.game.menu import Button, ToggleButton, SliderButton
 
 class Menu(State):
     def __init__(self):
