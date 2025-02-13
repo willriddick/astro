@@ -3,7 +3,7 @@ from src.util.assets import Assets, Vec2
 
 class Button():
 
-    SURFACE_SIZE = Vec2(256, 16)
+    SURFACE_SIZE = Vec2(224, 16)
     X_OFFSET = 5
     OFFSET_SPEED = 0.05 
 

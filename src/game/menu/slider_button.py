@@ -37,7 +37,7 @@ class SliderButton(Button):
         )
         pygame.draw.rect(
             surface, color, 
-            rect=pygame.Rect(
+            rect=(
                 self.SLIDER_POS.x + self.knob_position, 
                 self.SLIDER_POS.y - self.KNOB_SIZE.y // 2, 
                 self.KNOB_SIZE.x, 
