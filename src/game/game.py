@@ -8,6 +8,7 @@ from .clock import Clock
 from .level import Level
 from .camera import Camera
 from .settings import Settings
+from .input import Input
 
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
@@ -16,6 +17,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.settings = Settings()
+        self.input = Input()
 
         self.running = False
 

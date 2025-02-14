@@ -1,27 +1,38 @@
 import os
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field, asdict
+import pygame
 
 @dataclass
 class Settings:
-    fullscreen: bool = False
+    _instance = None  # singleton instance
+
+    fullscreen: bool = True
     window_scale: int = 4
     master_volume: int = 5
     sfx_volume: int = 5
     music_volume: int = 5
-    fuel_ui_alpha: int = 3
+    fuel_ui_alpha: int = 5
 
-    _instance = None  # class-level singleton instance
+    input_map: dict[str, list[int]] = field(default_factory=lambda: {
+        'up': [pygame.K_w, pygame.K_UP],
+        'down': [pygame.K_s, pygame.K_DOWN],
+        'left': [pygame.K_a, pygame.K_LEFT],
+        'right': [pygame.K_d, pygame.K_RIGHT],
+        'space': pygame.K_SPACE,
+        'enter': pygame.K_RETURN,
+        'esc': pygame.K_ESCAPE,
+    })
 
     def __new__(cls, *args, **kwargs):
         """Ensure only one instance is created."""
         if cls._instance is None:
             cls._instance = super(Settings, cls).__new__(cls)
         return cls._instance
-
+    
     def __init__(self):
-        """Load settings only once when the instance is first created."""
-        if not hasattr(self, "_initialized"):  # prevent reloading on re-instantiation
+        """Initialize settings from file only once."""
+        if not hasattr(self, "_initialized"):
             self.load()
             self._initialized = True
 
@@ -35,4 +46,5 @@ class Settings:
         if os.path.exists(filename):
             with open(filename, "r") as f:
                 data = json.load(f)
-                self.__dict__.update(data)
+                for key, value in data.items():
+                    setattr(self, key, value)

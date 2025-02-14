@@ -2,6 +2,7 @@ import pygame
 from typing import Callable
 from src.util import Assets, Vec2
 from .button import Button
+from src.game.input import Input
 
 class SliderButton(Button):
 
@@ -16,6 +17,8 @@ class SliderButton(Button):
 
         self.knob_position = 0
         self.knob_target = 0
+
+        self.input = Input()
     
     def select(self):
         self.change_value(self.value + 1)
@@ -28,13 +31,8 @@ class SliderButton(Button):
     def update(self, hovered: bool):
         super().update(hovered)
         if self.hovered:
-            just_pressed = pygame.key.get_just_pressed()
-            self.input_dir = pygame.Vector2(
-                int(just_pressed[pygame.K_d]) - int(just_pressed[pygame.K_a]),
-                int(just_pressed[pygame.K_s]) - int(just_pressed[pygame.K_w])
-            )
-            if self.input_dir.x != 0:
-                self.change_value(self.value + int(self.input_dir.x))
+            if self.input.get_dir().x != 0:
+                self.change_value(self.value + int(self.input.get_dir(just_pressed=True).x))
            
         self.knob_target = self.SLIDER_LENGTH * (self.value / self.max_value)
         self.knob_position += (self.knob_target - self.knob_position) * 0.2
