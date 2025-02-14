@@ -18,12 +18,24 @@ class SliderButton(Button):
         self.knob_target = 0
     
     def select(self):
-        self.value = (self.value + 1) % (self.max_value + 1)
-        Assets.SOUNDS.play('blip', pitch_index=self.value)
+        self.change_value(self.value + 1)
+    
+    def change_value(self, value: int, ):
+        self.value = value % (self.max_value + 1)
+        Assets.SOUNDS.play('slider_blip', pitch_index=self.value)
         self.callback(self.value)
     
     def update(self, hovered: bool):
         super().update(hovered)
+        if self.hovered:
+            just_pressed = pygame.key.get_just_pressed()
+            self.input_dir = pygame.Vector2(
+                int(just_pressed[pygame.K_d]) - int(just_pressed[pygame.K_a]),
+                int(just_pressed[pygame.K_s]) - int(just_pressed[pygame.K_w])
+            )
+            if self.input_dir.x != 0:
+                self.change_value(self.value + int(self.input_dir.x))
+           
         self.knob_target = self.SLIDER_LENGTH * (self.value / self.max_value)
         self.knob_position += (self.knob_target - self.knob_position) * 0.2
     

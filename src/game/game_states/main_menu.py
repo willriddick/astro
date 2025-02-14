@@ -26,7 +26,7 @@ class MainMenu(State):
                     SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), self.settings.fuel_ui_alpha),
                     SliderButton('Master Volume', lambda x: self._set_volume('master', x), self.settings.master_volume),
                     SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), self.settings.sfx_volume),
-                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.music_volume),
+                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), self.settings.music_volume),
                     Button('Back', self._switch_to_main)
                 ]
             ],
@@ -65,9 +65,9 @@ class MainMenu(State):
         if type == 'master':
             self.settings.master_volume = value
         elif type == 'sfx':
-            self.settings.set_sfx_volume(value)
+            self.settings.sfx_volume = value
         else:
-            self.settings.set_music_volume(value)
+            self.settings.music_volume = value
         self.settings.save()
     
     def _set_fuel_ui_alpha(self, value: int):

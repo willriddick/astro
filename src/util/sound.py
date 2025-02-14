@@ -72,9 +72,10 @@ class SoundManager:
         """
         sound = load_sound(name if path == '' else path)
 
-        if p_min == 1 and p_max == 1:
-            self.sounds[name] = [sound]
-            sound.set_volume(vol)
+        if p_min == p_max:
+            new_sound = change_pitch(sound, p_min)
+            self.sounds[name] = [new_sound]
+            new_sound.set_volume(vol)
             return
 
         list = []
