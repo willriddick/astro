@@ -62,6 +62,8 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
+        self.settings = Settings()
+
         self.camera = None
         self.input_dir = pygame.Vector2(1, 0)  # starts at one because the player is facing right
         self.slide_dir = 0
@@ -303,7 +305,7 @@ class Player(PhysicsEntity):
 
         # oosition the fuel fill at the bottom and expand symmetrically
         surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
-        alpha = 255 * (Settings.get_fuel_ui_alpha() / 10)
+        alpha = 255 * (self.settings.fuel_ui_alpha / 10)
         surface.set_alpha(alpha)
 
         center_x = bar_width // 2

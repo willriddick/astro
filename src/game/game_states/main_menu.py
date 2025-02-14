@@ -12,6 +12,7 @@ class MainMenu(State):
         self.background_color = (24, 20, 37)
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
+        self.settings = Settings()
 
         self.menu = Menu(
             pages = [
@@ -21,11 +22,11 @@ class MainMenu(State):
                     Button('Quit', self._quit)
                 ],
                 [
-                    ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), Settings.get_fullscreen()),
-                    SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), Settings.get_fuel_ui_alpha()),
-                    SliderButton('Master Volume', lambda x: self._set_volume('master', x), Settings.get_master_volume()),
-                    SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), Settings.get_sfx_volume()),
-                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.get_music_volume()),
+                    ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), self.settings.fullscreen),
+                    SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), self.settings.fuel_ui_alpha),
+                    SliderButton('Master Volume', lambda x: self._set_volume('master', x), self.settings.master_volume),
+                    SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), self.settings.sfx_volume),
+                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), Settings.music_volume),
                     Button('Back', self._switch_to_main)
                 ]
             ],
@@ -58,19 +59,19 @@ class MainMenu(State):
 
     def _switch_to_main(self):
         self.menu.change_page(0)
-        Settings.save()
+        self.settings.save()
     
     def _set_volume(self, type: str, value: int):
         if type == 'master':
-            Settings.set_master_volume(value)
+            self.settings.master_volume = value
         elif type == 'sfx':
-            Settings.set_sfx_volume(value)
+            self.settings.set_sfx_volume(value)
         else:
-            Settings.set_music_volume(value)
-        Settings.save()
+            self.settings.set_music_volume(value)
+        self.settings.save()
     
     def _set_fuel_ui_alpha(self, value: int):
-        Settings.set_fuel_ui_alpha(value)
+        self.settings.fuel_ui_alpha = value
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)
