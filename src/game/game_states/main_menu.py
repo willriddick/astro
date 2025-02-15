@@ -37,8 +37,8 @@ class MainMenu(State):
         self.star_spawner.spawn(30)
         self.owner.camera.boundary = None
         self.camera_movement = pygame.Vector2(
-            choice([-1, 1]) * randint(25, 35), 
-            choice([-1, 1]) * randint(10, 20)
+            choice([-1, 1]) * randint(20, 30), 
+            choice([-1, 1]) * randint(5, 15)
         )
     
     def on_exit(self):

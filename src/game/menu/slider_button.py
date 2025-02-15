@@ -31,8 +31,9 @@ class SliderButton(Button):
     def update(self, hovered: bool):
         super().update(hovered)
         if self.hovered:
-            if self.input.get_dir().x != 0:
-                self.change_value(self.value + int(self.input.get_dir(just_pressed=True).x))
+            input_dir = self.input.get_dir(just_pressed=True).x
+            if input_dir:
+                self.change_value(self.value + input_dir)
            
         self.knob_target = self.SLIDER_LENGTH * (self.value / self.max_value)
         self.knob_position += (self.knob_target - self.knob_position) * 0.2

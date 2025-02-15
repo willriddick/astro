@@ -4,6 +4,7 @@ from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite
 from src.game.clock import Clock
 from src.game.debug import Debug
 from src.game.settings import Settings
+from src.game.input import Input
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -63,11 +64,12 @@ class Player(PhysicsEntity):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
         self.settings = Settings()
+        self.input = Input()
 
         self.camera = None
-        self.input_dir = pygame.Vector2(1, 0)  # starts at one because the player is facing right
-        self.slide_dir = 0
+        self.input_dir = None
         self.spawn_position = pygame.Vector2(0, 0)
+        self.slide_dir = 0
 
         self.fuel_ui_color = None
         self.fuel = Player.MAX_FUEL 
@@ -83,8 +85,6 @@ class Player(PhysicsEntity):
 
         # inputs
         self.holding_jump = False
-        self.just_pressed_up = False
-        self.just_pressed_down = False
         self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
         self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
         self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
@@ -183,10 +183,10 @@ class Player(PhysicsEntity):
             if self.fuel >= Player.BOOST_UP_COST:
                 self.set_state(States.BOOST_UP)
         
-        if self.fuel < Player.BOOST_UP_COST and self.just_pressed_up:
+        if self.fuel < Player.BOOST_UP_COST and self.input.get('up', just_pressed=True):
             Assets.SOUNDS.play('cant_boost')
 
-        if self.just_pressed_down:
+        if self.input.get('down', just_pressed=True):
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
@@ -235,17 +235,7 @@ class Player(PhysicsEntity):
         super().handle_collision()
 
     def handle_input(self):
-        pressed = pygame.key.get_pressed()
-        just_pressed = pygame.key.get_just_pressed()
-
-        # update input direction
-        self.input_dir = pygame.Vector2(
-            int(pressed[pygame.K_d]) - int(pressed[pygame.K_a]),
-            int(pressed[pygame.K_s]) - int(pressed[pygame.K_w])
-        )
-
-        self.just_pressed_up = just_pressed[pygame.K_w]
-        self.just_pressed_down = just_pressed[pygame.K_s]
+        self.input_dir = self.input.get_dir()
 
         # update rotated field
         if self.input_dir.x != 0 and self.input_dir.x != self.last_facing_dir:
@@ -257,14 +247,14 @@ class Player(PhysicsEntity):
             self.last_facing_dir = self.input_dir.x
  
         # update jumping input timer
-        self.holding_jump = pressed[pygame.K_SPACE]
-        if just_pressed[pygame.K_SPACE]:
+        self.holding_jump = self.input.get('jump')
+        if self.input.get('jump', just_pressed=True):
             self.jump_input_timer.start()
 
         # update pressed left/right input timer
-        if pressed[pygame.K_a]:
+        if self.input_dir.x == -1:
             self.pressed_left_timer.start()
-        if pressed[pygame.K_d]:
+        if self.input_dir.x == 1:
             self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):

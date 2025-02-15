@@ -19,9 +19,9 @@ class Settings:
         'down': [pygame.K_s, pygame.K_DOWN],
         'left': [pygame.K_a, pygame.K_LEFT],
         'right': [pygame.K_d, pygame.K_RIGHT],
-        'space': pygame.K_SPACE,
-        'enter': pygame.K_RETURN,
-        'esc': pygame.K_ESCAPE,
+        'jump': pygame.K_SPACE,
+        'select': pygame.K_RETURN,
+        'escpe': pygame.K_ESCAPE,
     })
 
     def __new__(cls, *args, **kwargs):

@@ -1,6 +1,7 @@
 import pygame
 from src.util import Assets, Vec2
 from .button import Button
+from src.game.input import Input
 
 class Menu():
     def __init__(self, pages: list[list[Button]], position = Vec2(16, 16), draw_direction = -1):
@@ -8,9 +9,7 @@ class Menu():
         self.position = position
         self.draw_direction = draw_direction
 
-        self.input_dir = pygame.Vector2(0, 0)
-        self.input_select = False 
-        self.input_back = False 
+        self.input = Input()
 
         self.selected_page = 0
         self.hovered_index = 0
@@ -26,13 +25,12 @@ class Menu():
         self.page_height = len(self.current_buttons) * self.current_buttons[0].SURFACE_SIZE.y
 
     def update(self):
-        self.get_input()
-        self.hovered_index = int((self.hovered_index + self.input_dir.y) % len(self.current_buttons))
-
-        if self.input_dir.y != 0:
+        input_dir = self.input.get_dir(just_pressed=True).y
+        if input_dir:
+            self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
             Assets.SOUNDS.play('blip')
 
-        if self.input_select:
+        if self.input.get('select', just_pressed=True):
             self.current_buttons[self.hovered_index].select()
     
     def render(self, display, _):
@@ -47,11 +45,3 @@ class Menu():
                 y_pos = self.position.y - self.page_height + (index * button.SURFACE_SIZE.y)
 
             display.blit(surface, (self.position.x, y_pos))
-
-    def get_input(self):
-        just_pressed = pygame.key.get_just_pressed()
-        self.input_dir = pygame.Vector2(
-            int(just_pressed[pygame.K_d]) - int(just_pressed[pygame.K_a]),
-            int(just_pressed[pygame.K_s]) - int(just_pressed[pygame.K_w])
-        )
-        self.input_select = just_pressed[pygame.K_RETURN]
