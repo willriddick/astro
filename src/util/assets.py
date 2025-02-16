@@ -1,6 +1,6 @@
 import pygame
 
-from .sound import SoundManager
+from .sound_manager import SoundManager
 from .load import load_image, load_sprite_sheet 
 from .palette import Palette, load_palette, load_palettes
 from .vec2 import Vec2
@@ -53,9 +53,10 @@ class Assets:
         Assets.SOUNDS.add('teleport', vol=0.2)
         Assets.SOUNDS.add('hurt', vol=0.25)
         Assets.SOUNDS.add('dead', vol=1.4)
-        Assets.SOUNDS.add('slider_blip', path='blip', vol=0.2, p_min=0.5, p_max=0.8, p_step=0.025)
+        Assets.SOUNDS.add('pitch_blip', path='blip', vol=0.2, p_min=0.5, p_max=0.8, p_step=0.025)
         Assets.SOUNDS.add('blip', vol=0.2, p_min=0.6, p_max=0.6, p_step=0)
         Assets.SOUNDS.add('select', vol=0.1)
+        Assets.SOUNDS.update_sounds()
     
     @staticmethod
     def _load_tileset():

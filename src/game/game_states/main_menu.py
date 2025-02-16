@@ -1,6 +1,6 @@
 from random import randint, choice
 import pygame
-from src.util import State, Vec2
+from src.util import Assets, State, Vec2
 from src.game.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
 from src.game.settings import Settings
@@ -90,6 +90,7 @@ class MainMenu(State):
         else:
             self.settings.music_volume = value
         self.settings.save()
+        Assets.SOUNDS.update_sounds()
     
     def _set_fuel_ui_alpha(self, value: int):
         self.settings.fuel_ui_alpha = value

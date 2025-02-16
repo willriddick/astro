@@ -25,7 +25,7 @@ class SliderButton(Button):
     
     def change_value(self, value: int, ):
         self.value = value % (self.max_value + 1)
-        Assets.SOUNDS.play('slider_blip', pitch_index=self.value)
+        Assets.SOUNDS.play('pitch_blip', pitch_index=self.value)
         self.callback(self.value)
     
     def update(self, hovered: bool):

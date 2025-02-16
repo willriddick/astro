@@ -14,7 +14,7 @@ class ToggleButton(Button):
     
     def select(self):
         self.state = not self.state
-        Assets.SOUNDS.play('blip', pitch_index=Assets.SOUNDS.get_count('blip') if self.state else 0)
+        Assets.SOUNDS.play('pitch_blip', pitch_index=Assets.SOUNDS.get('pitch_blip').get_count() if self.state else 0)
         self.callback(self.state)
     
     def get_surface(self):
