@@ -14,11 +14,11 @@ class Settings:
     music_volume: int = 5
     fuel_ui_alpha: int = 5
 
-    input_map: dict[str, list[int]] = field(default_factory=lambda: {
-        'up': [pygame.K_w, pygame.K_UP],
-        'down': [pygame.K_s, pygame.K_DOWN],
-        'left': [pygame.K_a, pygame.K_LEFT],
-        'right': [pygame.K_d, pygame.K_RIGHT],
+    input_map: dict[str, int] = field(default_factory=lambda: {
+        'up': pygame.K_w,
+        'down': pygame.K_s,
+        'left': pygame.K_a,
+        'right': pygame.K_d,
         'jump': pygame.K_SPACE,
         'select': pygame.K_RETURN,
         'escpe': pygame.K_ESCAPE,

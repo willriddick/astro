@@ -14,6 +14,7 @@ class Idle(State):
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.handle_jump()
+        self.owner.handle_boost()
 
         if self.animation_timer.is_done:
             self.owner.sprite.set_animation(Animations.IDLE_B)

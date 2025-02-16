@@ -10,6 +10,7 @@ class Menu():
         self.draw_direction = draw_direction
 
         self.input = Input()
+        self.movement_enabled = True
 
         self.selected_page = 0
         self.hovered_index = 0
@@ -25,10 +26,11 @@ class Menu():
         self.page_height = len(self.current_buttons) * self.current_buttons[0].SURFACE_SIZE.y
 
     def update(self):
-        input_dir = self.input.get_dir(just_pressed=True).y
-        if input_dir:
-            self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
-            Assets.SOUNDS.play('blip')
+        if self.movement_enabled:
+            input_dir = self.input.get_dir(just_pressed=True).y
+            if input_dir:
+                self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
+                Assets.SOUNDS.play('blip')
 
         if self.input.get('select', just_pressed=True):
             self.current_buttons[self.hovered_index].select()

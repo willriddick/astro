@@ -15,6 +15,7 @@ class Run(State):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
         self.owner.accelerate_x(self.owner.input_dir.x, Player.GROUND_MOVE_SPEED, Player.GROUND_ACC)
         self.owner.handle_jump()
+        self.owner.handle_boost()
 
         # animate player
         if self.owner.rotated:

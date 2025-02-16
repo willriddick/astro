@@ -27,18 +27,33 @@ class Input:
         else:
             keys = pygame.key.get_pressed()
         
-        if isinstance(option, list):
-            return any(keys[k] for k in option)
-        else:
-            return keys[option]
+        return keys[option]
+    
+    def set_input(self, key: str, value: int) -> bool:
+        if key not in self.settings.input_map:
+            raise ValueError(f'Invalid input key: {key}')
+
+        if any(v == value for v in self.settings.input_map.values()):
+            return False
+
+        self.settings.input_map[key] = value
+        self.settings.save()
+        return True
     
     def get_dir(self, just_pressed=False) -> Vec2:
         """Returns the movement direction vector based on input keys."""
         keys = pygame.key.get_just_pressed() if just_pressed else pygame.key.get_pressed()
         
-        right = any(keys[key] for key in self.settings.input_map['right'])
-        left = any(keys[key] for key in self.settings.input_map['left'])
-        down = any(keys[key] for key in self.settings.input_map['down'])
-        up = any(keys[key] for key in self.settings.input_map['up'])
+        right = keys[self.settings.input_map['right']]
+        left = keys[self.settings.input_map['left']]
+        down = keys[self.settings.input_map['down']]
+        up = keys[self.settings.input_map['up']]
         
         return Vec2(int(right) - int(left), int(down) - int(up))
+    
+    def get_next_keydown(self) -> int | None:
+        """Returns the first key that was just pressed, or None if no key was pressed."""
+        keys = pygame.key.get_just_pressed()
+        for key in range(len(keys)):  
+            if keys[key]: return key  
+        return None

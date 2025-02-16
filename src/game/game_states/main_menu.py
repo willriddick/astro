@@ -1,9 +1,10 @@
 from random import randint, choice
 import pygame
 from src.util import State, Vec2
-from src.game.menu import Menu, Button, ToggleButton, SliderButton
+from src.game.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
 from src.game.settings import Settings
+from src.game.input import Input
 from .game_states import GameStates
 
 class MainMenu(State):
@@ -13,6 +14,7 @@ class MainMenu(State):
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
         self.settings = Settings()
+        self.input = Input()
 
         self.menu = Menu(
             pages = [
@@ -27,7 +29,16 @@ class MainMenu(State):
                     SliderButton('Master Volume', lambda x: self._set_volume('master', x), self.settings.master_volume),
                     SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), self.settings.sfx_volume),
                     SliderButton('Music Volume', lambda x: self._set_volume('music', x), self.settings.music_volume),
+                    Button('Controls', self._switch_to_controls),
                     Button('Back', self._switch_to_main)
+                ],
+                [
+                    InputButton('Up', lambda x: self._set_input_key('up', x), self.settings.input_map['up']),
+                    InputButton('Down', lambda x: self._set_input_key('down', x), self.settings.input_map['down']),
+                    InputButton('Left', lambda x: self._set_input_key('left', x), self.settings.input_map['left']),
+                    InputButton('Right', lambda x: self._set_input_key('right', x), self.settings.input_map['right']),
+                    InputButton('Jump', lambda x: self._set_input_key('jump', x), self.settings.input_map['jump']),
+                    Button('Back', self._switch_to_settings)
                 ]
             ],
             position=Vec2(16, 180 - 16),
@@ -56,6 +67,9 @@ class MainMenu(State):
 
     def _switch_to_settings(self):
         self.menu.change_page(1)
+    
+    def _switch_to_controls(self):
+        self.menu.change_page(2)
 
     def _switch_to_main(self):
         self.menu.change_page(0)
@@ -78,3 +92,12 @@ class MainMenu(State):
     
     def _quit(self):
         self.owner.running = False
+
+    def _set_input_key(self, key: str, value: int) -> bool:
+        self.menu.movement_enabled = False
+
+        if value is not None and self.input.set_input(key, value):
+            self.menu.movement_enabled = True
+            return True
+
+        return False
