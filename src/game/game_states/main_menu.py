@@ -26,11 +26,15 @@ class MainMenu(State):
                 [
                     ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), self.settings.fullscreen),
                     SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), self.settings.fuel_ui_alpha),
+                    Button('Audio', self._switch_to_audio),
+                    Button('Controls', self._switch_to_controls),
+                    Button('Back', self._switch_to_main)
+                ],
+                [
                     SliderButton('Master Volume', lambda x: self._set_volume('master', x), self.settings.master_volume),
                     SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), self.settings.sfx_volume),
                     SliderButton('Music Volume', lambda x: self._set_volume('music', x), self.settings.music_volume),
-                    Button('Controls', self._switch_to_controls),
-                    Button('Back', self._switch_to_main)
+                    Button('Back', self._switch_to_settings)
                 ],
                 [
                     InputButton('Up', lambda x: self._set_input_key('up', x), self.settings.input_map['up']),
@@ -65,15 +69,18 @@ class MainMenu(State):
         self.star_spawner.render(display, offset)
         self.menu.render(display, offset)
 
-    def _switch_to_settings(self):
-        self.menu.change_page(1)
-    
-    def _switch_to_controls(self):
-        self.menu.change_page(2)
-
     def _switch_to_main(self):
         self.menu.change_page(0)
         self.settings.save()
+
+    def _switch_to_settings(self):
+        self.menu.change_page(1)
+    
+    def _switch_to_audio(self):
+        self.menu.change_page(2)
+    
+    def _switch_to_controls(self):
+        self.menu.change_page(3)
     
     def _set_volume(self, type: str, value: int):
         if type == 'master':
