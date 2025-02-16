@@ -12,8 +12,11 @@ class Slide(State):
         Assets.SOUNDS.play('slide')
         self.owner.sprite.set_animation(Animations.SLIDE)
         self.owner.camera.screenshake(20, 2)
-        self.owner.slide_dir = 1 if self.owner.velocity.x > 0 else -1
-        self.owner.velocity.x = self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
+        self.owner.slide_dir = self.owner.last_facing_dir
+        self.owner.velocity.x = (
+            self.owner.slide_dir * Player.INITIAL_SLIDE_SPEED
+            + self.owner.velocity.x * Player.INITIAL_SLIDE_MULTIPLIER
+        )
         self.entry_speed = abs(self.owner.velocity.x)
         self.timer.start()
 
