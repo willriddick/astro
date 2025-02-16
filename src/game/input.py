@@ -32,10 +32,18 @@ class Input:
     def set_input(self, key: str, value: int) -> bool:
         if key not in self.settings.input_map:
             raise ValueError(f'Invalid input key: {key}')
+        
+        # if the new value is the current value for this input, return True
+        # this will happen if the player uses 'Escape' to cancel the input as well
+        if self.settings.input_map[key] == value:
+            print("ALREADY")
+            return True
 
+        # if the new value is already in the input map, return False
         if any(v == value for v in self.settings.input_map.values()):
             return False
 
+        # otherwise, update the input map and save the settings
         self.settings.input_map[key] = value
         self.settings.save()
         return True

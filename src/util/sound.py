@@ -34,6 +34,9 @@ class Sound:
             index = min(pitch_index, len(self.sounds) - 1)
             selection = self.sounds[index]
         
+        for sound in self.sounds:
+            sound.stop()
+        
         selection.play()
    
     def update_volume(self, multipler: float = 1.0):

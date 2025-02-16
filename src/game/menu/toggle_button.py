@@ -8,14 +8,14 @@ class ToggleButton(Button):
     TOGGLE_POS = Vec2(156, 4)
     TOGGLE_SIZE = Vec2(8, 8)    
 
-    def __init__(self, text: str, callback: Callable[[bool], None], state=False):
+    def __init__(self, text: str, callback: Callable[[bool], None], value=False):
         super().__init__(text, callback)
-        self.state = state
+        self.value = value
     
     def select(self):
-        self.state = not self.state
-        Assets.SOUNDS.play('pitch_blip', pitch_index=Assets.SOUNDS.get('pitch_blip').get_count() if self.state else 0)
-        self.callback(self.state)
+        self.value = not self.value
+        Assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.value else 0)
+        self.callback(self.value)
     
     def get_surface(self):
         surface = super().get_surface()
@@ -31,7 +31,7 @@ class ToggleButton(Button):
             width=1
         )
 
-        if self.state:
+        if self.value:
             pygame.draw.rect(
                 surface, color, 
                 rect=(
