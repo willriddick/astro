@@ -38,6 +38,22 @@ class Settings:
             'select': pygame.K_RETURN,
             'escape': pygame.K_ESCAPE,
         }
+    
+    def set_key(self, key: str, value: any):
+        """Set a setting by key."""
+        setattr(self._instance, key, value)
+    
+    def get_key(self, key: str):
+        """Get a setting by key."""
+        return getattr(self._instance, key)
+    
+    def set_input_key(self, key: str, value: int):
+        """Set an input key by key."""
+        self._instance.input_map[key] = value
+    
+    def get_input_key(self, key: str): 
+        """Get an input key by key."""
+        return self._instance.input_map[key]
 
     def save(self, filename="settings.json"):
         """Save settings to a file."""

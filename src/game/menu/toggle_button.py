@@ -8,9 +8,17 @@ class ToggleButton(Button):
     TOGGLE_POS = Vec2(156, 4)
     TOGGLE_SIZE = Vec2(8, 8)    
 
-    def __init__(self, text: str, callback: Callable[[bool], None], value=False):
+    def __init__(self, text: str, key: str, callback: Callable[[bool], None]):
         super().__init__(text, callback)
-        self.value = value
+        self.key = key
+    
+    @property
+    def value(self) -> int:
+        return self.settings.get_key(self.key)
+    
+    @value.setter
+    def value(self, value: int):
+        self.settings.set_key(self.key, value)
     
     def select(self):
         self.value = not self.value

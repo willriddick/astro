@@ -10,9 +10,9 @@ class SliderButton(Button):
     SLIDER_POS = Vec2(96, 4)
     KNOB_SIZE = Vec2(3, 5)
 
-    def __init__(self, text: str, callback: Callable[[int], None], value: int = 5, max_value: int = 10):
+    def __init__(self, text: str, key: str, callback: Callable[[], None]=None, max_value: int = 10):
         super().__init__(text, callback)
-        self.value = value
+        self.key = key
         self.max_value = max_value
 
         self.knob_position = 0
@@ -20,13 +20,22 @@ class SliderButton(Button):
 
         self.input = Input()
     
+    @property
+    def value(self) -> int:
+        return self.settings.get_key(self.key)
+    
+    @value.setter
+    def value(self, value: int):
+        self.settings.set_key(self.key, value)
+    
     def select(self):
         self.change_value(self.value + 1)
     
-    def change_value(self, value: int, ):
+    def change_value(self, value: int):
         self.value = value % (self.max_value + 1)
         Assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
-        self.callback(self.value)
+        if self.callback:
+            self.callback()
     
     def update(self, hovered: bool):
         super().update(hovered)

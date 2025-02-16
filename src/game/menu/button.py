@@ -1,5 +1,6 @@
 import pygame
 from src.util.assets import Assets, Vec2
+from src.game.settings import Settings
 
 class Button():
 
@@ -13,6 +14,7 @@ class Button():
         self.hovered = False
         self.x_offset = 0
         self.target_offset = 0 
+        self.settings = Settings()
 
         self.HOVERED_COLOR = Assets.PALETTE[34]
         self.DEFAULT_COLOR = Assets.PALETTE[5]

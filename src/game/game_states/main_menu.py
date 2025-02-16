@@ -24,25 +24,25 @@ class MainMenu(State):
                     Button('Quit', self._quit)
                 ],
                 [
-                    ToggleButton('Fullscreen', lambda x: self.owner.set_fullscreen(x), self.settings.fullscreen),
-                    SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), self.settings.fuel_ui_alpha),
+                    ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
+                    SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Audio', self._switch_to_audio),
                     Button('Controls', self._switch_to_controls),
                     Button('Reset Defaults', self._reset_defaults),
                     Button('Back', self._switch_to_main)
                 ],
                 [
-                    SliderButton('Master Volume', lambda x: self._set_volume('master', x), self.settings.master_volume),
-                    SliderButton('Sfx Volume', lambda x: self._set_volume('sfx', x), self.settings.sfx_volume),
-                    SliderButton('Music Volume', lambda x: self._set_volume('music', x), self.settings.music_volume),
+                    SliderButton('Master Volume', key='master_volume', callback=self._update_volume()),
+                    SliderButton('Sfx Volume', key='sfx_volume', callback=self._update_volume()),
+                    SliderButton('Music Volume', key='music_volume', callback=self._update_volume()),
                     Button('Back', self._switch_to_settings)
                 ],
                 [
-                    InputButton('Up', lambda x: self._set_input_key('up', x), self.settings.input_map['up']),
-                    InputButton('Down', lambda x: self._set_input_key('down', x), self.settings.input_map['down']),
-                    InputButton('Left', lambda x: self._set_input_key('left', x), self.settings.input_map['left']),
-                    InputButton('Right', lambda x: self._set_input_key('right', x), self.settings.input_map['right']),
-                    InputButton('Jump', lambda x: self._set_input_key('jump', x), self.settings.input_map['jump']),
+                    InputButton('Up', key='up', callback=lambda x: self._set_movement(x)),
+                    InputButton('Down', key='down', callback=lambda x: self._set_movement(x)), 
+                    InputButton('Left', key='left', callback=lambda x: self._set_movement(x)),
+                    InputButton('Right', key='right', callback=lambda x: self._set_movement(x)),
+                    InputButton('Jump', key='jump', callback=lambda x: self._set_movement(x)),
                     Button('Back', self._switch_to_settings)
                 ]
             ],
@@ -83,22 +83,15 @@ class MainMenu(State):
         self.menu.change_page(3)
     
     def _reset_defaults(self):
+        if not self.settings.fullscreen:
+            self.owner.set_fullscreen(True)
         self.settings.reset_defaults()
-        self.settings.save()
-    
-    def _set_volume(self, type: str, value: int):
-        if type == 'master':
-            self.settings.master_volume = value
-        elif type == 'sfx':
-            self.settings.sfx_volume = value
-        else:
-            self.settings.music_volume = value
         self.settings.save()
         Assets.SOUNDS.update_sounds()
     
-    def _set_fuel_ui_alpha(self, value: int):
-        self.settings.fuel_ui_alpha = value
+    def _update_volume(self):
         self.settings.save()
+        Assets.SOUNDS.update_sounds()
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)
@@ -106,11 +99,5 @@ class MainMenu(State):
     def _quit(self):
         self.owner.running = False
 
-    def _set_input_key(self, key: str, value: int) -> bool:
-        self.menu.movement_enabled = False
-
-        if value is not None and self.input.set_input(key, value):
-            self.menu.movement_enabled = True
-            return True
-
-        return False
+    def _set_movement(self, value: int):
+        self.menu.movement_enabled = value

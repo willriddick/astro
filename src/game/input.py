@@ -36,7 +36,6 @@ class Input:
         # if the new value is the current value for this input, return True
         # this will happen if the player uses 'Escape' to cancel the input as well
         if self.settings.input_map[key] == value:
-            print("ALREADY")
             return True
 
         # if the new value is already in the input map, return False

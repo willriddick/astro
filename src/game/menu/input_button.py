@@ -8,29 +8,38 @@ class InputButton(Button):
 
     INPUT_POS = Vec2(156, 4)
 
-    def __init__(self, text: str, callback: Callable[[int], bool], value: int):
+    def __init__(self, text: str, key: str, callback: Callable[[int], bool]):
         super().__init__(text, callback)
-        self.value = value
+        self.key = key
         self.state = False
         self.input = Input()
+    
+    @property
+    def value(self) -> int:
+        return self.settings.get_input_key(self.key)
+    
+    @value.setter
+    def value(self, value: int):
+        self.settings.set_input_key(self.key, value)
     
     def select(self):
         if not self.state:
             self.state = True
             Assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.state else 0)
-            self.callback(self.value)
+            self.callback(False)
     
     def update(self, hovered):
         super().update(hovered)
         if self.state:
             if self.input.get('escape', just_pressed=True):
-                self.callback(self.value)
                 self.state = False
+                self.callback(True)  # enable menu movement
             else:
-                key = self.input.get_next_keydown()
-                if self.callback(key):
-                    self.value = key
+                new_value = self.input.get_next_keydown()
+                if new_value and self.input.set_input(self.key, new_value):
+                    self.value = new_value
                     self.state = False
+                    self.callback(True)
     
     def get_surface(self):
         surface = super().get_surface()
