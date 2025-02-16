@@ -32,9 +32,9 @@ class MainMenu(State):
                     Button('Back', self._switch_to_main)
                 ],
                 [
-                    SliderButton('Master Volume', key='master_volume', callback=self._update_volume()),
-                    SliderButton('Sfx Volume', key='sfx_volume', callback=self._update_volume()),
-                    SliderButton('Music Volume', key='music_volume', callback=self._update_volume()),
+                    SliderButton('Master Volume', key='master_volume', callback=self._update_volume),
+                    SliderButton('Sfx Volume', key='sfx_volume', callback=self._update_volume),
+                    SliderButton('Music Volume', key='music_volume', callback=self._update_volume),
                     Button('Back', self._switch_to_settings)
                 ],
                 [
