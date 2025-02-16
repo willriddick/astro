@@ -46,8 +46,8 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_BUFFER = 300  # time after jumping to allow variable jump
 
     SLIDE_DURATION = 200  # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_SPEED = 50  # minimum speed when entering slide state
-    INITIAL_SLIDE_MULTIPLIER = 1.3  # multiplies velocity when entering slide state
+    INITIAL_SLIDE_SPEED = 80  # minimum speed when entering slide state
+    INITIAL_SLIDE_MULTIPLIER = 1.35  # multiplies velocity when entering slide state
     SLIDE_SPEED = 110
     SLIDE_ACC = (180, 180)
 

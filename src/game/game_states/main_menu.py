@@ -28,6 +28,7 @@ class MainMenu(State):
                     SliderButton('Fuel UI Alpha', lambda x: self._set_fuel_ui_alpha(x), self.settings.fuel_ui_alpha),
                     Button('Audio', self._switch_to_audio),
                     Button('Controls', self._switch_to_controls),
+                    Button('Reset Defaults', self._reset_defaults),
                     Button('Back', self._switch_to_main)
                 ],
                 [
@@ -71,7 +72,6 @@ class MainMenu(State):
 
     def _switch_to_main(self):
         self.menu.change_page(0)
-        self.settings.save()
 
     def _switch_to_settings(self):
         self.menu.change_page(1)
@@ -81,6 +81,10 @@ class MainMenu(State):
     
     def _switch_to_controls(self):
         self.menu.change_page(3)
+    
+    def _reset_defaults(self):
+        self.settings.reset_defaults()
+        self.settings.save()
     
     def _set_volume(self, type: str, value: int):
         if type == 'master':
@@ -94,6 +98,7 @@ class MainMenu(State):
     
     def _set_fuel_ui_alpha(self, value: int):
         self.settings.fuel_ui_alpha = value
+        self.settings.save()
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)
