@@ -20,6 +20,7 @@ class Game:
         self.input = Input()
 
         self.running = False
+        self.paused = False
 
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * self.settings.window_scale, DISPLAY_HEIGHT * self.settings.window_scale),
@@ -42,6 +43,7 @@ class Game:
     
     async def run(self):
         self.running = True
+        #Assets.SOUNDS.play('track1', loops=-1)
        
         while self.running:
             Debug.update()
@@ -51,7 +53,8 @@ class Game:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
-            self.state_machine.update()
+            if not self.paused:
+                self.state_machine.update()
             self.camera.update()
 
             # handle commmands and draw command prompt
@@ -114,6 +117,9 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                self.paused = not self.paused
     
     def handle_resize(self, width, height):
         new_width = width

@@ -5,7 +5,7 @@ import pygame
 from src.game.settings import Settings
 from .sound import Sound
 
-SOUND_PATH = os.path.join('assets', 'sounds')
+SOUND_PATH = os.path.join('assets', 'audio')
 
 class SoundManager:
     """
@@ -36,7 +36,7 @@ class SoundManager:
         assert name in self.sounds, f'Sound "{name}" not found'
         return self.sounds[name]
     
-    def play(self, name: str, pitch_index: int = None):
+    def play(self, name: str, pitch_index: int = None, loops: int = 0):
         """
         Play a sound from the dictionary.
 
@@ -45,13 +45,13 @@ class SoundManager:
             pitch_index (int): The index of the pitch-shifted sound to play. If 
                 None, a random sound is played.
         """
-        self.get(name).play(pitch_index)
+        self.get(name).play(pitch_index, loops)
     
     def add(self, 
             name: str, 
             path: str = '',
             category: int = 0,
-            vol: float = 1.0,
+            vol: float = 0.5,
             p_min: float = 0.9,
             p_max: float = 1.1,
             p_step: float = 0.05

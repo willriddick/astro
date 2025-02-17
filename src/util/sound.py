@@ -22,7 +22,7 @@ class Sound:
     def get_count(self) -> int:
         return len(self.sounds)
     
-    def play(self, pitch_index: int = None):
+    def play(self, pitch_index: int = None, loops: int = 0):
         selection = None
 
         if pitch_index is None:
@@ -37,7 +37,7 @@ class Sound:
         for sound in self.sounds:
             sound.stop()
         
-        selection.play()
+        selection.play(loops)
    
     def update_volume(self, multipler: float = 1.0):
         """
