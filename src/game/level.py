@@ -1,10 +1,11 @@
 import os
 import random
 import pygame
+from src.game.debug import Debug
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Assets, Vec2, Direction
 from src.tilemap import TileMap, Tile
-from src.level_gen import LevelMap, Room
+from src.level_gen import LevelMap
 
 MAPS_PATH = 'assets/maps'
 
@@ -14,8 +15,11 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
+        from src.game.entities import StarSpawner
         
         Level.current = self
+
+        self.background_color = (24, 20, 37)
 
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
@@ -30,8 +34,8 @@ class Level:
         else:
             self.tilemap = self.generate(config, seed)
         
-        Level._create_border(self.tilemap)
-        
+        self.tilemap.create_border(Assets.TILESET.get_by('stone'))
+
         if self.spawn_tile:
             self.spawn_pos = self.spawn_tile.pos
         if self.exit_tile:
@@ -40,12 +44,41 @@ class Level:
         self.spikes = Level._create_spikes(self.tilemap)
         self.entities.extend(self.spikes)
         
-        self.star_spawner = None
+        self.star_spawner = StarSpawner(invert_depth=True)
+        self.star_spawner.spawn(50)
         
         self.player = Player()
         self.entities.append(self.player)
         self.player.spawn(self.spawn_pos)
+
+        self.tilemap_surface = self.tilemap.get_surface()
     
+    def update(self) -> None:
+        for entity in self.entities:
+            entity.update()
+        
+        self.star_spawner.update()
+    
+    def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
+        # background
+        display.fill(self.background_color)
+
+        # display stars
+        self.star_spawner.render(display, offset)
+
+        # display prerendered tilemap surface
+        if self.tilemap_surface:
+            display.blit(self.tilemap_surface, offset)
+        
+        # display all entities relative to the offset
+        for entity in Level.current.entities:
+            entity.render(display, offset)
+        
+        # debug display colliders 
+        if Debug.enabled():
+            for collider in Level.current.colliders:
+                collider.render(display, offset)
+
     def register_collider(self, collider: 'Collider'):
         self.colliders.append(collider)
 
@@ -82,9 +115,9 @@ class Level:
                     pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
                     self.spawn_tile = new_map.create_tile(Assets.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
                 
-                if room.has_attribute(Attribute.EXIT):
-                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
-                    self.exit_tile = new_map.create_tile(Assets.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
+                #if room.has_attribute(Attribute.EXIT):
+                #    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                #    self.exit_tile = new_map.create_tile(Assets.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
 
                 tilemap.place_tilemap(new_map, room.position, flip)
                
@@ -97,7 +130,7 @@ class Level:
         based on three sets, horizontal, vertical, and corner tiles. This greatly reduces the 
         entity/collider count by creating a single entity for a grouping of spikes.
         """
-        from .spike import Spike, HSpike, VSpike, CSpike
+        from src.game.entities import Spike, HSpike, VSpike, CSpike
         spikes: set[Spike] = set()
         horizontal_tiles: set[Tile] = set()
         vertical_tiles: set[Tile] = set()
@@ -161,17 +194,6 @@ class Level:
         # remove tile object from tilemap now that we have created an entity
         tilemap.remove_tiles(spike_tiles)
         return spikes
-
-    @staticmethod 
-    def _create_border(tilemap: TileMap) -> None:
-        top = pygame.Rect(0, -1, tilemap.size.x + 2, 1)
-        bottom = pygame.Rect(-1, tilemap.size.y, tilemap.size.x + 2, 1)
-        left = pygame.Rect(-1, -1, 1, tilemap.size.y + 1)
-        right = pygame.Rect(tilemap.size.x, -1, 1, tilemap.size.y + 1)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), top)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), bottom)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), left)
-        tilemap.create_tile_rect(Assets.TILESET.get_by('stone'), right)
     
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:

@@ -7,6 +7,7 @@ class StateMachine:
         self.states: dict[Enum, State] = {}
         self.add_states(states)
         self.current_state: State = states[0]
+        self.current_state.on_enter()
         self.previous_state: State = self.current_state
    
     def update(self):

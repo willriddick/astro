@@ -23,3 +23,4 @@ ENV/
 /build/
 /dist/
 /main.spec
+settings.json

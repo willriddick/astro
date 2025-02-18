@@ -1,5 +1,4 @@
-import pygame
-from src.util import State, Timer
+from src.util import State, Timer, Assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -18,6 +17,8 @@ class Air(State):
         self.owner.handle_wall_jump()
         self.owner.accelerate_x(self.owner.input_dir.x, Player.AIR_MOVE_SPEED, Player.AIR_ACC)
 
+        self.owner.handle_boost()
+
         # handle rotation animation
         if self.owner.rotated:
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.AIR_ROTATE_DURATION)
@@ -29,13 +30,13 @@ class Air(State):
         # switch states
         if self.owner.wall_slide_timer.is_active:
             self.switch(States.WALL_SLIDE)
-        
-        if self.owner.just_pressed_down:
-            self.switch(States.DROP)
 
         if self.owner.on_ground:
+            if self.owner.velocity.y >= 0:
+                Assets.SOUNDS.play('land')
+
             if self.timer.is_done:
-                self.owner.camera.screenshake(20, 2)
+                self.owner.camera.screenshake(30, 3)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)

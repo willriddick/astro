@@ -1,61 +1,64 @@
 import asyncio
 import sys
 import pygame
-from src.util import Assets, CommandPrompt, Vec2
+from src.util import Assets, CommandPrompt, Vec2, StateMachine
+from .game_states import GameStates
 from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-from .stars import StarSpawner
+from .settings import Settings
+from .input import Input
 
-WINDOW_SCALE = 4
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
 class Game:
     def __init__(self):
         pygame.init()
+        self.settings = Settings()
+        self.input = Input()
 
         self.running = False
         self.paused = False
-        self.command_prompt = CommandPrompt()
 
         self.window = pygame.display.set_mode(
-            (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE),
+            (DISPLAY_WIDTH * self.settings.window_scale, DISPLAY_HEIGHT * self.settings.window_scale),
             pygame.SCALED
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
-        self.fullscreen = False
-        Assets.load_assets()
+        self.set_fullscreen(self.settings.fullscreen)
 
+        Assets.load()
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(Assets.ICON)
 
+        self.command_prompt = CommandPrompt()
+
+        from .game_states import MainMenu, Playing
+        self.state_machine = StateMachine(self, [MainMenu(), Playing()])
+
         self.level = None
-        self.new_level(map_path='assets/maps/test/0.json')
+        self.new_level()
     
     async def run(self):
         self.running = True
+        #Assets.SOUNDS.play('track1', loops=-1)
        
         while self.running:
             Debug.update()
             Debug.add_display(f'fps: {Clock.fps()}')
-            Debug.add_display(self.level.player.debug)
 
             for event in pygame.event.get():
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
-            
+
+            if not self.paused:
+                self.state_machine.update()
+            self.camera.update()
+
+            # handle commmands and draw command prompt
             self.handle_commands()
-
-            if not self.command_prompt.enabled and not self.paused:
-                self.camera.update()
-                self.camera.move_to(self.level.player.center)
-                self.level.star_spawner.update()
-                for entity in self.level.entities:
-                    entity.update()
-
-            # draw command prompt
             self.command_prompt.render(self.camera.display)
 
             try:
@@ -73,11 +76,7 @@ class Game:
     def new_level(self, map_path: str = None, seed: int = None):
         self.level = Level(map_path=map_path, seed=seed)
         self.level.player.camera = self.camera
-        self.camera.set_level(self.level)
-
-        star_spawner = StarSpawner()
-        star_spawner.spawn(50)
-        self.level.star_spawner = star_spawner
+        self.camera.set_pos(self.level.spawn_pos)
         print(self.level.entities)
 
     def handle_commands(self):
@@ -87,10 +86,10 @@ class Game:
 
         player = self.level.player
         match command.split():
-            case ['g']:
-                player.toggle_ghost()
             case ['d']:
                 Debug.toggle()
+            case ['g']:
+                player.toggle_ghost()
             case ['n']:
                 self.new_level()
             case ['n', seed]:
@@ -101,8 +100,11 @@ class Game:
                 player.spawn(player.spawn_position)
             case ['tp', x, y]:
                 player.set_position(pygame.Vector2(int(x), int(y)))
+                Assets.SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
+            case ['gs', state]:
+                self.state_machine.switch(list(GameStates)[int(state)])
             case ['q']:
                 self.running = False
             case _:
@@ -117,7 +119,7 @@ class Game:
             self.toggle_fullscreen
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
-                self.paused = not self.paused 
+                self.paused = not self.paused
     
     def handle_resize(self, width, height):
         new_width = width
@@ -128,13 +130,16 @@ class Game:
         self.window = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
     
     def toggle_fullscreen(self):
-        self.fullscreen = not self.fullscreen
+        self.set_fullscreen(not self.settings.fullscreen)
 
-        if self.fullscreen:
+    def set_fullscreen(self, value: bool):
+        self.settings.fullscreen = value
+
+        if value:
             size = (0, 0)
             mode = pygame.FULLSCREEN
         else:
-            size = (DISPLAY_WIDTH * WINDOW_SCALE, DISPLAY_HEIGHT * WINDOW_SCALE)
+            size = (DISPLAY_WIDTH * self.settings.window_scale, DISPLAY_HEIGHT * self.settings.window_scale)
             mode = pygame.RESIZABLE
 
         self.window = pygame.display.set_mode(size, mode)

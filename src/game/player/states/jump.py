@@ -1,4 +1,4 @@
-from src.util import State, Timer
+from src.util import State, Timer, Assets
 from ..player import Player
 from ..enums import States
 
@@ -19,10 +19,12 @@ class Jump(State):
         if self.owner.jumps_remaining:
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
 
+            Assets.SOUNDS.play('jump')
             self.owner.velocity.y = -Player.JUMP_SPEED * self.owner.velocity_multiplier.y
             self.owner.jump_input_timer.reset()
             self.owner.coyote_timer.reset()
             self.owner.variable_jump_timer.start()
+        
         
         # switch to AIR
         self.timer.start()

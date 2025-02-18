@@ -9,4 +9,5 @@ from .ghost import Ghost
 from .hurt import Hurt
 from .dead import Dead
 from .spawn import Spawn
-from .drop import Drop
+from .boost_up import BoostUp
+from .boost_down import BoostDown

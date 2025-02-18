@@ -32,6 +32,21 @@ class TileMap:
         for tile in self.map.values():
             tile.render(surf, offset)
     
+    def get_surface(self) -> pygame.Surface:
+        # create a transparent surface the size of our tilemap
+        surface = pygame.Surface(
+            (self.size.x * self.tile_size.x, self.size.y * self.tile_size.y),
+            pygame.SRCALPHA 
+        )
+
+        # render all tiles to the surface
+        for tile in self.map.values():
+            if tile:
+                tile.render(surface, pygame.Vector2(0, 0))
+        
+        # return prerendered tilemap surface
+        return surface
+    
     def get_tile(self, tile_pos: Vec2, offset: Direction = Direction.NONE) -> Tile | None:
         return self.map.get(Vec2.translate(tile_pos, offset))
     
@@ -106,6 +121,16 @@ class TileMap:
         for tile in tilemap.map.values():
             new_pos = Vec2(x_start + tile.tile_pos.x, y_start + tile.tile_pos.y)
             self.place_tile(tile, new_pos)
+    
+    def create_border(self, type: TileType, width: int = 1) -> None:
+        top = pygame.Rect(-width, -width, self.size.x + width, width)
+        bottom = pygame.Rect(-width, self.size.y, self.size.x + width + 1, width)
+        left = pygame.Rect(-width, -width, width, self.size.y + width)
+        right = pygame.Rect(self.size.x, -width, width, self.size.y + width)
+        self.create_tile_rect(type, top)
+        self.create_tile_rect(type, bottom)
+        self.create_tile_rect(type, left)
+        self.create_tile_rect(type, right)
 
     def _update_autotiles_around(self, tile_pos: Vec2):
         for direction in Direction:
