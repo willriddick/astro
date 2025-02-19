@@ -4,7 +4,6 @@ from src.util import Assets, State, Vec2
 from src.game.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
 import src.game.settings as settings
-from src.game.input import Input
 from .game_states import GameStates
 
 class MainMenu(State):
@@ -13,7 +12,6 @@ class MainMenu(State):
         self.background_color = (24, 20, 37)
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
-        self.input = Input()
 
         self.menu = Menu(
             pages = [

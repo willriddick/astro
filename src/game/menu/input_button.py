@@ -1,9 +1,9 @@
 import pygame
 from typing import Callable
 from src.util import Assets, Vec2
-from src.game.input import Input
 from .button import Button
 import src.game.settings as settings
+import src.game.inputs as inputs
 
 class InputButton(Button):
 
@@ -13,7 +13,6 @@ class InputButton(Button):
         super().__init__(text, callback)
         self.key = key
         self.state = False
-        self.input = Input()
     
     @property
     def value(self) -> int:
@@ -32,12 +31,12 @@ class InputButton(Button):
     def update(self, hovered):
         super().update(hovered)
         if self.state:
-            if self.input.get('escape', just_pressed=True):
+            if inputs.get('escape', just_pressed=True):
                 self.state = False
                 self.callback(True)  # enable menu movement
             else:
-                new_value = self.input.get_next_keydown()
-                if new_value and self.input.set_input(self.key, new_value):
+                new_value = inputs.get_next_keydown()
+                if new_value and inputs.set_input(self.key, new_value):
                     self.value = new_value
                     self.state = False
                     self.callback(True)

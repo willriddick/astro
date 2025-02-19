@@ -1,7 +1,7 @@
 import pygame
 from src.util import Assets, Vec2
 from .button import Button
-from src.game.input import Input
+import src.game.inputs as inputs
 
 class Menu():
     def __init__(self, pages: list[list[Button]], position = Vec2(16, 16), draw_direction = -1):
@@ -9,7 +9,6 @@ class Menu():
         self.position = position
         self.draw_direction = draw_direction
 
-        self.input = Input()
         self.movement_enabled = True
 
         self.selected_page = 0
@@ -27,12 +26,12 @@ class Menu():
 
     def update(self):
         if self.movement_enabled:
-            input_dir = self.input.get_dir(just_pressed=True).y
+            input_dir = inputs.get_dir(just_pressed=True).y
             if input_dir:
                 self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
                 Assets.SOUNDS.play('blip')
 
-        if self.input.get('select', just_pressed=True):
+        if inputs.get('select', just_pressed=True):
             self.current_buttons[self.hovered_index].select()
     
     def render(self, display, _):

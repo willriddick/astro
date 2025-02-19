@@ -2,8 +2,8 @@ import pygame
 from typing import Callable
 from src.util import Assets, Vec2
 from .button import Button
-from src.game.input import Input
 import src.game.settings as settings
+import src.game.inputs as inputs
 
 class SliderButton(Button):
 
@@ -18,8 +18,6 @@ class SliderButton(Button):
 
         self.knob_position = 0
         self.knob_target = 0
-
-        self.input = Input()
     
     @property
     def value(self) -> int:
@@ -41,7 +39,7 @@ class SliderButton(Button):
     def update(self, hovered: bool):
         super().update(hovered)
         if self.hovered:
-            input_dir = self.input.get_dir(just_pressed=True).x
+            input_dir = inputs.get_dir(just_pressed=True).x
             if input_dir:
                 self.change_value(self.value + input_dir)
            
