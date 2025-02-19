@@ -1,7 +1,7 @@
 from random import randint, choice
 import pygame
 from src.util import Assets, State, Vec2
-from src.game.menu import Menu, Button, ToggleButton, SliderButton, InputButton
+from src.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
 import src.game.settings as settings
 import src.game.inputs as inputs
@@ -15,6 +15,7 @@ class MainMenu(State):
         self.camera_movement: pygame.Vector2 = None
 
         self.menu = Menu(
+            position=Vec2(16, 180 - 16),
             pages = [
                 [
                     Button('Play', self._play),
@@ -44,7 +45,6 @@ class MainMenu(State):
                     Button('Back', self._switch_to_settings)
                 ]
             ],
-            position=Vec2(16, 180 - 16),
         )
     
     def on_enter(self):

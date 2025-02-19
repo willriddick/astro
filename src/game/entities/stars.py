@@ -1,4 +1,4 @@
-from math import sqrt, floor
+from math import floor
 from random import choice, choices, randint
 import pygame
 from src.util import Assets, randf
@@ -27,7 +27,7 @@ class StarSpawner():
     
 class Star(Entity):
 
-    DEPTH = [0.05, 0.3]
+    DEPTH = [0.05, 0.25]
     ALPHA = [20, 200]
     TINT_BASE = 220
     TINT_VARIATION = 35

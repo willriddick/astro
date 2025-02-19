@@ -8,7 +8,6 @@ from .clock import Clock
 from .level import Level
 from .camera import Camera
 import src.game.settings as settings
-import src.game.inputs as inputs
 
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT

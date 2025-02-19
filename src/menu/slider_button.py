@@ -11,9 +11,10 @@ class SliderButton(Button):
     SLIDER_POS = Vec2(96, 4)
     KNOB_SIZE = Vec2(3, 5)
 
-    def __init__(self, text: str, key: str, callback: Callable[[], None]=None, max_value: int = 10):
+    def __init__(self, text: str, key: str, callback: Callable[[], None]=None, min_value: int = 0, max_value: int = 10):
         super().__init__(text, callback)
         self.key = key
+        self.min_value = min_value
         self.max_value = max_value
 
         self.knob_position = 0
@@ -31,7 +32,9 @@ class SliderButton(Button):
         self.change_value(self.value + 1)
     
     def change_value(self, value: int):
-        self.value = value % (self.max_value + 1)
+        """Update the slider value while respecting min/max bounds."""
+        value_range = self.max_value - self.min_value + 1
+        self.value = (value - self.min_value) % value_range + self.min_value
         Assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
         if self.callback:
             self.callback()
@@ -42,10 +45,11 @@ class SliderButton(Button):
             input_dir = inputs.get_dir(just_pressed=True).x
             if input_dir:
                 self.change_value(self.value + input_dir)
-           
-        self.knob_target = self.SLIDER_LENGTH * (self.value / self.max_value)
+
+        # Adjust slider knob positioning based on min_value
+        self.knob_target = self.SLIDER_LENGTH * ((self.value - self.min_value) / (self.max_value - self.min_value))
         self.knob_position += (self.knob_target - self.knob_position) * 0.2
-    
+ 
     def get_surface(self) -> pygame.Surface:
         surface = super().get_surface()
         color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR

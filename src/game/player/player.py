@@ -282,7 +282,11 @@ class Player(PhysicsEntity):
 
     def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
         """Draw a fuel bar expanding symmetrically from the center."""
-        if self.fuel < Player.BOOST_UP_COST or self.fuel == Player.MAX_FUEL:
+        if (
+            self.fuel < Player.BOOST_UP_COST 
+            or self.fuel == Player.MAX_FUEL
+            or self.get_state() == States.DEAD
+        ):
             return
 
         bar_width = 10
