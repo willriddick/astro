@@ -1,5 +1,6 @@
 import pygame
-from src.util.assets import Assets, Vec2
+from src.util import Vec2
+import src.game.assets as assets
 
 class Button():
 
@@ -14,14 +15,14 @@ class Button():
         self.x_offset = 0
         self.target_offset = 0 
 
-        self.HOVERED_COLOR = Assets.PALETTE[34]
-        self.DEFAULT_COLOR = Assets.PALETTE[5]
+        self.HOVERED_COLOR = assets.PALETTE[34]
+        self.DEFAULT_COLOR = assets.PALETTE[5]
     
     def __str__(self):
         return self.text
    
     def select(self):
-        Assets.SOUNDS.play('select')
+        assets.SOUNDS.play('select')
         self.callback()
     
     def update(self, hovered: bool):
@@ -32,5 +33,5 @@ class Button():
     def get_surface(self) -> pygame.Surface:
         color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
         surface = pygame.Surface(self.SURFACE_SIZE, pygame.SRCALPHA)
-        surface.blit(Assets.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
+        surface.blit(assets.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
         return surface

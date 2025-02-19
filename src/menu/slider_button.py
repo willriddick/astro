@@ -1,9 +1,10 @@
 import pygame
 from typing import Callable
-from src.util import Assets, Vec2
+from src.util import Vec2
 from .button import Button
 import src.game.settings as settings
 import src.game.inputs as inputs
+import src.game.assets as assets
 
 class SliderButton(Button):
 
@@ -35,7 +36,7 @@ class SliderButton(Button):
         """Update the slider value while respecting min/max bounds."""
         value_range = self.max_value - self.min_value + 1
         self.value = (value - self.min_value) % value_range + self.min_value
-        Assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
+        assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
         if self.callback:
             self.callback()
     

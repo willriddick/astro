@@ -1,10 +1,11 @@
 import pygame
-from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
+from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.clock import Clock
 from src.game.debug import Debug
 import src.game.settings as settings
 import src.game.inputs as inputs
+import src.game.assets as assets
 from .enums import Animations, States
 
 class Player(PhysicsEntity):
@@ -181,13 +182,13 @@ class Player(PhysicsEntity):
                 self.set_state(States.BOOST_UP)
         
         if self.fuel < Player.BOOST_UP_COST and inputs.get('up', just_pressed=True):
-            Assets.SOUNDS.play('cant_boost')
+            assets.SOUNDS.play('cant_boost')
 
         if inputs.get('down', just_pressed=True):
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
-                Assets.SOUNDS.play('cant_boost')
+                assets.SOUNDS.play('cant_boost')
 
     def handle_jump(self):
         if self.on_ground:
@@ -255,14 +256,14 @@ class Player(PhysicsEntity):
             self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):
-        self.palette_index = palette_index % len(Assets.PLAYER_PALETTES)
-        self.palette = Assets.PLAYER_PALETTES[self.palette_index]
+        self.palette_index = palette_index % len(assets.PLAYER_PALETTES)
+        self.palette = assets.PLAYER_PALETTES[self.palette_index]
 
         self.fuel_ui_color = self.palette[Player.FUEL_UI_COLOR_INDEX]
 
         sheet = swap_palette(
-            Assets.PLAYER_SHEET,
-            Assets.PLAYER_PALETTES[0],
+            assets.PLAYER_SHEET,
+            assets.PLAYER_PALETTES[0],
             self.palette,
         )
         image_list = load_sprite_sheet(sheet, (16, 18))

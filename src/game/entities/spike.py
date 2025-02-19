@@ -1,6 +1,7 @@
 import pygame
-from src.util import Assets, Vec2
+from src.util import Vec2
 from src.game.components import Entity, Sprite, DamageComponent, Collider
+import src.game.assets as assets
 
 class Spike(Entity):
     def __init__(self, position: pygame.Vector2, size: Vec2):
@@ -8,7 +9,7 @@ class Spike(Entity):
         self.collider = None
         self.damage_component = None
         self.sprite = Sprite(self.position)
-        self.sprite.add_animation(0, Assets.SPIKE.copy())
+        self.sprite.add_animation(0, assets.SPIKE.copy())
         self.sprite.set_animation(0)
 
     def render(self, display, offset):

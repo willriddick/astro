@@ -1,10 +1,11 @@
 import numpy as np
 import pygame
 from typing import Callable
-from src.util import Assets, Vec2, randf, draw_rect
+from src.util import Vec2, randf, draw_rect
 from .level import Level
 from .clock import Clock
 from .debug import Debug
+import src.game.assets as assets
 
 class Camera:
     def __init__(self, size: Vec2):
@@ -49,7 +50,7 @@ class Camera:
     
     def _debug_display(self):
         # display debug information
-        text_surf = Assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
+        text_surf = assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
         draw_rect(

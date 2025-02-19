@@ -1,10 +1,11 @@
 from random import randint, choice
 import pygame
-from src.util import Assets, State, Vec2
+from src.util import State, Vec2
 from src.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
 import src.game.settings as settings
 import src.game.inputs as inputs
+import src.game.assets as assets
 from .game_states import GameStates
 
 class MainMenu(State):
@@ -87,11 +88,11 @@ class MainMenu(State):
         settings.save()
         inputs.reset_defaults()
         inputs.save()
-        Assets.SOUNDS.update_sounds()
+        assets.SOUNDS.update_sounds()
     
     def _update_volume(self):
         settings.save()
-        Assets.SOUNDS.update_sounds()
+        assets.SOUNDS.update_sounds()
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)

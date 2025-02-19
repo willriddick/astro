@@ -1,5 +1,6 @@
-from src.util import State, approach, Assets
+from src.util import State, approach
 from src.game.clock import Clock
+import src.game.assets as assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -9,7 +10,7 @@ class BoostUp(State):
         self.dir = 0
     
     def on_enter(self):
-        Assets.SOUNDS.play('boost')
+        assets.SOUNDS.play('boost')
         self.owner.sprite.set_next(Animations.BOOST_UP)
         self.owner.velocity.y = min(self.owner.velocity.y, -Player.INITIAL_BOOST_UP)
     

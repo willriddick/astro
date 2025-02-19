@@ -1,13 +1,14 @@
 import asyncio
 import sys
 import pygame
-from src.util import Assets, CommandPrompt, Vec2, StateMachine
+from src.util import CommandPrompt, Vec2, StateMachine
 from .game_states import GameStates
 from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
 import src.game.settings as settings
+import src.game.assets as assets
 
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
@@ -25,9 +26,9 @@ class Game:
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.set_fullscreen(settings.get('fullscreen'))
 
-        Assets.load()
+        assets.load()
         pygame.display.set_caption('Astro')
-        pygame.display.set_icon(Assets.ICON)
+        pygame.display.set_icon(assets.ICON)
 
         self.command_prompt = CommandPrompt()
 
@@ -39,7 +40,7 @@ class Game:
     
     async def run(self):
         self.running = True
-        #Assets.SOUNDS.play('track1', loops=-1)
+        #assets.SOUNDS.play('track1', loops=-1)
        
         while self.running:
             Debug.update()
@@ -96,7 +97,7 @@ class Game:
                 player.spawn(player.spawn_position)
             case ['tp', x, y]:
                 player.set_position(pygame.Vector2(int(x), int(y)))
-                Assets.SOUNDS.play('teleport')
+                assets.SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
             case ['gs', state]:

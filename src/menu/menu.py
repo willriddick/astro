@@ -1,6 +1,6 @@
-import pygame
-from src.util import Assets, Vec2
+from src.util import Vec2
 from .button import Button
+import src.game.assets as assets
 import src.game.inputs as inputs
 
 class Menu():
@@ -29,7 +29,7 @@ class Menu():
             input_dir = inputs.get_dir(just_pressed=True).y
             if input_dir:
                 self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
-                Assets.SOUNDS.play('blip')
+                assets.SOUNDS.play('blip')
 
         if inputs.get('select', just_pressed=True):
             self.current_buttons[self.hovered_index].select()

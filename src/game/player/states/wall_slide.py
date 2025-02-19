@@ -1,4 +1,5 @@
-from src.util import State, Direction, Assets
+from src.util import State, Direction
+import src.game.assets as assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -35,7 +36,7 @@ class WallSlide(State):
         # switch to IDLE or RUN state
         if self.owner.on_ground:
             self.switch(States.IDLE if self.owner.velocity.x == 0 else States.RUN)
-            Assets.SOUNDS.play('land')
+            assets.SOUNDS.play('land')
         
         # switch to AIR state 
         if (

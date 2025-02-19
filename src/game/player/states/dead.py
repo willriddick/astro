@@ -1,5 +1,6 @@
 import pygame
-from src.util import State, Direction, Timer, Assets
+from src.util import State, Direction, Timer
+import src.game.assets as assets
 from ..player import Player
 from ..enums import Animations, States
 
@@ -10,7 +11,7 @@ class Dead(State):
     
     def on_enter(self):
         self.timer.start()
-        Assets.SOUNDS.play('dead')
+        assets.SOUNDS.play('dead')
         self.owner.sprite.reset()
         self.owner.sprite.flash(self.timer.duration, pygame.Color(255, 0, 0), pygame.BLEND_RGB_MULT)
         self.owner.sprite.set_animation(Animations.IDLE_A)

@@ -1,8 +1,9 @@
 from random import choice, randint
 import pygame
-from src.util import Assets, randf, Vec2
+from src.util import randf, Vec2
 from src.game.clock import Clock
 from src.game.components import PhysicsEntity, Entity, Sprite
+import src.game.assets as assets
 
 class AsteroidSpawner(Entity):
     def __init__(self):
@@ -41,7 +42,7 @@ class AsteroidSpawner(Entity):
         # Set asteroid properties
         asteroid.pos = pygame.Vector2(x, y)
         asteroid.velocity = pygame.Vector2(x_vel, y_vel)
-        asteroid.sprite.set_frame(randint(0, len(Assets.ASTEROIDS) - 1))
+        asteroid.sprite.set_frame(randint(0, len(assets.ASTEROIDS) - 1))
     
     def clear(self):
         self.asteroids.clear()
@@ -62,7 +63,7 @@ class Asteroid(PhysicsEntity):
         super().__init__(pygame.Vector2(0, 0), Vec2(16, 16))
         self.spawner = spawner
         self.sprite = Sprite(self.pos, Vec2(0, 0))
-        self.sprite.add_animation(0, Assets.ASTEROIDS, 0)
+        self.sprite.add_animation(0, assets.ASTEROIDS, 0)
     
     def __str__(self):
         return f'asteroid: pos={self.pos}, vel={self.velocity}, frame={self.sprite.frame}'

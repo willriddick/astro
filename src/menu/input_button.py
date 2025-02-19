@@ -1,7 +1,8 @@
 import pygame
 from typing import Callable
-from src.util import Assets, Vec2
+from src.util import Vec2
 from .button import Button
+import src.game.assets as assets
 import src.game.inputs as inputs
 
 class InputButton(Button):
@@ -24,7 +25,7 @@ class InputButton(Button):
     def select(self):
         if not self.state:
             self.state = True
-            Assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.state else 0)
+            assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.state else 0)
             self.callback(False)
     
     def update(self, hovered):
@@ -45,6 +46,6 @@ class InputButton(Button):
         color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
         
         item = '?' if self.state else pygame.key.name(self.value)
-        surface.blit(Assets.FONT.render(item, antialias=False, color=color), (self.INPUT_POS.x, 0))
+        surface.blit(assets.FONT.render(item, antialias=False, color=color), (self.INPUT_POS.x, 0))
         return surface
  
