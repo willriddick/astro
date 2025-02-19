@@ -31,5 +31,5 @@ def load_palette(path: str) -> Palette:
 def load_palettes(path: str) -> list[Palette]:
     palettes = []
     for img_name in sorted(os.listdir(IMAGE_PATH + path)):
-        palettes.append(load_palette(path + '/' + img_name))
+        palettes.append(load_palette(os.path.join(path, img_name)))
     return palettes

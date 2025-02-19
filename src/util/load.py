@@ -18,7 +18,7 @@ def load_image(path: str, convert_alpha: bool=True) -> pygame.Surface:
 def load_images(path: str, convert_alpha: bool=False) -> list[pygame.Surface]:
     images = []
     for img_name in sorted(os.listdir(IMAGE_PATH + path)):
-        images.append(load_image(path + '/' + img_name, convert_alpha))
+        images.append(load_image(os.path.join(path, img_name), convert_alpha))
     return images
 
 def load_sprite_sheet(image: pygame.surface, size: tuple[int, int]) -> list[pygame.Surface]:
