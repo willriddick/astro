@@ -1,7 +1,7 @@
 from random import randint, choice
 import pygame
 from src.util import State, Vec2
-from src.menu import Menu, Button, ToggleButton, SliderButton, InputButton
+from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton
 from src.entities import StarSpawner
 import src.settings as settings
 import src.inputs as inputs
@@ -18,33 +18,33 @@ class MainMenu(State):
         self.menu = Menu(
             position=Vec2(16, 180 - 16),
             pages = [
-                [
+                Page([
                     Button('Play', self._play),
                     Button('Settings', self._switch_to_settings), 
                     Button('Quit', self._quit)
-                ],
-                [
+                ]),
+                Page([
                     ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Audio', self._switch_to_audio),
                     Button('Controls', self._switch_to_controls),
                     Button('Reset Defaults', self._reset_defaults),
                     Button('Back', self._switch_to_main)
-                ],
-                [
+                ]),
+                Page([
                     SliderButton('Master Volume', key='master_volume', callback=self._update_volume),
                     SliderButton('Sfx Volume', key='sfx_volume', callback=self._update_volume),
                     SliderButton('Music Volume', key='music_volume', callback=self._update_volume),
                     Button('Back', self._switch_to_settings)
-                ],
-                [
+                ]),
+                Page([
                     InputButton('Up', key='up', callback=lambda x: self._set_movement(x)),
                     InputButton('Down', key='down', callback=lambda x: self._set_movement(x)), 
                     InputButton('Left', key='left', callback=lambda x: self._set_movement(x)),
                     InputButton('Right', key='right', callback=lambda x: self._set_movement(x)),
                     InputButton('Jump', key='jump', callback=lambda x: self._set_movement(x)),
                     Button('Back', self._switch_to_settings)
-                ]
+                ])
             ],
         )
     

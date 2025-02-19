@@ -1,48 +1,47 @@
 from src.util import Vec2
-from .button import Button
 import src.assets as assets
 import src.inputs as inputs
+from .button import Button
+from .page import Page
 
 class Menu():
-    def __init__(self, pages: list[list[Button]], position = Vec2(16, 16), draw_direction = -1):
+    def __init__(self, pages: list[Page], position = Vec2(16, 16), draw_direction = -1):
         self.pages = pages
         self.position = position
         self.draw_direction = draw_direction
 
-        self.movement_enabled = True
+        self.current_page: Page = None
+        self.page_index = 0
+        self.button_index = 0
 
-        self.selected_page = 0
-        self.hovered_index = 0
-        self.current_buttons: list[Button] = []
-        self.page_height = 0
+        self.movement_enabled = True
 
         self.change_page(0)
     
     def change_page(self, page_index: int):
-        self.selected_page = page_index % len(self.pages)
-        self.hovered_index = 0
-        self.current_buttons = self.pages[self.selected_page]
-        self.page_height = len(self.current_buttons) * self.current_buttons[0].SURFACE_SIZE.y
+        self.page_index = page_index % len(self.pages)
+        self.current_page = self.pages[self.page_index]
+        self.button_index = self.current_page.index
 
     def update(self):
         if self.movement_enabled:
             input_dir = inputs.get_dir(just_pressed=True).y
             if input_dir:
-                self.hovered_index = int((self.hovered_index + input_dir) % len(self.current_buttons))
+                self.button_index = int((self.button_index + input_dir) % self.current_page.button_count)
                 assets.SOUNDS.play('blip')
 
         if inputs.get('select', just_pressed=True):
-            self.current_buttons[self.hovered_index].select()
+            self.current_page.buttons[self.button_index].select()
     
     def render(self, display, _):
-        for index, button in enumerate(self.current_buttons):
-            button.update(hovered=index == self.hovered_index)
+        for index, button in enumerate(self.current_page.buttons):
+            button.update(hovered=index == self.button_index)
             surface = button.get_surface()
             y_pos = self.position.y + (index * button.SURFACE_SIZE.y)
 
             if self.draw_direction == 1:  # top-to-bottom
                 y_pos = self.position.y + (index * button.SURFACE_SIZE.y)
             else:  # bottom-to-top
-                y_pos = self.position.y - self.page_height + (index * button.SURFACE_SIZE.y)
+                y_pos = self.position.y - self.current_page.page_height + (index * button.SURFACE_SIZE.y)
 
             display.blit(surface, (self.position.x, y_pos))
