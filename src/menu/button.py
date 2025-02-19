@@ -1,12 +1,13 @@
 import pygame
 from src.util import Vec2
+from src.game.clock import Clock
 import src.game.assets as assets
 
 class Button():
 
     SURFACE_SIZE = Vec2(224, 16)
-    X_OFFSET = 5
-    OFFSET_SPEED = 0.05 
+    X_OFFSET = 7
+    OFFSET_SPEED = 15 
 
     def __init__(self, text: str, callback: callable):
         self.text = text
@@ -28,7 +29,7 @@ class Button():
     def update(self, hovered: bool):
         self.hovered = hovered
         self.target_offset = self.X_OFFSET if self.hovered else 0
-        self.x_offset += (self.target_offset - self.x_offset) * self.OFFSET_SPEED
+        self.x_offset += (self.target_offset - self.x_offset) * self.OFFSET_SPEED * Clock.dt()
     
     def get_surface(self) -> pygame.Surface:
         color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR

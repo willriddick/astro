@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 from typing import Callable
-from src.util import Vec2, randf, draw_rect
+from src.util import Vec2, randf, draw_rect, Timer
 from .level import Level
 from .clock import Clock
 from .debug import Debug
@@ -18,7 +18,7 @@ class Camera:
         self.boundary: pygame.Rect = None
 
         self.screenshake_offset = pygame.Vector2(0, 0)
-        self.screenshake_timer = 0
+        self.screenshake_timer = Timer()
         self.screenshake_intensity = 0
 
         self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
@@ -110,14 +110,13 @@ class Camera:
         
         # Clamp the position and update
         self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
-   
+
     def screenshake(self, duration: int, intensity: int) -> None:
-        self.screenshake_timer = duration
+        self.screenshake_timer.start(duration)
         self.screenshake_intensity = intensity
     
     def _handle_screenshake(self) -> None:
-        self.screenshake_timer = max(0, self.screenshake_timer - 1)
-        if self.screenshake_timer > 0:
+        if self.screenshake_timer.is_active:
             self.screenshake_offset = pygame.Vector2(
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),

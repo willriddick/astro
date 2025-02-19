@@ -1,7 +1,7 @@
 import pygame 
 
 class Timer:
-    def __init__(self, duration: int):
+    def __init__(self, duration: int = 0):
         """Create a new timer with a duration in milliseconds."""
         self.duration = duration
         self.start_time = None

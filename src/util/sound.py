@@ -23,6 +23,14 @@ class Sound:
         return len(self.sounds)
     
     def play(self, pitch_index: int = None, loops: int = 0):
+        """
+        Play a sound from the dictionary.
+
+        Args:
+            pitch_index (int): The index of the pitch-shifted sound to play. 
+            If None, a random sound is played.
+            loops: The number of times to play the sound, -1 for infinite, 0 for once, and n for n+1 times.
+        """
         selection = None
 
         if pitch_index is None:

@@ -30,6 +30,7 @@ def load(filename=SETTINGS_FILE):
 def reset_defaults():
     global _settings
     _settings = {
+        "max_fps": 0,
         "fullscreen": True,
         "window_scale": 4,
         "master_volume": 5,
