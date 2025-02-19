@@ -42,46 +42,37 @@ class SoundManager:
         Play a sound from the dictionary.
 
         Args:
-            name (str): The name of the sound.
             pitch_index (int): The index of the pitch-shifted sound to play. If 
                 None, a random sound is played.
+            loops (int): The number of times to loop the sound (0 for once, -1 for infinite).
         """
         self.get(name).play(pitch_index, loops)
     
-    def add(self,  
-            name: str, 
-            path: str = '',
-            category: int = 0,
-            vol: float = 0.5,
-            p_min: float = 0.9,
-            p_max: float = 1.1,
-            p_step: float = 0.05
-        ):
-        """
-        Add a sound to the dictionary with optional pitch shifting.
-
-        Args:
-            name (str): The name of the sound.
-            path (str): The path to the sound file, by default, this is the same as the name.
-            vol (float): The volume of the sound.
-            p_min (float): The minimum pitch shift factor.
-            p_max (float): The maximum pitch shift factor.
-            p_step (float): The step size between pitch
-        """
-        base_sound = load_sound(name if path == '' else path)
+    def load(self, sound: Sound):
+        # load sound using name if path is empty
+        base_sound = load_sound(sound.name if sound.path == '' else sound.path)
         sounds = []
 
-        if p_min == p_max or p_step == 0:
-            new_sound = change_pitch(base_sound, p_min)
-            new_sound.set_volume(vol)
+        # if pitch min == pitch max or pitch step is 0, only add one sound
+        if sound.pitch[0] == sound.pitch[1] or sound.pitch[2] == 0:
+            new_sound = change_pitch(base_sound, sound.pitch[0])
+            new_sound.set_volume(sound.default_volume)
             sounds.append(new_sound)
         else:
-            for pitch in np.arange(p_min, p_max, p_step):
+            # otherwise, add multiple pitches of the same sound
+            for pitch in np.arange(sound.pitch[0], sound.pitch[1], sound.pitch[2]):
                 new_sound = change_pitch(base_sound, pitch)
-                new_sound.set_volume(vol)
+                new_sound.set_volume(sound.default_volume)
                 sounds.append(new_sound)
 
-        self.sounds[name] = Sound(name, sounds, category, vol, p_min, p_max, p_step)
+        # update the sound object and add it to our dictionary
+        sound.set_sounds(sounds)
+        self.sounds[sound.name] = sound
+    
+    def load_all(self, sounds: list[Sound]):
+        for sound in sounds:
+            self.load(sound)
+        self.update_sounds()
     
 def load_sound(name: str) -> pygame.mixer.Sound:
     return pygame.mixer.Sound(os.path.join(SOUND_PATH, f'{name}.wav'))
