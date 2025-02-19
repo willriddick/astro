@@ -11,12 +11,6 @@ def set_key(key: str, value: any):
 def get(key: str):
     return _settings.get(key)
 
-def set_input(key: str, value: int):
-    _settings["input_map"][key] = value
-
-def get_input(key: str):
-    return _settings["input_map"].get(key)
-
 def save(filename=SETTINGS_FILE):
     with open(filename, "w") as f:
         json.dump(_settings, f, indent=4)
@@ -41,16 +35,7 @@ def reset_defaults():
         "master_volume": 5,
         "sfx_volume": 5,
         "music_volume": 5,
-        "fuel_ui_alpha": 5,
-        "input_map": {
-            "up": 119,
-            "down": 115,
-            "left": 97,
-            "right": 100,
-            "jump": 32,
-            "select": 13,
-            "escape": 27
-        } 
+        "fuel_ui_alpha": 5
     }
 
 

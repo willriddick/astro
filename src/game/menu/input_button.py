@@ -2,7 +2,6 @@ import pygame
 from typing import Callable
 from src.util import Assets, Vec2
 from .button import Button
-import src.game.settings as settings
 import src.game.inputs as inputs
 
 class InputButton(Button):
@@ -16,11 +15,11 @@ class InputButton(Button):
     
     @property
     def value(self) -> int:
-        return settings.get_input(self.key)
+        return inputs.get_input(self.key)
     
     @value.setter
     def value(self, value: int):
-        settings.set_input(self.key, value)
+        inputs.set_input(self.key, value)
     
     def select(self):
         if not self.state:
