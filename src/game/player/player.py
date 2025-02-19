@@ -289,11 +289,11 @@ class Player(PhysicsEntity):
             or self.get_state() == States.DEAD
         ):
             return
-
+        
         bar_width = 10
         fuel_percentage = max(self.fuel / Player.MAX_FUEL, 0)
         fuel_fill_width = int(bar_width * fuel_percentage)
-        offset += self.position + Player.FUEL_UI_OFFSET
+        fuel_pos = offset + self.position + Player.FUEL_UI_OFFSET
 
         # oosition the fuel fill at the bottom and expand symmetrically
         surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
@@ -305,4 +305,4 @@ class Player(PhysicsEntity):
         right_x = center_x + (fuel_fill_width // 2)
 
         pygame.draw.line(surface, self.fuel_ui_color, (left_x, 0), (right_x, 0))
-        display.blit(surface, offset)
+        display.blit(surface, fuel_pos)
