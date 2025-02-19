@@ -221,6 +221,3 @@ class Editor:
                 self.left_click = False
             elif event.button == 3:
                 self.right_click = False
-
-if __name__ == '__main__':
-    Editor().run()

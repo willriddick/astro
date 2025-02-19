@@ -105,10 +105,10 @@ class Level:
                 
                 # if room exists at postion (x, y) in level_map
                 sub, flip = self._get_folder_flip(room.key)
-                map_folder = f'{MAPS_PATH}/{sub}'
+                map_folder = os.path.join(MAPS_PATH, sub)
                 map_paths: list[str] = []
                 for name in os.listdir(map_folder):
-                    map_paths.append(map_folder + '/' + name)
+                    map_paths.append(os.path.join(map_folder, name))
                 map_path = random.choice(map_paths)
                 new_map = TileMap.load(map_path, assets.TILESET)
 
@@ -136,16 +136,22 @@ class Level:
         # categorize all spikes into three sets: horizontal, vertical, and corner
         spike_tiles = tilemap.get_tiles_with('spike')
         for tile in spike_tiles:
-            a = []
+            a = []  # up, down, left, right
+            w = []
             for direction in Direction.cardinals():
                 adj = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y), direction)
                 a.append(bool(adj and adj.tile_type.name == 'spike'))
+                w.append(bool(adj and adj.tile_type.name == 'stone'))
 
-            if (a[2] or a[3]) and not (a[0] or a[1]):
+            if any(a[2:]) and not any(a[:2]):    # row spike: left/right only
                 horizontal_tiles.add(tile)
-            elif (a[0] or a[1]) and not (a[2] or a[3]):
+            elif any(a[:2]) and not any(a[2:]):  # column spike: up/down only
                 vertical_tiles.add(tile)
-            else:
+            elif not any(a[2:]) and any(w[:2]):  # single spike: but stone above/below
+                horizontal_tiles.add(tile)
+            elif not any(a[:2]) and any(w[2:]):  # single spike: but stone left/right
+                vertical_tiles.add(tile)
+            else:                                # must be a corner spike
                 corner_tiles.add(tile)
         
         # create merged spike entities for horizontal set

@@ -70,8 +70,8 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def new_level(self, map_path: str = None, seed: int = None):
-        self.level = Level(map_path=map_path, seed=seed)
+    def new_level(self, seed: int = None, map_path: str = None):
+        self.level = Level(seed=seed, map_path=map_path)
         self.level.player.camera = self.camera
         self.camera.set_pos(self.level.spawn_pos)
         print(self.level.entities)
