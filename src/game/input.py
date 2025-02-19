@@ -1,6 +1,6 @@
 import pygame
 from src.util import Vec2
-from src.game.settings import Settings
+import src.game.settings as settings
 
 class Input:
     _instance = None
@@ -13,14 +13,13 @@ class Input:
     
     def __init__(self):
         if not hasattr(self, '_initialized'):
-            self.settings = Settings()
             self._initialized = True
     
     def get(self, key: str, just_pressed=False) -> bool:
-        if key not in self.settings.input_map:
+        if key not in settings.get('input_map'):
             raise ValueError(f'Invalid input key: {key}')
         
-        option = self.settings.input_map[key]
+        option = settings.get_input(key)
 
         if just_pressed:
             keys = pygame.key.get_just_pressed()
@@ -30,31 +29,31 @@ class Input:
         return keys[option]
     
     def set_input(self, key: str, value: int) -> bool:
-        if key not in self.settings.input_map:
+        if key not in settings.get('input_map'):
             raise ValueError(f'Invalid input key: {key}')
         
         # if the new value is the current value for this input, return True
         # this will happen if the player uses 'Escape' to cancel the input as well
-        if self.settings.input_map[key] == value:
+        if settings.get_input(key) == value:
             return True
 
         # if the new value is already in the input map, return False
-        if any(v == value for v in self.settings.input_map.values()):
+        if any(v == value for v in settings.get('input_map').values()):
             return False
 
         # otherwise, update the input map and save the settings
-        self.settings.input_map[key] = value
-        self.settings.save()
+        settings.set_input(key, value)
+        settings.save()
         return True
     
     def get_dir(self, just_pressed=False) -> Vec2:
         """Returns the movement direction vector based on input keys."""
         keys = pygame.key.get_just_pressed() if just_pressed else pygame.key.get_pressed()
         
-        right = keys[self.settings.input_map['right']]
-        left = keys[self.settings.input_map['left']]
-        down = keys[self.settings.input_map['down']]
-        up = keys[self.settings.input_map['up']]
+        right = keys[settings.get_input('right')]
+        left = keys[settings.get_input('left')]
+        down = keys[settings.get_input('down')]
+        up = keys[settings.get_input('up')]
         
         return Vec2(int(right) - int(left), int(down) - int(up))
     

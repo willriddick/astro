@@ -3,7 +3,7 @@ import pygame
 from src.util import Assets, State, Vec2
 from src.game.menu import Menu, Button, ToggleButton, SliderButton, InputButton
 from src.game.entities import StarSpawner
-from src.game.settings import Settings
+import src.game.settings as settings
 from src.game.input import Input
 from .game_states import GameStates
 
@@ -13,7 +13,6 @@ class MainMenu(State):
         self.background_color = (24, 20, 37)
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
-        self.settings = Settings()
         self.input = Input()
 
         self.menu = Menu(
@@ -83,14 +82,14 @@ class MainMenu(State):
         self.menu.change_page(3)
     
     def _reset_defaults(self):
-        if not self.settings.fullscreen:
+        if not settings.get('fullscreen'):
             self.owner.set_fullscreen(True)
-        self.settings.reset_defaults()
-        self.settings.save()
+        settings.reset_defaults()
+        settings.save()
         Assets.SOUNDS.update_sounds()
     
     def _update_volume(self):
-        self.settings.save()
+        settings.save()
         Assets.SOUNDS.update_sounds()
     
     def _play(self):

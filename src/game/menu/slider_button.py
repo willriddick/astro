@@ -3,6 +3,7 @@ from typing import Callable
 from src.util import Assets, Vec2
 from .button import Button
 from src.game.input import Input
+import src.game.settings as settings
 
 class SliderButton(Button):
 
@@ -22,11 +23,11 @@ class SliderButton(Button):
     
     @property
     def value(self) -> int:
-        return self.settings.get_key(self.key)
+        return settings.get(self.key)
     
     @value.setter
     def value(self, value: int):
-        self.settings.set_key(self.key, value)
+        settings.set_key(self.key, value)
     
     def select(self):
         self.change_value(self.value + 1)

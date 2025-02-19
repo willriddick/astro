@@ -1,25 +1,26 @@
 import os
 import numpy as np
-from enum import Enum
 import pygame
-from src.game.settings import Settings
+import src.game.settings as settings
 from .sound import Sound
 
 SOUND_PATH = os.path.join('assets', 'audio')
 
 class SoundManager:
-    """
-    A class to manage loading and playing sounds.
-    """
     def __init__(self):
         self.sounds: dict[str, list[Sound]] = {}
-        self.settings = Settings()
     
-    def get_sfx_volume(self) -> float:
-        return (self.settings.sfx_volume / 10) * (self.settings.master_volume / 10)
+    @property
+    def master_volume(self) -> float:
+        return settings.get('master_volume') / 10
+    
+    @property
+    def sfx_volume(self) -> float:
+        return (settings.get('sfx_volume') / 10)  * self.master_volume
 
-    def get_music_volume(self) -> float:
-        return (self.settings.music_volume / 10) * (self.settings.master_volume / 10)
+    @property
+    def music_volume(self) -> float:
+        return (settings.get('music_volume') / 10) * self.master_volume
     
     def update_sounds(self):
         """
@@ -27,9 +28,9 @@ class SoundManager:
         """
         for sound in self.sounds.values():
             if sound.category == 0:
-                sound.update_volume(self.get_sfx_volume())
+                sound.update_volume(self.sfx_volume)
             elif sound.category == 1:
-                sound.update_volume(self.get_music_volume())
+                sound.update_volume(self.music_volume)
             
     def get(self, name: str) -> Sound:
         """Get a sound from the dictionary."""
@@ -47,7 +48,7 @@ class SoundManager:
         """
         self.get(name).play(pitch_index, loops)
     
-    def add(self, 
+    def add(self,  
             name: str, 
             path: str = '',
             category: int = 0,

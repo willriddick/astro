@@ -7,7 +7,7 @@ from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-from .settings import Settings
+import src.game.settings as settings
 from .input import Input
 
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
@@ -16,18 +16,17 @@ ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 class Game:
     def __init__(self):
         pygame.init()
-        self.settings = Settings()
         self.input = Input()
 
         self.running = False
         self.paused = False
-
+        scale = settings.get('window_scale')
         self.window = pygame.display.set_mode(
-            (DISPLAY_WIDTH * self.settings.window_scale, DISPLAY_HEIGHT * self.settings.window_scale),
+            (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
             pygame.SCALED
         )
         self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
-        self.set_fullscreen(self.settings.fullscreen)
+        self.set_fullscreen(settings.get('fullscreen'))
 
         Assets.load()
         pygame.display.set_caption('Astro')
@@ -130,16 +129,16 @@ class Game:
         self.window = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
     
     def toggle_fullscreen(self):
-        self.set_fullscreen(not self.settings.fullscreen)
+        self.set_fullscreen(not settings.get('fullscreen'))
 
     def set_fullscreen(self, value: bool):
-        self.settings.fullscreen = value
-
+        settings.set_key('fullscreen', value)
         if value:
             size = (0, 0)
             mode = pygame.FULLSCREEN
         else:
-            size = (DISPLAY_WIDTH * self.settings.window_scale, DISPLAY_HEIGHT * self.settings.window_scale)
+            scale = settings.get('window_scale')
+            size = (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale)
             mode = pygame.RESIZABLE
 
         self.window = pygame.display.set_mode(size, mode)

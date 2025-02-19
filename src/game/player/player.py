@@ -3,7 +3,7 @@ from src.util import Assets, Direction, StateMachine, load_sprite_sheet, swap_pa
 from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
 from src.game.clock import Clock
 from src.game.debug import Debug
-from src.game.settings import Settings
+import src.game.settings as settings
 from src.game.input import Input
 from .enums import Animations, States
 
@@ -64,7 +64,6 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
-        self.settings = Settings()
         self.input = Input()
 
         self.camera = None
@@ -295,7 +294,7 @@ class Player(PhysicsEntity):
 
         # oosition the fuel fill at the bottom and expand symmetrically
         surface = pygame.Surface((bar_width, 1), pygame.SRCALPHA)
-        alpha = 255 * (self.settings.fuel_ui_alpha / 10)
+        alpha = 255 * (settings.get('fuel_ui_alpha') / 10)
         surface.set_alpha(alpha)
 
         center_x = bar_width // 2
