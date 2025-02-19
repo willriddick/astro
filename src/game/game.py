@@ -116,7 +116,8 @@ class Game:
             self.toggle_fullscreen
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
-                self.paused = not self.paused
+                if event.mod & pygame.KMOD_CTRL:
+                    self.paused = not self.paused
     
     def handle_resize(self, width, height):
         new_width = width

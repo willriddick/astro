@@ -8,6 +8,9 @@ from .debug import Debug
 import src.game.assets as assets
 
 class Camera:
+
+    DISTANCE_BUFFER = 7
+
     def __init__(self, size: Vec2):
         self.size = size
         self.display = pygame.Surface(size)
@@ -95,14 +98,18 @@ class Camera:
         
         return pygame.Vector2(clamped_x, clamped_y)
     
-    def set_pos(self, target_pos: pygame.Vector2) -> None:
+    def set_pos(self, target_pos: pygame.Vector2):
         """Set the camera's position to a target position."""
         self.pos = target_pos
     
-    def move_to(self, target_pos: pygame.Vector2, smoothing=10, factor=20) -> None:
+    def move_to(self, target_pos: pygame.Vector2, smoothing=10, factor=20):
         """Smoothly interpolate towards the target position using an exponential decay approach."""
         # Calculate dynamic smoothing based on the distance to the target
         distance_to_target = (target_pos - self.pos).length()
+
+        if distance_to_target < self.DISTANCE_BUFFER:
+            return
+
         dynamic_smoothing = smoothing * (1 + distance_to_target / factor) 
         
         # Apply exponential smoothing (cosine interpolation)
@@ -111,11 +118,11 @@ class Camera:
         # Clamp the position and update
         self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
 
-    def screenshake(self, duration: int, intensity: int) -> None:
+    def screenshake(self, duration: int, intensity: int):
         self.screenshake_timer.start(duration)
         self.screenshake_intensity = intensity
     
-    def _handle_screenshake(self) -> None:
+    def _handle_screenshake(self):
         if self.screenshake_timer.is_active:
             self.screenshake_offset = pygame.Vector2(
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
