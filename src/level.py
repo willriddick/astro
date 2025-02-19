@@ -1,12 +1,12 @@
 import os
 import random
 import pygame
-from src.game.debug import Debug
+from src.debug import Debug
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Vec2, Direction
 from src.tilemap import TileMap, Tile
 from src.level_gen import LevelMap
-import src.game.assets as assets
+import src.assets as assets
 
 MAPS_PATH = 'assets/maps'
 
@@ -16,7 +16,7 @@ class Level:
     def __init__(self, seed = None, config = CONFIGS[0], map_path: str = None):
         from .components import Entity, Collider
         from .player import Player 
-        from src.game.entities import StarSpawner
+        from src.entities import StarSpawner
         
         Level.current = self
 
@@ -127,7 +127,7 @@ class Level:
         based on three sets, horizontal, vertical, and corner tiles. This greatly reduces the 
         entity/collider count by creating a single entity for a grouping of spikes.
         """
-        from src.game.entities import Spike, HSpike, VSpike, CSpike
+        from src.entities import Spike, HSpike, VSpike, CSpike
         spikes: set[Spike] = set()
         horizontal_tiles: set[Tile] = set()
         vertical_tiles: set[Tile] = set()

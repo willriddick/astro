@@ -1,5 +1,5 @@
 from src.util import State, Direction
-import src.game.assets as assets
+import src.assets as assets
 from ..enums import States
 
 class Hurt(State):

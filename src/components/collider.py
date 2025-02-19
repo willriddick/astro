@@ -1,7 +1,7 @@
 from typing import Callable
 import pygame
 from src.util import Vec2, draw_rect
-from src.game.level import Level
+from src.level import Level
 from ..components import Entity
 
 class Collider(Entity):

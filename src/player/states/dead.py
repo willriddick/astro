@@ -1,6 +1,6 @@
 import pygame
 from src.util import State, Direction, Timer
-import src.game.assets as assets
+import src.assets as assets
 from ..player import Player
 from ..enums import Animations, States
 

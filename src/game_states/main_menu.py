@@ -2,10 +2,10 @@ from random import randint, choice
 import pygame
 from src.util import State, Vec2
 from src.menu import Menu, Button, ToggleButton, SliderButton, InputButton
-from src.game.entities import StarSpawner
-import src.game.settings as settings
-import src.game.inputs as inputs
-import src.game.assets as assets
+from src.entities import StarSpawner
+import src.settings as settings
+import src.inputs as inputs
+import src.assets as assets
 from .game_states import GameStates
 
 class MainMenu(State):

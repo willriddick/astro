@@ -7,8 +7,8 @@ from .debug import Debug
 from .clock import Clock
 from .level import Level
 from .camera import Camera
-import src.game.settings as settings
-import src.game.assets as assets
+import src.settings as settings
+import src.assets as assets
 
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT

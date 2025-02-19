@@ -1,10 +1,10 @@
 import pygame
 from typing import Callable
 from src.util import Vec2
-from src.game.clock import Clock
-import src.game.settings as settings
-import src.game.inputs as inputs
-import src.game.assets as assets
+from src.clock import Clock
+import src.settings as settings
+import src.inputs as inputs
+import src.assets as assets
 from .button import Button
 
 class SliderButton(Button):

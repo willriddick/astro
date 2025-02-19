@@ -5,7 +5,7 @@ from src.util import Vec2, randf, draw_rect, Timer
 from .level import Level
 from .clock import Clock
 from .debug import Debug
-import src.game.assets as assets
+import src.assets as assets
 
 class Camera:
 

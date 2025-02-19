@@ -1,7 +1,7 @@
 from src.util import Vec2
 from .button import Button
-import src.game.assets as assets
-import src.game.inputs as inputs
+import src.assets as assets
+import src.inputs as inputs
 
 class Menu():
     def __init__(self, pages: list[list[Button]], position = Vec2(16, 16), draw_direction = -1):

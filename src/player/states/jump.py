@@ -1,5 +1,5 @@
 from src.util import State, Timer
-import src.game.assets as assets
+import src.assets as assets
 from ..player import Player
 from ..enums import States
 

@@ -1,11 +1,11 @@
 import pygame
 from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
-from src.game.components import PhysicsEntity, Collider, HealthComponent, Sprite 
-from src.game.clock import Clock
-from src.game.debug import Debug
-import src.game.settings as settings
-import src.game.inputs as inputs
-import src.game.assets as assets
+from src.components import PhysicsEntity, Collider, HealthComponent, Sprite 
+from src.clock import Clock
+from src.debug import Debug
+import src.settings as settings
+import src.inputs as inputs
+import src.assets as assets
 from .enums import Animations, States
 
 class Player(PhysicsEntity):

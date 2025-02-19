@@ -1,7 +1,7 @@
 from enum import Enum
 import math
 import pygame
-from src.game.clock import Clock
+from src.clock import Clock
 from src.util import Vec2, Timer
 
 class Sprite:

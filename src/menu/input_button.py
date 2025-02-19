@@ -2,8 +2,8 @@ import pygame
 from typing import Callable
 from src.util import Vec2
 from .button import Button
-import src.game.assets as assets
-import src.game.inputs as inputs
+import src.assets as assets
+import src.inputs as inputs
 
 class InputButton(Button):
 

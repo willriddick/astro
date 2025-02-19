@@ -1,9 +1,9 @@
 from random import choice, randint
 import pygame
 from src.util import randf, Vec2
-from src.game.clock import Clock
-from src.game.components import PhysicsEntity, Entity, Sprite
-import src.game.assets as assets
+from src.clock import Clock
+from src.components import PhysicsEntity, Entity, Sprite
+import src.assets as assets
 
 class AsteroidSpawner(Entity):
     def __init__(self):

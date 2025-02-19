@@ -2,7 +2,7 @@ import os
 import sys
 import pygame
 from src.util import Vec2, CommandPrompt
-import src.game.assets as assets
+import src.assets as assets
 from .tile_map import TileMap
 from .tile_type import TileType
 

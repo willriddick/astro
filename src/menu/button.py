@@ -1,7 +1,7 @@
 import pygame
 from src.util import Vec2
-from src.game.clock import Clock
-import src.game.assets as assets
+from src.clock import Clock
+import src.assets as assets
 
 class Button():
 

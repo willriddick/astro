@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pygame
-import src.game.settings as settings
+import src.settings as settings
 from .sound import Sound
 
 SOUND_PATH = os.path.join('assets', 'audio')

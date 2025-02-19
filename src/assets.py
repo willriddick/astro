@@ -1,9 +1,5 @@
 import pygame
-from ..util.sound_manager import SoundManager
-from ..util.sound import Sound
-from ..util.load import load_image, load_sprite_sheet
-from ..util.palette import load_palette, load_palettes
-from ..util.vec2 import Vec2
+from src.util import SoundManager, Sound, load_image, load_sprite_sheet, load_palette, load_palettes, Vec2
 
 ICON = None
 PALETTE = None

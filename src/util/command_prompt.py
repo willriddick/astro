@@ -122,7 +122,7 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
-            import src.game.assets as assets
+            import src.assets as assets
 
             rect = pygame.Rect(0, display.get_height() - 12, display.get_width(), 12)
             draw_rect(

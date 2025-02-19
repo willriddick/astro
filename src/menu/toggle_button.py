@@ -2,8 +2,8 @@ import pygame
 from typing import Callable
 from src.util import Vec2
 from .button import Button
-import src.game.settings as settings
-import src.game.assets as assets
+import src.settings as settings
+import src.assets as assets
 
 class ToggleButton(Button):
 

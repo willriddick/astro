@@ -1,6 +1,6 @@
 from src.util import State, approach
-from src.game.clock import Clock
-import src.game.assets as assets
+from src.clock import Clock
+import src.assets as assets
 from ..player import Player
 from ..enums import Animations, States
 

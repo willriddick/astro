@@ -1,5 +1,5 @@
 import pygame
-import src.game.settings as settings
+import src.settings as settings
 
 class Clock:
     """A global clock for our game."""

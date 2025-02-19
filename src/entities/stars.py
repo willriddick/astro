@@ -2,8 +2,8 @@ from math import floor
 from random import choice, choices, randint
 import pygame
 from src.util import randf
-from src.game.components import Entity
-import src.game.assets as assets
+from src.components import Entity
+import src.assets as assets
 
 class StarSpawner():
     def __init__(self, invert_depth: bool = False, buffer: int = 16):
