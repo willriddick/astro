@@ -15,6 +15,12 @@ class Timer:
         self.start_time = None
     
     @property
+    def progress(self) -> float:
+        if self.duration == 0:
+            return 0
+        return (self.duration - self.time_left) / self.duration
+    
+    @property
     def time_left(self) -> float:
         if self.start_time is None:
             return 0

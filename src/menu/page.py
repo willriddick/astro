@@ -7,7 +7,7 @@ class Page:
         self.default_index = default_index
         self.button_index = default_index
     
-    def move_index(self, input_dir: int):
+    def change_index(self, input_dir: int):
         self.button_index = int((self.button_index + input_dir) % self.button_count)
     
     @property
@@ -18,7 +18,7 @@ class Page:
     def page_height(self) -> int:
         return self.button_count * self.buttons[0].SURFACE_SIZE.y
     
-    def render(self, display, position, draw_dir):
+    def render(self, display, position, draw_dir, alpha):
         for index, button in enumerate(self.buttons):
             button.update(hovered=index == self.button_index)
             surface = button.get_surface()
@@ -29,5 +29,7 @@ class Page:
                 y_pos = position.y + y_offset
             else:  # bottom-to-top
                 y_pos = position.y - self.page_height + y_offset
+            
+            surface.set_alpha(alpha)
 
             display.blit(surface, (position.x, y_pos))

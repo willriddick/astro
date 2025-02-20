@@ -71,6 +71,7 @@ class MainMenu(State):
 
     def _switch_to_main(self):
         self.menu.change_page(0)
+        settings.save()
 
     def _switch_to_settings(self):
         self.menu.change_page(1)
