@@ -1,8 +1,7 @@
-import pygame
-from src.clock import Clock
 from src.util import Vec2, Timer
 import src.assets as assets
 import src.inputs as inputs
+from src.camera import CAMERA
 from .page import Page
 
 class Menu():
@@ -35,15 +34,16 @@ class Menu():
 
         if inputs.get('select', just_pressed=True):
             self.current_page.selected_button.select()
+            CAMERA.screenshake(20, 2)
     
     def render(self, display, _):
         if self.transition_timer.is_active:
-            self._render_transition(display) 
+            self._render_transition(display, position=self.position + CAMERA.screenshake_offset) 
         else:
-            self.current_page.render(display, self.position, self.draw_direction, 255)
+            self.current_page.render(display, self.position + CAMERA.screenshake_offset, self.draw_direction, 255)
     
-    def _render_transition(self, display):
+    def _render_transition(self, display, position):
         progress = self.transition_timer.progress
-        self.previous_page.render(display, self.position, self.draw_direction, int((1 - progress) * 255))
-        self.current_page.render(display, self.position, self.draw_direction, int(progress * 255))
+        self.previous_page.render(display, position, self.draw_direction, int((1 - progress) * 255))
+        self.current_page.render(display, position, self.draw_direction, int(progress * 255))
     

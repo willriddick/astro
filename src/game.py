@@ -2,16 +2,14 @@ import asyncio
 import sys
 import pygame
 from src.util import CommandPrompt, Vec2, StateMachine
-from .game_states import GameStates
-from .debug import Debug
-from .clock import Clock
-from .level import Level
-from .camera import Camera
+from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, ASPECT_RATIO
+from src.game_states import GameStates
+from src.debug import Debug
+from src.clock import Clock
+from src.level import Level
+from src.camera import CAMERA
 import src.settings as settings
 import src.assets as assets
-
-DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
-ASPECT_RATIO = DISPLAY_WIDTH / DISPLAY_HEIGHT
 
 class Game:
     def __init__(self):
@@ -23,7 +21,7 @@ class Game:
             (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
             pygame.SCALED
         )
-        self.camera = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        self.camera = CAMERA
         self.set_fullscreen(settings.get('fullscreen'))
 
         assets.load()
@@ -52,14 +50,14 @@ class Game:
 
             if not self.paused:
                 self.state_machine.update()
-            self.camera.update()
+            CAMERA.update()
 
             # handle commmands and draw command prompt
             self.handle_commands()
-            self.command_prompt.render(self.camera.display)
+            self.command_prompt.render(CAMERA.display)
 
             try:
-                self.window.blit(pygame.transform.scale(self.camera.display, self.window.get_size()))
+                self.window.blit(pygame.transform.scale(CAMERA.display, self.window.get_size()))
                 pygame.display.flip()
                 Clock.update()
             except KeyboardInterrupt:
@@ -72,8 +70,8 @@ class Game:
 
     def new_level(self, seed: int = None, map_path: str = None):
         self.level = Level(seed=seed, map_path=map_path)
-        self.level.player.camera = self.camera
-        self.camera.set_pos(self.level.spawn_pos)
+        self.level.player.camera = CAMERA
+        CAMERA.set_pos(self.level.spawn_pos)
         print(self.level.entities)
 
     def handle_commands(self):

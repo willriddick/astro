@@ -1,6 +1,7 @@
 import numpy as np
 import pygame
 from typing import Callable
+from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, randf, draw_rect, Timer
 from .level import Level
 from .clock import Clock
@@ -135,3 +136,4 @@ class Camera:
     def get_blank(self) -> pygame.Surface:
         return pygame.Surface(self.size)
     
+CAMERA = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))

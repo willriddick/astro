@@ -20,7 +20,6 @@ class ToggleButton(Button):
     
     @value.setter
     def value(self, value: int):
-        print((self.key, value))
         settings.set_key(self.key, value)
     
     def select(self):
