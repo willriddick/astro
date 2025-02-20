@@ -2,6 +2,7 @@ import pygame
 from src.util import Vec2
 from src.clock import Clock
 import src.assets as assets
+from src.camera import CAMERA
 
 class Button():
 
@@ -24,6 +25,7 @@ class Button():
    
     def select(self):
         assets.SOUNDS.play('select')
+        CAMERA.screenshake(30, 1)
         self.callback()
     
     def update(self, hovered: bool):

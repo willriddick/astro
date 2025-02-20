@@ -1,8 +1,7 @@
 from .button import Button
 
-from src.camera import CAMERA
-
 class Page:
+
     def __init__(self, buttons: list[Button], default_index: int = 0):
         self.buttons = buttons
         self.button_count = len(self.buttons)

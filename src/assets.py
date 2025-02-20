@@ -51,7 +51,7 @@ def _load_sounds():
         Sound("teleport", default_volume=0.2),
         Sound("hurt", default_volume=0.25),
         Sound("dead", default_volume=1.4),
-        Sound("blip_pitch",  path="blip2", default_volume=0.5, pitch=[0.8, 1, 0.025]),
+        Sound("blip_pitch",  path="blip2", default_volume=0.5, pitch=[0.7, 1.2, 0.03]),
         Sound("blip", path="blip2", default_volume=0.5, pitch=[0.9, 1.1, 0.025]),
         Sound("select", default_volume=0.4, path="select2"),
     ])

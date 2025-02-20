@@ -34,7 +34,6 @@ class Menu():
 
         if inputs.get('select', just_pressed=True):
             self.current_page.selected_button.select()
-            CAMERA.screenshake(20, 2)
     
     def render(self, display, _):
         if self.transition_timer.is_active:

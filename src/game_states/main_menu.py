@@ -25,6 +25,7 @@ class MainMenu(State):
                 ]),
                 Page([
                     ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
+                    SliderButton('Resolution', key='window_scale', min_value=1, max_value=5, callback=lambda: self.owner.set_fullscreen(settings.get('fullscreen'))),
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Audio', self._switch_to_audio),
                     Button('Controls', self._switch_to_controls),

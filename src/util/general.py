@@ -1,4 +1,4 @@
-from random import randrange, randint
+from random import randint
 from typing import TypeVar
 
 def approach(value: float, target: float, step: float) -> float:
@@ -10,7 +10,8 @@ def approach(value: float, target: float, step: float) -> float:
         return target
 
 def randf(start: float, stop: float, step: float) -> float:
-    return randrange(int(start / step), int(stop / step)) * step
+    steps = int((stop - start) / step)
+    return start + step * randint(0, steps)
 
 T = TypeVar('T')
 def get_weighted_choice(available: list[T], weights: dict[T, int]) -> T | None:
