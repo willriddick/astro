@@ -129,7 +129,9 @@ class Player(PhysicsEntity):
         self.draw_fuel_bar(display, offset)
     
     def update(self):
-        Debug.add_display(self.debug)
+        if Debug.enabled():
+            Debug.add_display(self.debug)
+
         self.handle_input()
         self.sprite.update(self.position)
         self.health_component.update(self.position)

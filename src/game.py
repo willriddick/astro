@@ -42,7 +42,9 @@ class Game:
        
         while self.running:
             Debug.update()
-            Debug.add_display(f'fps: {Clock.fps()}')
+
+            if settings.get('show_fps') or Debug.enabled():
+                Debug.add_display(f'fps: {Clock.fps()}')
 
             for event in pygame.event.get():
                 self.handle_event(event)

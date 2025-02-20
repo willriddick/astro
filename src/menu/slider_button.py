@@ -14,11 +14,13 @@ class SliderButton(Button):
     KNOB_SIZE = Vec2(3, 7)
     KNOB_SPEED = 20
 
-    def __init__(self, text: str, key: str, callback: Callable[[], None]=None, min_value: int = 0, max_value: int = 10):
+    def __init__(self, text: str, key: str, callback: Callable[[int], None]=None, min_value=0, max_value=10, step=1, wrap=True):
         super().__init__(text, callback)
         self.key = key
         self.min_value = min_value
         self.max_value = max_value
+        self.step = step
+        self.wrap = wrap
 
         self.knob_position = 0
         self.knob_target = 0
@@ -32,21 +34,25 @@ class SliderButton(Button):
         settings.set_key(self.key, value)
     
     def select(self):
-        self.change_value(self.value + 1)
+        self.change_value(self.value * self.step)
     
     def change_value(self, value: int):
         """Update the slider value while respecting min/max bounds."""
         value_range = self.max_value - self.min_value + 1
-        self.value = (value - self.min_value) % value_range + self.min_value
+        if self.wrap:
+            self.value = (value * self.step - self.min_value) % value_range + self.min_value
+        else:
+            self.value = max(self.min_value, min(self.max_value, value))
+
         assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
         if self.callback:
-            self.callback()
+            self.callback(self.value)
     
     def update(self, hovered: bool):
         super().update(hovered)
         if self.hovered:
             input_dir = inputs.get_dir(just_pressed=True).x
-            if input_dir:
+            if input_dir != 0:
                 self.change_value(self.value + input_dir)
 
         # Adjust slider knob positioning based on min_value

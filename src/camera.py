@@ -1,6 +1,6 @@
 import numpy as np
-import pygame
 from typing import Callable
+import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, randf, draw_rect, Timer
 from .level import Level
@@ -45,8 +45,7 @@ class Camera:
         self.render_callback(self.display, -self.offset)
 
         # render debug display
-        if Debug.enabled():
-            self._debug_display()
+        self._debug_display()
     
     def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
         """Set a new render function for the camera."""
@@ -57,13 +56,14 @@ class Camera:
         text_surf = assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
+        buffer = 2
         draw_rect(
             self.display,
-            rect=pygame.Rect(0, 0, 100, text_rect.height + 8),
+            rect=pygame.Rect(0, 0, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
             fill_color=(0, 0, 0, 40),
             outline_color=(0, 0, 0, 0)
         )
-        self.display.blit(text_surf, (4, 4))
+        self.display.blit(text_surf, (buffer, buffer))
 
     @property
     def debug(self) -> str:

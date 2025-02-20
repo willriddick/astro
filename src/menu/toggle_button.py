@@ -7,10 +7,10 @@ import src.assets as assets
 
 class ToggleButton(Button):
 
-    TOGGLE_POS = Vec2(156, 4)
+    TOGGLE_POS = Vec2(156, 2)
     TOGGLE_SIZE = Vec2(8, 8)    
 
-    def __init__(self, text: str, key: str, callback: Callable[[bool], None]):
+    def __init__(self, text: str, key: str, callback: Callable[[bool], None]=None):
         super().__init__(text, callback)
         self.key = key
     
@@ -25,7 +25,8 @@ class ToggleButton(Button):
     def select(self):
         self.value = not self.value
         assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.value else 0)
-        self.callback(self.value)
+        if self.callback:
+            self.callback(self.value)
     
     def get_surface(self):
         surface = super().get_surface()

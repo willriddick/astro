@@ -13,7 +13,7 @@ class Clock:
         
         Updates delta time to `_clock.tick() / 1000` since `tick()` returns milliseconds.
         """
-        cls._dt = cls._clock.tick(settings.get('max_fps')) / 1000
+        cls._dt = cls._clock.tick() / 1000
 
     @classmethod
     def dt(cls) -> float:

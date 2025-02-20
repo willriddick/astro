@@ -24,13 +24,18 @@ class MainMenu(State):
                     Button('Quit', self._quit)
                 ]),
                 Page([
-                    ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
-                    SliderButton('Resolution', key='window_scale', min_value=1, max_value=5, callback=lambda: self.owner.set_fullscreen(settings.get('fullscreen'))),
-                    SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
+                    Button('Display', self._switch_to_display),
                     Button('Audio', self._switch_to_audio),
                     Button('Controls', self._switch_to_controls),
                     Button('Reset Defaults', self._reset_defaults),
                     Button('Back', self._switch_to_main)
+                ]),
+                Page([
+                    ToggleButton('Show FPS', key='show_fps', callback=lambda _: settings.save()),
+                    ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
+                    SliderButton('Resolution', key='window_scale', min_value=1, max_value=5, callback=lambda _: self.owner.set_fullscreen(settings.get('fullscreen'))),
+                    SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
+                    Button('Back', self._switch_to_settings)
                 ]),
                 Page([
                     SliderButton('Master Volume', key='master_volume', callback=self._update_volume),
@@ -77,11 +82,14 @@ class MainMenu(State):
     def _switch_to_settings(self):
         self.menu.change_page(1)
     
-    def _switch_to_audio(self):
+    def _switch_to_display(self):
         self.menu.change_page(2)
     
-    def _switch_to_controls(self):
+    def _switch_to_audio(self):
         self.menu.change_page(3)
+    
+    def _switch_to_controls(self):
+        self.menu.change_page(4)
     
     def _reset_defaults(self):
         if not settings.get('fullscreen'):
@@ -92,7 +100,7 @@ class MainMenu(State):
         inputs.save()
         assets.SOUNDS.update_sounds()
     
-    def _update_volume(self):
+    def _update_volume(self, _):
         settings.save()
         assets.SOUNDS.update_sounds()
     
