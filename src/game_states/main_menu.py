@@ -5,7 +5,7 @@ from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton
 from src.entities import StarSpawner
 from src.camera import CAMERA
 from src.settings import SETTINGS
-import src.inputs as inputs
+from src.inputs import INPUTS
 import src.assets as assets
 from .game_states import GameStates
 
@@ -105,8 +105,8 @@ class MainMenu(State):
             self.owner.set_fullscreen(True)
         SETTINGS.reset_defaults()
         SETTINGS.save()
-        inputs.reset_defaults()
-        inputs.save()
+        INPUTS.reset_defaults()
+        INPUTS.save()
         assets.SOUNDS.update_sounds()
     
     def _set_fullscreen(self, value: bool):

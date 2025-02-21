@@ -3,7 +3,7 @@ from typing import Callable
 from src.util import Vec2
 from src.clock import CLOCK
 from src.settings import SETTINGS
-import src.inputs as inputs
+from src.inputs import INPUTS
 import src.assets as assets
 from .button import Button
 
@@ -51,7 +51,7 @@ class SliderButton(Button):
     def update(self, hovered: bool):
         super().update(hovered)
         if self.hovered:
-            input_dir = inputs.get_dir(just_pressed=True).x
+            input_dir = INPUTS.get_dir(just_pressed=True).x
             if input_dir != 0:
                 self.change_value(self.value + input_dir)
 

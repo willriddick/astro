@@ -4,7 +4,7 @@ from src.components import PhysicsEntity, Collider, HealthComponent, Sprite
 from src.clock import CLOCK
 from src.debug import DEBUG
 from src.settings import SETTINGS
-import src.inputs as inputs
+from src.inputs import INPUTS
 import src.assets as assets
 from .enums import Animations, States
 
@@ -182,10 +182,10 @@ class Player(PhysicsEntity):
             if self.fuel >= Player.BOOST_UP_COST:
                 self.set_state(States.BOOST_UP)
         
-        if self.fuel < Player.BOOST_UP_COST and inputs.get('up', just_pressed=True):
+        if self.fuel < Player.BOOST_UP_COST and INPUTS.get('up', just_pressed=True):
             assets.SOUNDS.play('cant_boost')
 
-        if inputs.get('down', just_pressed=True):
+        if INPUTS.get('down', just_pressed=True):
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
@@ -234,7 +234,7 @@ class Player(PhysicsEntity):
         super().handle_collision()
 
     def handle_input(self):
-        self.input_dir = inputs.get_dir()
+        self.input_dir = INPUTS.get_dir()
 
         # update rotated field
         if self.input_dir.x != 0 and self.input_dir.x != self.last_facing_dir:
@@ -246,8 +246,8 @@ class Player(PhysicsEntity):
             self.last_facing_dir = self.input_dir.x
  
         # update jumping input timer
-        self.holding_jump = inputs.get('jump')
-        if inputs.get('jump', just_pressed=True):
+        self.holding_jump = INPUTS.get('jump')
+        if INPUTS.get('jump', just_pressed=True):
             self.jump_input_timer.start()
 
         # update pressed left/right input timer

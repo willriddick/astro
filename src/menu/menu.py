@@ -1,6 +1,6 @@
 from src.util import Vec2, Timer
 import src.assets as assets
-import src.inputs as inputs
+from src.inputs import INPUTS
 from src.camera import CAMERA
 from .page import Page
 
@@ -27,12 +27,12 @@ class Menu():
 
     def update(self):
         if self.movement_enabled:
-            input_dir = inputs.get_dir(just_pressed=True).y
+            input_dir = INPUTS.get_dir(just_pressed=True).y
             if input_dir:
                 self.current_page.change_index(input_dir)
                 assets.SOUNDS.play('blip')
 
-        if inputs.get('select', just_pressed=True):
+        if INPUTS.get('select', just_pressed=True):
             self.current_page.selected_button.select()
     
     def render(self, display, _):

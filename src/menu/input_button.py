@@ -3,7 +3,7 @@ from typing import Callable
 from src.util import Vec2
 from .button import Button
 import src.assets as assets
-import src.inputs as inputs
+from src.inputs import INPUTS
 
 class InputButton(Button):
 
@@ -16,11 +16,11 @@ class InputButton(Button):
     
     @property
     def value(self) -> int:
-        return inputs.get_input(self.key)
+        return INPUTS.get_input(self.key)
     
     @value.setter
     def value(self, value: int):
-        inputs.set_input(self.key, value)
+        INPUTS.set_input(self.key, value)
     
     def select(self):
         if not self.state:
@@ -31,12 +31,12 @@ class InputButton(Button):
     def update(self, hovered):
         super().update(hovered)
         if self.state:
-            if inputs.get('escape', just_pressed=True):
+            if INPUTS.get('escape', just_pressed=True):
                 self.state = False
                 self.callback(True)  # enable menu movement
             else:
-                new_value = inputs.get_next_keydown()
-                if new_value and inputs.set_input(self.key, new_value):
+                new_value = INPUTS.get_next_keydown()
+                if new_value and INPUTS.set_input(self.key, new_value):
                     self.value = new_value
                     self.state = False
                     self.callback(True)
