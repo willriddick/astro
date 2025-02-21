@@ -1,3 +1,4 @@
+from random import randint
 import pygame
 from src.util import Vec2
 from src.clock import Clock
@@ -10,6 +11,8 @@ class Button():
     X_OFFSET = 7
     OFFSET_SPEED = 15 
 
+    HOVERED_COLOR = None  # placeholder 
+
     def __init__(self, text: str, callback: callable):
         self.text = text
         self.callback = callback
@@ -17,8 +20,13 @@ class Button():
         self.x_offset = 0
         self.target_offset = 0 
 
-        self.HOVERED_COLOR = assets.PALETTE[34]
+        self.disabled = False
+
         self.DEFAULT_COLOR = assets.PALETTE[5]
+        self.DISABLED_COLOR = assets.PALETTE[3]
+
+        if Button.HOVERED_COLOR is None:
+            Button.HOVERED_COLOR = assets.PALETTE[randint(20, len(assets.PALETTE) - 1)]
     
     def __str__(self):
         return self.text
@@ -34,7 +42,11 @@ class Button():
         self.x_offset += (self.target_offset - self.x_offset) * self.OFFSET_SPEED * Clock.dt()
     
     def get_surface(self) -> pygame.Surface:
-        color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
+        if self.disabled:
+            color = self.DISABLED_COLOR
+        else:
+            color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
+
         surface = pygame.Surface(self.SURFACE_SIZE, pygame.SRCALPHA)
         surface.blit(assets.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
         return surface

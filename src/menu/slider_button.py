@@ -61,7 +61,12 @@ class SliderButton(Button):
  
     def get_surface(self) -> pygame.Surface:
         surface = super().get_surface()
-        color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
+
+        if self.disabled:
+            color = self.DISABLED_COLOR
+        else:
+            color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
+
         pygame.draw.line(
             surface, color, 
             start_pos=self.SLIDER_POS, 

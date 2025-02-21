@@ -32,7 +32,7 @@ def reset_defaults():
     _settings = {
         "show_fps": False,
         "fullscreen": True,
-        "window_scale": 4,
+        "window_scale": 3,
         "master_volume": 10,
         "sfx_volume": 5,
         "music_volume": 5,

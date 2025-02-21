@@ -1,3 +1,4 @@
+from numpy import sign
 from .button import Button
 
 class Page:
@@ -9,7 +10,10 @@ class Page:
         self.button_index = default_index
     
     def change_index(self, input_dir: int):
-        self.button_index = int((self.button_index + input_dir) % self.button_count)
+        button_index = int((self.button_index + input_dir) % self.button_count)
+        self.button_index = button_index 
+        if self.buttons[button_index].disabled:
+            self.button_index += int(sign(input_dir))
     
     @property
     def selected_button(self) -> Button:

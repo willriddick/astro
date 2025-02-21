@@ -15,6 +15,14 @@ class MainMenu(State):
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
+        self.resolution_slider = SliderButton(
+            'Resolution', 
+            key='window_scale', 
+            min_value=1, max_value=7, 
+            callback=lambda _: self.owner.set_fullscreen(settings.get('fullscreen'))
+        )
+        self.resolution_slider.disabled = settings.get('fullscreen')
+
         self.menu = Menu(
             position=Vec2(16, 180 - 16),
             pages = [
@@ -32,8 +40,8 @@ class MainMenu(State):
                 ]),
                 Page([
                     ToggleButton('Show FPS', key='show_fps', callback=lambda _: settings.save()),
-                    ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self.owner.set_fullscreen(x)),
-                    SliderButton('Resolution', key='window_scale', min_value=1, max_value=5, callback=lambda _: self.owner.set_fullscreen(settings.get('fullscreen'))),
+                    ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self._set_fullscreen(x)),
+                    self.resolution_slider,
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Back', self._switch_to_settings)
                 ]),
@@ -99,6 +107,10 @@ class MainMenu(State):
         inputs.reset_defaults()
         inputs.save()
         assets.SOUNDS.update_sounds()
+    
+    def _set_fullscreen(self, value: bool):
+        self.owner.set_fullscreen(value)
+        self.resolution_slider.disabled = value
     
     def _update_volume(self, _):
         settings.save()
