@@ -1,28 +1,31 @@
 class Debug:
-    _state = False
-    _messages: list[str] = []
+    """A global debug system for logging messages."""
+    
+    def __init__(self):
+        self._state = False
+        self._messages: list[str] = []
 
-    @classmethod
-    def update(cls) -> None:
-        """Clears messages each frame."""
-        cls._messages.clear()
-
-    @classmethod
-    def toggle(cls) -> None:
-        """Toggles debug mode on/off."""
-        cls._state = not cls._state
-
-    @classmethod
-    def enabled(cls) -> bool:
+    @property
+    def enabled(self) -> bool:
         """Returns whether debug mode is enabled."""
-        return cls._state
+        return self._state
 
-    @classmethod
-    def add_display(cls, text: str) -> None:
-        """Adds a debug message to display."""
-        cls._messages.append(text)
-
-    @classmethod
-    def display(cls) -> str:
+    @property
+    def display(self) -> str:
         """Returns all debug messages as a formatted string."""
-        return '\n'.join(cls._messages)
+        return '\n'.join(self._messages)
+
+    def update(self) -> None:
+        """Clears messages each frame."""
+        self._messages.clear()
+
+    def toggle(self) -> None:
+        """Toggles debug mode on/off."""
+        self._state = not self._state
+
+    def add_display(self, text: str) -> None:
+        """Adds a debug message to display."""
+        self._messages.append(text)
+
+
+DEBUG = Debug()
