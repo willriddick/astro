@@ -21,7 +21,7 @@ class Sound:
             path: str = '', 
             category: int = 0,
             default_volume: float = 1.0,
-            pitch: tuple[float, float, float] = (1.0, 1.0, 0.0)
+            pitch: tuple[float, float, float] = None
         ):
         self.name = name
         self.path = path

@@ -54,8 +54,14 @@ class SoundManager:
         sounds = []
 
         # if pitch min == pitch max or pitch step is 0, only add one sound
-        if sound.pitch[0] == sound.pitch[1] or sound.pitch[2] == 0:
-            new_sound = change_pitch(base_sound, sound.pitch[0])
+        if sound.pitch is None or sound.pitch[0] == sound.pitch[1] or sound.pitch[2] == 0:
+            # if pitch is not None, we wanted to change the default pitch
+            if sound.pitch is not None:
+                new_sound = change_pitch(base_sound, sound.pitch[0])
+            else:
+                new_sound = base_sound
+            
+            # update volume and add to Sound object
             new_sound.set_volume(sound.default_volume)
             sounds.append(new_sound)
         else:

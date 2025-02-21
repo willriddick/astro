@@ -33,7 +33,7 @@ def reset_defaults():
         "show_fps": False,
         "fullscreen": True,
         "window_scale": 4,
-        "master_volume": 5,
+        "master_volume": 10,
         "sfx_volume": 5,
         "music_volume": 5,
         "fuel_ui_alpha": 5

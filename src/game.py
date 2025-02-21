@@ -38,7 +38,7 @@ class Game:
     
     async def run(self):
         self.running = True
-        #assets.SOUNDS.play('track1', loops=-1)
+        #assets.SOUNDS.play('music/track1', loops=-1)
        
         while self.running:
             Debug.update()
