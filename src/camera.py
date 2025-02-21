@@ -4,8 +4,8 @@ import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, randf, draw_rect, Timer
 from .level import Level
-from .clock import Clock
-from .debug import Debug
+from .clock import CLOCK
+from .debug import DEBUG
 import src.assets as assets
 
 class Camera:
@@ -53,7 +53,7 @@ class Camera:
     
     def _debug_display(self):
         # display debug information
-        text_surf = assets.FONT.render(str(Debug.display()), antialias=False, color=(255, 255, 255))
+        text_surf = assets.FONT.render(str(DEBUG.display), antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
         buffer = 2
@@ -114,7 +114,7 @@ class Camera:
         dynamic_smoothing = smoothing * (1 + distance_to_target / factor) 
         
         # Apply exponential smoothing (cosine interpolation)
-        self.smoothing = (1 - np.cos(dynamic_smoothing * np.pi * Clock.dt())) / 2
+        self.smoothing = (1 - np.cos(dynamic_smoothing * np.pi * CLOCK.dt)) / 2
         
         # Clamp the position and update
         self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
@@ -136,4 +136,5 @@ class Camera:
     def get_blank(self) -> pygame.Surface:
         return pygame.Surface(self.size)
     
+
 CAMERA = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))

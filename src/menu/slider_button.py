@@ -1,7 +1,7 @@
 import pygame
 from typing import Callable
 from src.util import Vec2
-from src.clock import Clock
+from src.clock import CLOCK
 import src.settings as settings
 import src.inputs as inputs
 import src.assets as assets
@@ -57,7 +57,7 @@ class SliderButton(Button):
 
         # Adjust slider knob positioning based on min_value
         self.knob_target = self.SLIDER_LENGTH * ((self.value - self.min_value) / (self.max_value - self.min_value))
-        self.knob_position += (self.knob_target - self.knob_position) * self.KNOB_SPEED * Clock.dt()
+        self.knob_position += (self.knob_target - self.knob_position) * self.KNOB_SPEED * CLOCK.dt
  
     def get_surface(self) -> pygame.Surface:
         surface = super().get_surface()

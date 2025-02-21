@@ -1,5 +1,5 @@
 from src.util import State, approach
-from src.clock import Clock
+from src.clock import CLOCK
 import src.assets as assets
 from ..player import Player
 from ..enums import Animations, States
@@ -20,7 +20,7 @@ class BoostUp(State):
     def update(self):
         self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_UP_MOVE_SPEED, Player.BOOST_UP_MOVE_ACC)
 
-        self.owner.fuel = approach(self.owner.fuel, 0, 100 * Clock.dt())
+        self.owner.fuel = approach(self.owner.fuel, 0, 100 * CLOCK.dt)
         self.owner.accelerate_y(-1, Player.BOOST_UP_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
         self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_UP_SPEED)
 

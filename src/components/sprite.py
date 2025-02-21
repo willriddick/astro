@@ -1,7 +1,7 @@
 from enum import Enum
 import math
 import pygame
-from src.clock import Clock
+from src.clock import CLOCK
 from src.util import Vec2, Timer
 
 class Sprite:
@@ -121,7 +121,7 @@ class Sprite:
             surface.fill(self.flash_color, special_flags=self.flash_blend)
         
         if self.alpha_timer.is_active and self.flash_timer.is_done:
-            time_factor = (Clock.ticks() // self.alpha_speed) % 2
+            time_factor = (CLOCK.ticks // self.alpha_speed) % 2
             alpha = self.alpha_range[time_factor]
             surface.set_alpha(alpha)
         else:

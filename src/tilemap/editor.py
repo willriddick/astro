@@ -18,7 +18,7 @@ class Editor:
         pygame.display.set_caption('Editor')
         
         self.running = False
-        self.clock = pygame.time.Clock()
+        self.clock = pygame.time.CLOCK()
         self.last_path = ''
         self.command_prompt = CommandPrompt()
 

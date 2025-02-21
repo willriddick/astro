@@ -4,8 +4,8 @@ import pygame
 from src.util import CommandPrompt, Vec2, StateMachine
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, ASPECT_RATIO
 from src.game_states import GameStates
-from src.debug import Debug
-from src.clock import Clock
+from src.debug import DEBUG
+from src.clock import CLOCK
 from src.level import Level
 from src.camera import CAMERA
 import src.settings as settings
@@ -40,10 +40,10 @@ class Game:
         #assets.SOUNDS.play('music/track1', loops=-1)
        
         while self.running:
-            Debug.update()
+            DEBUG.update()
 
-            if settings.get('show_fps') or Debug.enabled():
-                Debug.add_display(f'fps: {Clock.fps()}')
+            if settings.get('show_fps') or DEBUG.enabled:
+                DEBUG.add_display(f'fps: {CLOCK.fps}')
 
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -60,7 +60,7 @@ class Game:
             try:
                 self.window.blit(pygame.transform.scale(CAMERA.display, self.window.get_size()))
                 pygame.display.flip()
-                Clock.update()
+                CLOCK.update()
             except KeyboardInterrupt:
                 self.running = False
             
@@ -83,7 +83,7 @@ class Game:
         player = self.level.player
         match command.split():
             case ['d']:
-                Debug.toggle()
+                DEBUG.toggle()
             case ['g']:
                 player.toggle_ghost()
             case ['n']:

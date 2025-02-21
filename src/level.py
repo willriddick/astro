@@ -1,7 +1,7 @@
 import os
 import random
 import pygame
-from src.debug import Debug
+from src.debug import DEBUG
 from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Vec2, Direction
 from src.tilemap import TileMap, Tile
@@ -76,7 +76,7 @@ class Level:
             entity.render(display, offset)
         
         # debug display colliders 
-        if Debug.enabled():
+        if DEBUG.enabled:
             for collider in Level.current.colliders:
                 collider.render(display, offset)
 

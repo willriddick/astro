@@ -3,7 +3,7 @@ from src.tilemap import Tile
 from src.util import approach, Direction, Vec2
 from ..level import Level
 from .entity import Entity
-from ..clock import Clock
+from ..clock import CLOCK
 
 class PhysicsEntity(Entity):
     def __init__(self, position: pygame.Vector2, size: Vec2):
@@ -37,23 +37,23 @@ class PhysicsEntity(Entity):
     def apply_gravity(self, gravity: float, fall_speed: float) -> None:
         self.velocity.y = min(
             fall_speed * self.gravity_multiplier,
-            self.velocity.y + (gravity * self.gravity_multiplier * Clock.dt())
+            self.velocity.y + (gravity * self.gravity_multiplier * CLOCK.dt)
         )
 
     @staticmethod
     def _acc_dec(value: float, target: float, dir_: int, acc: tuple[float, float], multiplier: float) -> float:
         if dir_ != 0:
             target = dir_ * target * multiplier
-            step = acc[0] * multiplier * Clock.dt()
+            step = acc[0]
         else:
             target = 0
-            step = acc[1] * multiplier * Clock.dt()
+            step = acc[1]
 
-        return approach(value, target, step)
+        return approach(value, target, step * multiplier * CLOCK.dt)
 
     def handle_collision(self) -> None:
         if not self.collision_enabled:
-            self.position += self.velocity * Clock.dt()
+            self.position += self.velocity * CLOCK.dt()
             return
 
         # Update tile position
@@ -67,7 +67,7 @@ class PhysicsEntity(Entity):
         collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position
-        self.position.y += self.velocity.y * Clock.dt()
+        self.position.y += self.velocity.y * CLOCK.dt
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect
@@ -82,7 +82,7 @@ class PhysicsEntity(Entity):
                     self.velocity.y *= 0.85
 
         # Update x position
-        self.position.x += self.velocity.x * Clock.dt() 
+        self.position.x += self.velocity.x * CLOCK.dt 
         entity_rect = self.rect
         for tile in collisions_around:
             rect = tile.rect

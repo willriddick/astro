@@ -1,7 +1,7 @@
 from random import randint
 import pygame
 from src.util import Vec2
-from src.clock import Clock
+from src.clock import CLOCK
 import src.assets as assets
 from src.camera import CAMERA
 
@@ -39,7 +39,7 @@ class Button():
     def update(self, hovered: bool):
         self.hovered = hovered
         self.target_offset = self.X_OFFSET if self.hovered else 0
-        self.x_offset += (self.target_offset - self.x_offset) * self.OFFSET_SPEED * Clock.dt()
+        self.x_offset += (self.target_offset - self.x_offset) * self.OFFSET_SPEED * CLOCK.dt
     
     def get_surface(self) -> pygame.Surface:
         if self.disabled:

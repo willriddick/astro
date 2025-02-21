@@ -1,8 +1,8 @@
 import pygame
 from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
 from src.components import PhysicsEntity, Collider, HealthComponent, Sprite 
-from src.clock import Clock
-from src.debug import Debug
+from src.clock import CLOCK
+from src.debug import DEBUG
 import src.settings as settings
 import src.inputs as inputs
 import src.assets as assets
@@ -128,8 +128,8 @@ class Player(PhysicsEntity):
         self.draw_fuel_bar(display, offset)
     
     def update(self):
-        if Debug.enabled():
-            Debug.add_display(self.debug)
+        if DEBUG.enabled:
+            DEBUG.add_display(self.debug)
 
         self.handle_input()
         self.sprite.update(self.position)
@@ -175,7 +175,7 @@ class Player(PhysicsEntity):
             and self.refuel_timer.is_done 
             and self.fuel != Player.MAX_FUEL
         ):
-            self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * Clock.dt())
+            self.fuel = approach(self.fuel, Player.MAX_FUEL, Player.REFUEL_RATE * CLOCK.dt)
     
     def handle_boost(self):
         if self.input_dir.y == -1:
