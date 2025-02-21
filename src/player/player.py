@@ -65,7 +65,6 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
-        self.camera = None
         self.input_dir = None
         self.spawn_position = pygame.Vector2(0, 0)
         self.slide_dir = 0

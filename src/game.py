@@ -21,7 +21,6 @@ class Game:
             (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
             pygame.SCALED
         )
-        self.camera = CAMERA
         self.set_fullscreen(settings.get('fullscreen'))
 
         assets.load()

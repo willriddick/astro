@@ -3,6 +3,7 @@ import pygame
 from src.util import State, Vec2
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton
 from src.entities import StarSpawner
+from src.camera import CAMERA
 import src.settings as settings
 import src.inputs as inputs
 import src.assets as assets
@@ -64,18 +65,18 @@ class MainMenu(State):
     
     def on_enter(self):
         self.star_spawner.spawn(30)
-        self.owner.camera.boundary = None
+        CAMERA.boundary = None
         self.camera_movement = pygame.Vector2(
-            choice([-1, 1]) * randint(20, 30), 
-            choice([-1, 1]) * randint(5, 15)
+            choice([-1, 1]) * randint(5, 30),
+            choice([-1, 1]) * randint(5, 30)
         )
     
     def on_exit(self):
         self.star_spawner.clear()
 
     def update(self):
-        self.owner.camera.set_render_callback(self.render)
-        self.owner.camera.move_to(self.owner.camera.pos + self.camera_movement)
+        CAMERA.set_render_callback(self.render)
+        CAMERA.move_to(CAMERA.pos + self.camera_movement)
         self.menu.update()
     
     def render(self, display, offset):

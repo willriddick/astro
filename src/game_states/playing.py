@@ -1,4 +1,5 @@
 from src.util import State
+from src.camera import CAMERA
 from .game_states import GameStates
 
 class Playing(State):
@@ -6,9 +7,9 @@ class Playing(State):
         super().__init__(GameStates.PLAYING)
 
     def on_enter(self):
-        self.owner.camera.boundary = self.owner.level.tilemap.rect
+        CAMERA.boundary = self.owner.level.tilemap.rect
 
     def update(self):
         self.owner.level.update()
-        self.owner.camera.set_render_callback(self.owner.level.render) 
-        self.owner.camera.move_to(self.owner.level.player.center)
+        CAMERA.set_render_callback(self.owner.level.render) 
+        CAMERA.move_to(self.owner.level.player.center)
