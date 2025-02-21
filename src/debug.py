@@ -1,5 +1,5 @@
 class Debug:
-    """A global debug system for logging messages."""
+    """A global class used to manage the debug state."""
     
     def __init__(self):
         self._state = False

@@ -9,6 +9,7 @@ from .debug import DEBUG
 import src.assets as assets
 
 class Camera:
+    """A global class for rendering."""
 
     DISTANCE_BUFFER = 7
 

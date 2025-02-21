@@ -4,7 +4,7 @@ from src.util import State, Vec2
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton
 from src.entities import StarSpawner
 from src.camera import CAMERA
-import src.settings as settings
+from src.settings import SETTINGS
 import src.inputs as inputs
 import src.assets as assets
 from .game_states import GameStates
@@ -20,9 +20,9 @@ class MainMenu(State):
             'Resolution', 
             key='window_scale', 
             min_value=1, max_value=7, 
-            callback=lambda _: self.owner.set_fullscreen(settings.get('fullscreen'))
+            callback=lambda _: self.owner.set_fullscreen(SETTINGS.get('fullscreen'))
         )
-        self.resolution_slider.disabled = settings.get('fullscreen')
+        self.resolution_slider.disabled = SETTINGS.get('fullscreen')
 
         self.menu = Menu(
             position=Vec2(16, 180 - 16),
@@ -40,7 +40,7 @@ class MainMenu(State):
                     Button('Back', self._switch_to_main)
                 ]),
                 Page([
-                    ToggleButton('Show FPS', key='show_fps', callback=lambda _: settings.save()),
+                    ToggleButton('Show FPS', key='show_fps', callback=lambda _: SETTINGS.save()),
                     ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self._set_fullscreen(x)),
                     self.resolution_slider,
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
@@ -86,7 +86,7 @@ class MainMenu(State):
 
     def _switch_to_main(self):
         self.menu.change_page(0)
-        settings.save()
+        SETTINGS.save()
 
     def _switch_to_settings(self):
         self.menu.change_page(1)
@@ -101,10 +101,10 @@ class MainMenu(State):
         self.menu.change_page(4)
     
     def _reset_defaults(self):
-        if not settings.get('fullscreen'):
+        if not SETTINGS.get('fullscreen'):
             self.owner.set_fullscreen(True)
-        settings.reset_defaults()
-        settings.save()
+        SETTINGS.reset_defaults()
+        SETTINGS.save()
         inputs.reset_defaults()
         inputs.save()
         assets.SOUNDS.update_sounds()
@@ -114,7 +114,7 @@ class MainMenu(State):
         self.resolution_slider.disabled = value
     
     def _update_volume(self, _):
-        settings.save()
+        SETTINGS.save()
         assets.SOUNDS.update_sounds()
     
     def _play(self):

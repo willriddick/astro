@@ -8,7 +8,7 @@ from src.debug import DEBUG
 from src.clock import CLOCK
 from src.level import Level
 from src.camera import CAMERA
-import src.settings as settings
+from src.settings import SETTINGS
 import src.assets as assets
 
 class Game:
@@ -16,12 +16,12 @@ class Game:
         pygame.init()
         self.running = False
         self.paused = False
-        scale = settings.get('window_scale')
+        scale = SETTINGS.get('window_scale')
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
             pygame.SCALED
         )
-        self.set_fullscreen(settings.get('fullscreen'))
+        self.set_fullscreen(SETTINGS.get('fullscreen'))
 
         assets.load()
         pygame.display.set_caption('Astro')
@@ -42,7 +42,7 @@ class Game:
         while self.running:
             DEBUG.update()
 
-            if settings.get('show_fps') or DEBUG.enabled:
+            if SETTINGS.get('show_fps') or DEBUG.enabled:
                 DEBUG.add_display(f'fps: {CLOCK.fps}')
 
             for event in pygame.event.get():
@@ -127,15 +127,15 @@ class Game:
         self.window = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
     
     def toggle_fullscreen(self):
-        self.set_fullscreen(not settings.get('fullscreen'))
+        self.set_fullscreen(not SETTINGS.get('fullscreen'))
 
     def set_fullscreen(self, value: bool):
-        settings.set_key('fullscreen', value)
+        SETTINGS.set_key('fullscreen', value)
         if value:
             size = (0, 0)
             mode = pygame.FULLSCREEN
         else:
-            scale = settings.get('window_scale')
+            scale = SETTINGS.get('window_scale')
             size = (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale)
             mode = pygame.RESIZABLE
 

@@ -1,7 +1,7 @@
 import pygame
 
 class Clock:
-    """A global clock for our game."""
+    """A global class for managing the time clock."""
     
     def __init__(self):
         self._clock = pygame.time.Clock()

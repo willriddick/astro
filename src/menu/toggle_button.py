@@ -2,7 +2,7 @@ import pygame
 from typing import Callable
 from src.util import Vec2
 from .button import Button
-import src.settings as settings
+from src.settings import SETTINGS
 import src.assets as assets
 
 class ToggleButton(Button):
@@ -16,11 +16,11 @@ class ToggleButton(Button):
     
     @property
     def value(self) -> int:
-        return settings.get(self.key)
+        return SETTINGS.get(self.key)
     
     @value.setter
     def value(self, value: int):
-        settings.set_key(self.key, value)
+        SETTINGS.set_key(self.key, value)
     
     def select(self):
         self.value = not self.value

@@ -3,43 +3,51 @@ import json
 
 SETTINGS_FILE = "settings.json"
 
-_settings = {}
+class Settings:
+    """Manages game settings with load/save functionality."""
+    
+    def __init__(self):
+        """Initialize settings with default values and load from file."""
+        self._settings = {}
+        self.reset_defaults()
+        self.load()
 
-def set_key(key: str, value: any):
-    _settings[key] = value
+    def set_key(self, key: str, value: any) -> None:
+        """Set a key-value pair in the settings."""
+        self._settings[key] = value
 
-def get(key: str):
-    return _settings.get(key)
+    def get(self, key: str):
+        """Get a value from settings."""
+        return self._settings.get(key)
 
-def save(filename=SETTINGS_FILE):
-    with open(filename, "w") as f:
-        json.dump(_settings, f, indent=4)
+    def save(self, filename=SETTINGS_FILE) -> None:
+        """Save settings to a file."""
+        with open(filename, "w") as f:
+            json.dump(self._settings, f, indent=4)
 
-def load(filename=SETTINGS_FILE):
-    global _settings
-    try:
-        if os.path.exists(filename):
-            with open(filename, "r") as f:
-                content = f.read().strip()
-                if content:
-                    _settings.update(json.loads(content))
-    except (json.JSONDecodeError, ValueError) as e:
-        print(f"Error loading settings: {e}, resetting to defaults.")
-        save(filename)
+    def load(self, filename=SETTINGS_FILE) -> None:
+        """Load settings from a file or reset on error."""
+        try:
+            if os.path.exists(filename):
+                with open(filename, "r") as f:
+                    content = f.read().strip()
+                    if content:
+                        self._settings.update(json.loads(content))
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"Error loading settings: {e}, resetting to defaults.")
+            self.save(filename)
 
-def reset_defaults():
-    global _settings
-    _settings = {
-        "show_fps": False,
-        "fullscreen": True,
-        "window_scale": 3,
-        "master_volume": 10,
-        "sfx_volume": 5,
-        "music_volume": 5,
-        "fuel_ui_alpha": 5
-    }
+    def reset_defaults(self) -> None:
+        """Reset settings to default values."""
+        self._settings = {
+            "show_fps": False,
+            "fullscreen": True,
+            "window_scale": 3,
+            "master_volume": 10,
+            "sfx_volume": 5,
+            "music_volume": 5,
+            "fuel_ui_alpha": 5
+        }
 
 
-# load settings on module import
-reset_defaults()
-load()
+SETTINGS = Settings()

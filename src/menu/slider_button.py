@@ -2,7 +2,7 @@ import pygame
 from typing import Callable
 from src.util import Vec2
 from src.clock import CLOCK
-import src.settings as settings
+from src.settings import SETTINGS
 import src.inputs as inputs
 import src.assets as assets
 from .button import Button
@@ -27,11 +27,11 @@ class SliderButton(Button):
     
     @property
     def value(self) -> int:
-        return settings.get(self.key)
+        return SETTINGS.get(self.key)
     
     @value.setter
     def value(self, value: int):
-        settings.set_key(self.key, value)
+        SETTINGS.set_key(self.key, value)
     
     def select(self):
         self.change_value(self.value * self.step)

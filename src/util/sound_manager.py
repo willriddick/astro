@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pygame
-import src.settings as settings
+from src.settings import SETTINGS
 from .sound import Sound
 
 SOUND_PATH = os.path.join('assets', 'audio')
@@ -12,19 +12,19 @@ class SoundManager:
     
     @property
     def master_volume(self) -> float:
-        return settings.get('master_volume') / 10
+        return SETTINGS.get('master_volume') / 10
     
     @property
     def sfx_volume(self) -> float:
-        return (settings.get('sfx_volume') / 10)  * self.master_volume
+        return (SETTINGS.get('sfx_volume') / 10)  * self.master_volume
 
     @property
     def music_volume(self) -> float:
-        return (settings.get('music_volume') / 10) * self.master_volume
+        return (SETTINGS.get('music_volume') / 10) * self.master_volume
     
     def update_sounds(self):
         """
-        Update the volume of all sounds in the dictionary based on current volume settings.
+        Update the volume of all sounds in the dictionary based on current volume SETTINGS
         """
         for sound in self.sounds.values():
             if sound.category == 0:
