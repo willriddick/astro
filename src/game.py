@@ -1,14 +1,15 @@
 import asyncio
 import sys
 import pygame
-from src.util import CommandPrompt, Vec2, StateMachine
+from src.util import CommandPrompt, StateMachine
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, ASPECT_RATIO
 from src.game_states import GameStates
 from src.debug import DEBUG
 from src.clock import CLOCK
-from src.level import Level
 from src.camera import CAMERA
 from src.settings import SETTINGS
+from src.sounds import SOUNDS
+from src.level import Level
 import src.assets as assets
 
 class Game:
@@ -37,7 +38,7 @@ class Game:
     
     async def run(self):
         self.running = True
-        #assets.SOUNDS.play('music/track1', loops=-1)
+        #SOUNDS.play('music/track1', loops=-1)
        
         while self.running:
             DEBUG.update()
@@ -96,7 +97,7 @@ class Game:
                 player.spawn(player.spawn_position)
             case ['tp', x, y]:
                 player.set_position(pygame.Vector2(int(x), int(y)))
-                assets.SOUNDS.play('teleport')
+                SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
             case ['gs', state]:

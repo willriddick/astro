@@ -2,8 +2,9 @@ from random import randint
 import pygame
 from src.util import Vec2
 from src.clock import CLOCK
-import src.assets as assets
 from src.camera import CAMERA
+from src.sounds import SOUNDS
+import src.assets as assets
 
 class Button():
 
@@ -32,7 +33,7 @@ class Button():
         return self.text
    
     def select(self):
-        assets.SOUNDS.play('select')
+        SOUNDS.play('select')
         CAMERA.screenshake(30, 1)
         self.callback()
     

@@ -6,7 +6,7 @@ from src.entities import StarSpawner
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.inputs import INPUTS
-import src.assets as assets
+from src.sounds import SOUNDS
 from .game_states import GameStates
 
 class MainMenu(State):
@@ -107,7 +107,7 @@ class MainMenu(State):
         SETTINGS.save()
         INPUTS.reset_defaults()
         INPUTS.save()
-        assets.SOUNDS.update_sounds()
+        SOUNDS.update_sounds()
     
     def _set_fullscreen(self, value: bool):
         self.owner.set_fullscreen(value)
@@ -115,7 +115,7 @@ class MainMenu(State):
     
     def _update_volume(self, _):
         SETTINGS.save()
-        assets.SOUNDS.update_sounds()
+        SOUNDS.update_sounds()
     
     def _play(self):
         self.owner.state_machine.switch(GameStates.PLAYING)

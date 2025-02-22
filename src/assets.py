@@ -1,5 +1,5 @@
 import pygame
-from src.util import SoundManager, Sound, load_image, load_sprite_sheet, load_palette, load_palettes, Vec2
+from src.util import load_image, load_sprite_sheet, load_palette, load_palettes, Vec2
 
 ICON = None
 PALETTE = None
@@ -34,28 +34,7 @@ def load():
     ASTEROIDS = load_sprite_sheet(load_image("asteroids.png", True), (16, 16))
     SPIKE = load_sprite_sheet(load_image("spikes.png", True), (16, 16))
 
-    _load_sounds()
     _load_tileset()
-
-def _load_sounds():
-    """Initialize and store sounds using SoundManager."""
-    global SOUNDS
-    SOUNDS = SoundManager()
-    SOUNDS.load_all([
-        Sound("jump", default_volume=0.2, pitch=[0.9, 1.1, 0.05]),
-        Sound("wall_jump", path="jump", default_volume=0.2, pitch=[0.7, 1.8, 0.05]),
-        Sound("land", default_volume=0.7),
-        Sound("boost", default_volume=0.8),
-        Sound("cant_boost", default_volume=0.8),
-        Sound("slide", default_volume=0.7),
-        Sound("teleport", default_volume=0.4),
-        Sound("hurt", default_volume=0.5),
-        Sound("dead", default_volume=2.8),
-        Sound("blip_pitch",  path="blip2", default_volume=1, pitch=[0.7, 1.2, 0.03]),
-        Sound("blip", path="blip2", default_volume=1, pitch=[0.9, 1.1, 0.025]),
-        Sound("select", default_volume=0.8, path="select2"),
-        Sound("music/track1", default_volume=0.8),
-    ])
 
 def _load_tileset():
     """Initialize and store the tileset."""

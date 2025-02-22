@@ -1,9 +1,9 @@
 import os
 import json
 
-SETTINGS_FILE = "settings.json"
+SETTINGS_FILE = 'settings.json'
 
-class Settings:
+class SettingsManager:
     """Manages game settings with load/save functionality."""
     
     def __init__(self):
@@ -50,4 +50,4 @@ class Settings:
         }
 
 
-SETTINGS = Settings()
+SETTINGS = SettingsManager()

@@ -1,5 +1,5 @@
 from src.util import State, Timer
-import src.assets as assets
+from src.sounds import SOUNDS
 from ..player import Player
 from ..enums import Animations, States
 
@@ -10,7 +10,7 @@ class Slide(State):
         self.timer = Timer(Player.SLIDE_DURATION)
 
     def on_enter(self):
-        assets.SOUNDS.play('slide')
+        SOUNDS.play('slide')
         self.owner.sprite.set_animation(Animations.SLIDE)
         self.owner.camera.screenshake(20, 2)
         self.owner.slide_dir = self.owner.last_facing_dir

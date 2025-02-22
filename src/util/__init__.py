@@ -9,4 +9,3 @@ from .direction import Direction
 from .command_prompt import CommandPrompt
 from .timer import Timer
 from .sound import Sound
-from .sound_manager import SoundManager

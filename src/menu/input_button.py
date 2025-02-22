@@ -4,6 +4,7 @@ from src.util import Vec2
 from .button import Button
 import src.assets as assets
 from src.inputs import INPUTS
+from src.sounds import SOUNDS
 
 class InputButton(Button):
 
@@ -25,7 +26,7 @@ class InputButton(Button):
     def select(self):
         if not self.state:
             self.state = True
-            assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.state else 0)
+            SOUNDS.play('blip_pitch', pitch_index=-1 if self.state else 0)
             self.callback(False)
     
     def update(self, hovered):

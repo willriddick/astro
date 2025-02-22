@@ -3,9 +3,9 @@ import json
 import pygame
 from src.util import Vec2
 
-INPUTS_FILE = "inputs.json"
+INPUTS_FILE = 'inputs.json'
 
-class Inputs:
+class InputManager:
     def __init__(self):
         self._inputs = {}
         self.reset_defaults()
@@ -89,4 +89,4 @@ class Inputs:
         }
 
 
-INPUTS = Inputs()
+INPUTS = InputManager()

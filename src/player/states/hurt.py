@@ -1,5 +1,5 @@
 from src.util import State, Direction
-import src.assets as assets
+from src.sounds import SOUNDS
 from ..enums import States
 
 class Hurt(State):
@@ -7,7 +7,7 @@ class Hurt(State):
         super().__init__(States.HURT)
     
     def on_enter(self):
-        assets.SOUNDS.play('hurt')
+        SOUNDS.play('hurt')
         self.owner.sprite.flash(100)
         self.owner.sprite.oscillate_alpha(self.owner.health_component.invulnerable_duration, speed=125)
         self.owner.apply_force(100, Direction.UP)

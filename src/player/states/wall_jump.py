@@ -1,5 +1,5 @@
 from src.util import State, Timer
-import src.assets as assets
+from src.sounds import SOUNDS
 from ..player import Player
 from ..enums import Animations, States
 
@@ -11,7 +11,7 @@ class WallJump(State):
     def on_enter(self):
         self.timer.start()
 
-        assets.SOUNDS.play('wall_jump', pitch_index=self.owner.consecutive_wall_jumps)
+        SOUNDS.play('wall_jump', pitch_index=self.owner.consecutive_wall_jumps)
         self.owner.consecutive_wall_jumps += 1
 
         self.owner.sprite.set_animation(Animations.AIR_UP)

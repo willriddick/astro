@@ -3,7 +3,7 @@ from typing import Callable
 from src.util import Vec2
 from .button import Button
 from src.settings import SETTINGS
-import src.assets as assets
+from src.sounds import SOUNDS
 
 class ToggleButton(Button):
 
@@ -24,7 +24,7 @@ class ToggleButton(Button):
     
     def select(self):
         self.value = not self.value
-        assets.SOUNDS.play('blip_pitch', pitch_index=-1 if self.value else 0)
+        SOUNDS.play('blip_pitch', pitch_index=-1 if self.value else 0)
         if self.callback:
             self.callback(self.value)
     

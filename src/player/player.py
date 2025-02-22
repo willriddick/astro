@@ -5,6 +5,7 @@ from src.clock import CLOCK
 from src.debug import DEBUG
 from src.settings import SETTINGS
 from src.inputs import INPUTS
+from src.sounds import SOUNDS
 import src.assets as assets
 from .enums import Animations, States
 
@@ -183,13 +184,13 @@ class Player(PhysicsEntity):
                 self.set_state(States.BOOST_UP)
         
         if self.fuel < Player.BOOST_UP_COST and INPUTS.get('up', just_pressed=True):
-            assets.SOUNDS.play('cant_boost')
+            SOUNDS.play('cant_boost')
 
         if INPUTS.get('down', just_pressed=True):
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
-                assets.SOUNDS.play('cant_boost')
+                SOUNDS.play('cant_boost')
 
     def handle_jump(self):
         if self.on_ground:

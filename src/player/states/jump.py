@@ -1,5 +1,5 @@
 from src.util import State, Timer
-import src.assets as assets
+from src.sounds import SOUNDS
 from ..player import Player
 from ..enums import States
 
@@ -20,7 +20,7 @@ class Jump(State):
         if self.owner.jumps_remaining:
             self.owner.jumps_remaining = max(0, self.owner.jumps_remaining - 1)
 
-            assets.SOUNDS.play('jump')
+            SOUNDS.play('jump')
             self.owner.velocity.y = -Player.JUMP_SPEED * self.owner.velocity_multiplier.y
             self.owner.jump_input_timer.reset()
             self.owner.coyote_timer.reset()

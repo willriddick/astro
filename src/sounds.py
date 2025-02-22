@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pygame
 from src.settings import SETTINGS
-from .sound import Sound
+from .util.sound import Sound
 
 SOUND_PATH = os.path.join('assets', 'audio')
 
@@ -103,3 +103,23 @@ def change_pitch(sound: pygame.mixer.Sound, pitch_factor: float) -> pygame.mixer
         ).astype(np.int16)
     
     return pygame.sndarray.make_sound(new_sound_array)
+
+
+# initialize the SoundManager and load all sounds
+pygame.mixer.init()
+SOUNDS = SoundManager()
+SOUNDS.load_all([
+    Sound("jump", default_volume=0.2, pitch=[0.9, 1.1, 0.05]),
+    Sound("wall_jump", path="jump", default_volume=0.2, pitch=[0.7, 1.8, 0.05]),
+    Sound("land", default_volume=0.7),
+    Sound("boost", default_volume=0.8),
+    Sound("cant_boost", default_volume=0.8),
+    Sound("slide", default_volume=0.7),
+    Sound("teleport", default_volume=0.4),
+    Sound("hurt", default_volume=0.5),
+    Sound("dead", default_volume=2.8),
+    Sound("blip_pitch",  path="blip2", default_volume=1, pitch=[0.7, 1.2, 0.03]),
+    Sound("blip", path="blip2", default_volume=1, pitch=[0.9, 1.1, 0.025]),
+    Sound("select", default_volume=0.8, path="select2"),
+    Sound("music/track1", default_volume=0.8),
+])

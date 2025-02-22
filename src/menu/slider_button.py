@@ -4,7 +4,7 @@ from src.util import Vec2
 from src.clock import CLOCK
 from src.settings import SETTINGS
 from src.inputs import INPUTS
-import src.assets as assets
+from src.sounds import SOUNDS
 from .button import Button
 
 class SliderButton(Button):
@@ -44,7 +44,7 @@ class SliderButton(Button):
         else:
             self.value = max(self.min_value, min(self.max_value, value))
 
-        assets.SOUNDS.play('blip_pitch', pitch_index=self.value)
+        SOUNDS.play('blip_pitch', pitch_index=self.value)
         if self.callback:
             self.callback(self.value)
     
