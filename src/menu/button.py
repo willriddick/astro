@@ -6,6 +6,7 @@ from src.camera import CAMERA
 from src.sounds import SOUNDS
 import src.assets as assets
 
+
 class Button():
 
     SURFACE_SIZE = Vec2(224, 16)

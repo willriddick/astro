@@ -3,6 +3,7 @@ from src.util import Direction, Vec2
 from .status import Status
 from .attribute import Attribute
 
+
 class Room:
     """
     Represents a room in the level with a unique index, position, set of attributes, 

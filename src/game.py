@@ -10,9 +10,12 @@ from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.level import Level
 from src.game_states import GameStates, MainMenu, Playing
-import src.assets as assets
+from src import assets
+
 
 class Game:
+    """Main game class that handles the game loop and state machine."""
+
     def __init__(self):
         pygame.init()
         self.running = False
@@ -34,8 +37,10 @@ class Game:
 
         self.level = None
         self.new_level()
-    
+
+
     async def run(self):
+        """Main game loop that handles events, updates, and rendering."""
         self.running = True
         #SOUNDS.play('music/track1', loops=-1)
        
@@ -70,12 +75,14 @@ class Game:
         sys.exit()
 
     def new_level(self, seed: int = None, map_path: str = None):
+        """Create a new level with the given seed and map path."""
         self.level = Level(seed=seed, map_path=map_path)
         self.level.player.camera = CAMERA
         CAMERA.set_pos(self.level.spawn_pos)
         print(self.level.entities)
 
     def handle_commands(self):
+        """Handle commands from the command prompt."""
         command = self.command_prompt.pop_command()
         if command == '': 
             return

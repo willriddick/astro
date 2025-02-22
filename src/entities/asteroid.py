@@ -5,6 +5,7 @@ from src.clock import CLOCK
 from src.components import PhysicsEntity, Entity, Sprite
 import src.assets as assets
 
+
 class AsteroidSpawner(Entity):
     def __init__(self):
         super().__init__(pygame.Vector2(0, 0), Vec2(0, 0))

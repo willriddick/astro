@@ -1,6 +1,7 @@
 import os
 import json
 
+
 SETTINGS_FILE = 'settings.json'
 
 class SettingsManager:

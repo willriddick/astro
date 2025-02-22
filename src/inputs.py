@@ -3,6 +3,7 @@ import json
 import pygame
 from src.util import Vec2
 
+
 INPUTS_FILE = 'inputs.json'
 
 class InputManager:

@@ -1,6 +1,7 @@
 from numpy import sign
 from .button import Button
 
+
 class Page:
 
     def __init__(self, buttons: list[Button], default_index: int = 0):

@@ -1,6 +1,7 @@
 from typing import NamedTuple
 import pygame
 
+
 class Vec2(NamedTuple):
     """
     An immutable 2D vector of ints (to use when pygame.Vector2 is overkill)

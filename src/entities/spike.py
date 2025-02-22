@@ -3,6 +3,7 @@ from src.util import Vec2
 from src.components import Entity, Sprite, DamageComponent, Collider
 import src.assets as assets
 
+
 class Spike(Entity):
     def __init__(self, position: pygame.Vector2, size: Vec2):
         super().__init__(position, size)

@@ -1,5 +1,6 @@
 import pygame
 
+
 def draw_rect(
         display: pygame.Surface,
         offset = pygame.Vector2(0, 0),

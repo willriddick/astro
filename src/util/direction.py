@@ -1,12 +1,12 @@
 from enum import Enum
 import pygame
-from .vec2 import Vec2
+
 
 class Direction(Enum):
     """
     Represents a direction in the map with a name, bitmask value, and movement vector.
     Attributes:
-        vector (Vec2): A tuple representing the movement vector (dx, dy) for the direction.
+        vector (pygame.Vector2): A tuple representing the movement vector (dx, dy) for the direction.
         mask (int): A bitmask value representing the direction.
         symbol (str): A string symbol representing the direction.
     """

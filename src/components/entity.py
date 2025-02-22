@@ -1,7 +1,8 @@
 import pygame
 from src.util import Vec2
-from ..level import Level 
+from src.level import Level 
 from .sprite import Sprite
+
 
 class Entity:
     """

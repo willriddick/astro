@@ -1,5 +1,6 @@
 import pygame
 
+
 class Clock:
     """A global class for managing the time clock."""
     

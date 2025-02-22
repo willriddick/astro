@@ -7,6 +7,7 @@ from src.inputs import INPUTS
 from src.sounds import SOUNDS
 from .button import Button
 
+
 class SliderButton(Button):
 
     SLIDER_LENGTH = 64

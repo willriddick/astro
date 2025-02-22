@@ -1,9 +1,10 @@
 import pygame
 from src.tilemap import Tile
 from src.util import approach, Direction, Vec2
-from ..level import Level
+from src.level import Level
+from src.clock import CLOCK
 from .entity import Entity
-from ..clock import CLOCK
+
 
 class PhysicsEntity(Entity):
     def __init__(self, position: pygame.Vector2, size: Vec2):

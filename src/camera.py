@@ -1,12 +1,13 @@
 import numpy as np
 from typing import Callable
 import pygame
-from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, randf, draw_rect, Timer
-from .level import Level
-from .clock import CLOCK
-from .debug import DEBUG
+from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
+from src.clock import CLOCK
+from src.debug import DEBUG
+from src.level import Level
 import src.assets as assets
+
 
 class Camera:
     """A global class for rendering."""

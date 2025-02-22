@@ -1,14 +1,14 @@
 import os
 import sys
 import pygame
+from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, CommandPrompt
 import src.assets as assets
 from .tile_map import TileMap
 from .tile_type import TileType
 
-RENDER_SCALE = 3
-DISPLAY_WIDTH, DISPLAY_HEIGHT = 320, 180
 
+RENDER_SCALE = 4
 MAP_PATH = os.path.join('assets', 'maps')
 
 class Editor:

@@ -9,6 +9,7 @@ from src.sounds import SOUNDS
 import src.assets as assets
 from .enums import Animations, States
 
+
 class Player(PhysicsEntity):
     GROUND_MOVE_SPEED = 80
     GROUND_ACC = (360, 720) # (acceleration, deceleration)

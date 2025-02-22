@@ -2,6 +2,7 @@ import re
 import pygame
 from .draw import draw_rect
 
+
 RECT_COLOR = pygame.Color(0, 40, 80, 80)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
 

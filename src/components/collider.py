@@ -2,7 +2,8 @@ from typing import Callable
 import pygame
 from src.util import Vec2, draw_rect
 from src.level import Level
-from ..components import Entity
+from src.components import Entity
+
 
 class Collider(Entity):
     def __init__(self, size: Vec2, offset = pygame.Vector2(0, 0)):

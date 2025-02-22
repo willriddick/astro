@@ -3,6 +3,7 @@ from typing import List
 import pygame
 from .load import load_image
 
+
 IMAGE_PATH = os.path.join('assets', 'images')
 
 Palette = List[pygame.color.Color]

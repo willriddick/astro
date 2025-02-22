@@ -1,5 +1,6 @@
 import pygame 
 
+
 class Timer:
     def __init__(self, duration: int = 0):
         """Create a new timer with a duration in milliseconds."""

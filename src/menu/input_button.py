@@ -6,6 +6,7 @@ import src.assets as assets
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
 
+
 class InputButton(Button):
 
     INPUT_POS = Vec2(156, 4)

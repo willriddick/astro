@@ -5,6 +5,7 @@ from src.util import randf
 from src.components import Entity
 import src.assets as assets
 
+
 class StarSpawner():
     def __init__(self, invert_depth: bool = False, buffer: int = 16):
         self.invert_depth = invert_depth

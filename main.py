@@ -3,6 +3,7 @@ import asyncio
 from src.game import Game
 from src.tilemap.editor import Editor
 
+
 def main():
     parser = argparse.ArgumentParser(description='Run the game or the editor.')
     parser.add_argument('-e', '--editor', action='store_true', help='Run the editor.')

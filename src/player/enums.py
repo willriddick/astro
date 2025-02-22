@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Animations(Enum):
     IDLE_A = 0
     IDLE_B = 1
@@ -12,6 +13,7 @@ class Animations(Enum):
     SLIDE = 8
     BOOST_UP = 9
     BOOST_DOWN = 10
+
 
 class States(Enum):
     GHOST = -2

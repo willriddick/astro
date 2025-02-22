@@ -4,6 +4,7 @@ from .damage import DamageComponent
 from .entity import Entity
 from .collider import Collider
 
+
 class HealthComponent(Entity):
     def __init__(self, collider: Collider, max_health: int, invulnerable_duration: int = 500):
         self.collider = collider

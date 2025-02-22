@@ -1,6 +1,7 @@
 from random import randint
 from typing import TypeVar
 
+
 def approach(value: float, target: float, step: float) -> float:
     if value + step < target:
         return min(target, value + step)

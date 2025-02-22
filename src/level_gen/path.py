@@ -1,5 +1,6 @@
 from .room import Room
 
+
 class Path:
     """
     Represents a path consisting of rooms in a level.

@@ -4,6 +4,7 @@ from src.camera import CAMERA
 from src.sounds import SOUNDS
 from .page import Page
 
+
 class Menu():
 
     def __init__(self, pages: list[Page], position=Vec2(16, 16), draw_direction=-1, transition_duration=200):

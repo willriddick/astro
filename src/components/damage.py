@@ -1,6 +1,7 @@
 import pygame
 from .collider import Collider
 
+
 class DamageComponent:
     def __init__(self, colliders: Collider | list[Collider], damage: int):
         self.colliders = colliders if isinstance(colliders, list) else [colliders]

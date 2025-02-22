@@ -3,6 +3,7 @@ from .config import Config
 from .room import Room
 from .path import Path
 
+
 class LevelMap:
     """
     Represents a level consisting of a 2D map of rooms.

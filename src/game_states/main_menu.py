@@ -9,6 +9,7 @@ from src.inputs import INPUTS
 from src.sounds import SOUNDS
 from .game_states import GameStates
 
+
 class MainMenu(State):
     def __init__(self):
         super().__init__(GameStates.MAIN_MENU)

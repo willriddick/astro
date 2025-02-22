@@ -5,6 +5,7 @@ from .button import Button
 from src.settings import SETTINGS
 from src.sounds import SOUNDS
 
+
 class ToggleButton(Button):
 
     TOGGLE_POS = Vec2(156, 2)

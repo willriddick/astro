@@ -1,6 +1,7 @@
 import os
 import pygame
 
+
 IMAGE_PATH = os.path.join('assets', 'images')
 
 def load_image(path: str, convert_alpha: bool=True) -> pygame.Surface:

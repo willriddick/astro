@@ -2,6 +2,7 @@ from src.util import State
 from src.camera import CAMERA
 from .game_states import GameStates
 
+
 class Playing(State):
     def __init__(self):
         super().__init__(GameStates.PLAYING)

@@ -1,8 +1,8 @@
 from enum import Enum
-import math
 import pygame
 from src.clock import CLOCK
 from src.util import Vec2, Timer
+
 
 class Sprite:
     def __init__(self, pos: pygame.Vector2, image_offset = Vec2(0, 0)):
