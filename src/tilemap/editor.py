@@ -1,5 +1,5 @@
 from os.path import join
-from sys import exit
+import sys
 import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, CommandPrompt

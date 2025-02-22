@@ -30,7 +30,7 @@ class Direction(Enum):
     
     @classmethod
     def cardinals(cls) -> list['Direction']:
-        """Returns the four cardinal directions."""
+        """Returns the four cardinal directions: UP, DOWN, LEFT, RIGHT."""
         return [cls.UP, cls.DOWN, cls.LEFT, cls.RIGHT]
 
     @classmethod

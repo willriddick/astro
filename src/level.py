@@ -136,13 +136,17 @@ class Level:
         
         # categorize all spikes into three sets: horizontal, vertical, and corner
         spike_tiles = tilemap.get_tiles_with('spike')
+        tile_wall_map = {}
+
         for tile in spike_tiles:
             s = []  # spikes: up, down, left, right
             w = []  # walls:  up, down, left, right 
-            for direction in Direction.cardinals():
+            for _, direction in enumerate(Direction.cardinals()):
                 adj = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y), direction)
                 s.append(bool(adj and adj.tile_type.name == 'spike'))
-                w.append(bool(adj and adj.tile_type.collision))
+                w.append(bool(adj and adj.tile_type.collision and adj.tile_type.name != 'platform'))
+            
+            tile_wall_map[tile] = w  # store walls for later use
 
             if any(s[2:]) and not any(s[:2]):    # row spike: left/right only
                 horizontal_tiles.add(tile)
@@ -154,7 +158,7 @@ class Level:
                 vertical_tiles.add(tile)
             else:                                # must be a corner spike
                 corner_tiles.add(tile)
-        
+
         # create merged spike entities for horizontal set
         visited = set()
         for tile in sorted(horizontal_tiles, key=lambda tile: tile.tile_pos.x):
@@ -167,10 +171,9 @@ class Level:
                 visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x + width, tile.tile_pos.y)))
                 width += 1
             
-            tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
-            above = tile_above is not None and tile_above.tile_type.collision
+            above = tile_wall_map[tile][0]
             spikes.add(HSpike(tile.pos, width, above))
-        
+
         # create merged spike entities for vertical set
         visited.clear()
         for tile in sorted(vertical_tiles, key=lambda tile: tile.tile_pos.y):
@@ -183,22 +186,18 @@ class Level:
                 visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y + height)))
                 height += 1
             
-            tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
-            right = tile_right is not None and tile_right.collision
+            right = tile_wall_map[tile][3]
             spikes.add(VSpike(tile.pos, height, right))
 
         # create spike entities for corner set
         for tile in corner_tiles:
-            tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
-            above = tile_above is not None and tile_above.tile_type.collision
-            tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
-            right = tile_right is not None and tile_right.tile_type.collision
-            spikes.add(CSpike(tile.pos, above, right))
+            w = tile_wall_map[tile]  # reuse stored walls
+            spikes.add(CSpike(tile.pos, w[0], w[3]))  # above, right
 
         # remove tile object from tilemap now that we have created an entity
         tilemap.remove_tiles(spike_tiles)
         return spikes
-    
+        
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
         tilemap.create_tile_rect(
