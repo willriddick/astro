@@ -11,6 +11,7 @@ class BoostUp(State):
     
     def on_enter(self):
         SOUNDS.play('boost')
+        self.owner.fuel -= Player.BOOST_UP_COST
         self.owner.sprite.set_next(Animations.BOOST_UP)
         self.owner.velocity.y = min(self.owner.velocity.y, -Player.INITIAL_BOOST_UP)
     
