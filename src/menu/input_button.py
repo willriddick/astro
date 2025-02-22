@@ -2,7 +2,7 @@ import pygame
 from typing import Callable
 from src.util import Vec2
 from .button import Button
-import src.assets as assets
+import src.graphics as graphics
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
 
@@ -48,6 +48,6 @@ class InputButton(Button):
         color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
         
         item = '?' if self.state else pygame.key.name(self.value)
-        surface.blit(assets.FONT.render(item, antialias=False, color=color), (self.INPUT_POS.x, 0))
+        surface.blit(graphics.FONT.render(item, antialias=False, color=color), (self.INPUT_POS.x, 0))
         return surface
  

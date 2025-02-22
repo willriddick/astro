@@ -123,7 +123,7 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
-            import src.assets as assets
+            import src.graphics as graphics
 
             rect = pygame.Rect(0, display.get_height() - 12, display.get_width(), 12)
             draw_rect(
@@ -134,7 +134,7 @@ class CommandPrompt:
                 outline_color=RECT_COLOR,
             )
             text = f'/{self.input[:self.cursor_index]}_{self.input[self.cursor_index:]}'
-            text_surf = assets.FONT.render(text, antialias=False, color=(255, 255, 255))
+            text_surf = graphics.FONT.render(text, antialias=False, color=(255, 255, 255))
 
             display.blit(text_surf, (4, display.get_height() - 10))
     

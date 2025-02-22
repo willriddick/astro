@@ -7,7 +7,7 @@ from src.level_gen import CONFIGS, generate_level, Attribute
 from src.util import Vec2, Direction
 from src.tilemap import TileMap, Tile
 from src.level_gen import LevelMap
-import src.assets as assets
+import src.graphics as graphics
 
 MAPS_PATH = join('assets', 'maps')
 
@@ -32,11 +32,11 @@ class Level:
         self.exit_pos = pygame.Vector2(0, 0)
 
         if map_path:
-            self.tilemap = TileMap.load(map_path, assets.TILESET)
+            self.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
             self.tilemap = self.generate(config, seed)
         
-        self.tilemap.create_border(assets.TILESET.get_by('stone'))
+        self.tilemap.create_border(graphics.TILESET.get_by('stone'))
 
         if self.spawn_tile:
             self.spawn_pos = self.spawn_tile.pos
@@ -93,7 +93,7 @@ class Level:
 
     def generate(self, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
         level_map: LevelMap = generate_level(config, seed)
-        tilemap = TileMap(assets.TILESET, size=Vec2(0, 0))
+        tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
 
         for y in range(level_map.config.rows):
             for x in range(level_map.config.cols):
@@ -111,11 +111,11 @@ class Level:
                 for name in listdir(map_folder):
                     map_paths.append(join(map_folder, name))
                 map_path = choice(map_paths)
-                new_map = TileMap.load(map_path, assets.TILESET)
+                new_map = TileMap.load(map_path, graphics.TILESET)
 
                 if room.has_attribute(Attribute.ENTRANCE):
                     pos = choice(new_map.get_valid_floor()).tile_pos
-                    self.spawn_tile = new_map.create_tile(assets.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
+                    self.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
 
                 tilemap.place_tilemap(new_map, room.position, flip)
                
@@ -201,7 +201,7 @@ class Level:
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
         tilemap.create_tile_rect(
-            assets.TILESET.get_by('stone'), 
+            graphics.TILESET.get_by('stone'), 
             pygame.Rect(room_pos.x * room_size.x, room_pos.y * room_size.y, room_size.x, room_size.y)
         )
 

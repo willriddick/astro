@@ -3,7 +3,7 @@ from random import choice, choices, randint
 import pygame
 from src.util import randf
 from src.components import Entity
-import src.assets as assets
+import src.graphics as graphics
 
 
 class StarSpawner():
@@ -39,7 +39,7 @@ class Star(Entity):
         self.spawner = spawner
 
         # select a star image
-        self.image = choices(assets.STARS, weights=self.weights, k=1)[0].copy()
+        self.image = choices(graphics.STARS, weights=self.weights, k=1)[0].copy()
 
         # Adjust RGB values
         channel = randint(0, 2)
@@ -70,7 +70,7 @@ class Star(Entity):
     def weights(self) -> list[int]:
         # if WEIGHTS has not been initialized
         if len(Star.WEIGHTS) == 0:
-            length = len(assets.STARS)
+            length = len(graphics.STARS)
             # bias towards simpler starts
             for i in range(length):
                 Star.WEIGHTS.append(floor(abs(i - length) * 3) + 5)

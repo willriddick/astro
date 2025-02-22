@@ -4,7 +4,7 @@ from src.util import Vec2
 from src.clock import CLOCK
 from src.camera import CAMERA
 from src.sounds import SOUNDS
-import src.assets as assets
+import src.graphics as graphics
 
 
 class Button():
@@ -24,11 +24,11 @@ class Button():
 
         self.disabled = False
 
-        self.DEFAULT_COLOR = assets.PALETTE[5]
-        self.DISABLED_COLOR = assets.PALETTE[3]
+        self.DEFAULT_COLOR = graphics.PALETTE[5]
+        self.DISABLED_COLOR = graphics.PALETTE[3]
 
         if Button.HOVERED_COLOR is None:
-            Button.HOVERED_COLOR = assets.PALETTE[randint(20, len(assets.PALETTE) - 1)]
+            Button.HOVERED_COLOR = graphics.PALETTE[randint(20, len(graphics.PALETTE) - 1)]
     
     def __str__(self):
         return self.text
@@ -50,5 +50,5 @@ class Button():
             color = self.HOVERED_COLOR if self.hovered else self.DEFAULT_COLOR
 
         surface = pygame.Surface(self.SURFACE_SIZE, pygame.SRCALPHA)
-        surface.blit(assets.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
+        surface.blit(graphics.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
         return surface

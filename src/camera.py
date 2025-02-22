@@ -6,7 +6,7 @@ from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.clock import CLOCK
 from src.debug import DEBUG
 from src.level import Level
-import src.assets as assets
+import src.graphics as graphics
 
 
 class Camera:
@@ -55,7 +55,7 @@ class Camera:
     
     def _debug_display(self):
         # display debug information
-        text_surf = assets.FONT.render(str(DEBUG.display), antialias=False, color=(255, 255, 255))
+        text_surf = graphics.FONT.render(str(DEBUG.display), antialias=False, color=(255, 255, 255))
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
         buffer = 2

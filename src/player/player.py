@@ -6,7 +6,7 @@ from src.debug import DEBUG
 from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
-import src.assets as assets
+import src.graphics as graphics
 from .enums import Animations, States
 
 
@@ -259,14 +259,14 @@ class Player(PhysicsEntity):
             self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):
-        self.palette_index = palette_index % len(assets.PLAYER_PALETTES)
-        self.palette = assets.PLAYER_PALETTES[self.palette_index]
+        self.palette_index = palette_index % len(graphics.PLAYER_PALETTES)
+        self.palette = graphics.PLAYER_PALETTES[self.palette_index]
 
         self.fuel_ui_color = self.palette[Player.FUEL_UI_COLOR_INDEX]
 
         sheet = swap_palette(
-            assets.PLAYER_SHEET,
-            assets.PLAYER_PALETTES[0],
+            graphics.PLAYER_SHEET,
+            graphics.PLAYER_PALETTES[0],
             self.palette,
         )
         image_list = load_sprite_sheet(sheet, (16, 18))

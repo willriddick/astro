@@ -1,9 +1,6 @@
 from os.path import join
-import pygame
-from src.util import load_image, load_sprite_sheet, load_palette, load_palettes, Vec2
+from src.util import load_image, load_sprite_sheet, load_font, load_palette, load_palettes, Vec2
 
-
-ASSET_PATH = 'assets'
 
 ICON = None
 PALETTE = None
@@ -26,7 +23,7 @@ def load():
     
     PALETTE = load_palette('endesga-64.png')
     
-    FONT = pygame.font.Font(join(ASSET_PATH, join('fonts', 'DePixelKlein.ttf')), 9)
+    FONT = load_font('DePixelKlein.ttf', 9)
 
     PLAYER_SHEET = load_image(join('player', 'player.png'), False)
     PLAYER_PALETTES = load_palettes(join('player', 'palettes'))

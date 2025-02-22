@@ -4,7 +4,7 @@ import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, CommandPrompt
 from src.clock import CLOCK
-import src.assets as assets
+import src.graphics as graphics
 from .tile_map import TileMap
 from .tile_type import TileType
 
@@ -24,9 +24,9 @@ class Editor:
 
         self.display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
         self.screen = pygame.display.set_mode((DISPLAY_WIDTH * RENDER_SCALE, DISPLAY_HEIGHT * RENDER_SCALE))
-        assets.load()
+        graphics.load()
 
-        self.tilemap = TileMap(assets.TILESET)
+        self.tilemap = TileMap(graphics.TILESET)
 
         self.camera_direction = Vec2(0, 0)
         self.camera_speed = Vec2(2, 2)
@@ -41,7 +41,7 @@ class Editor:
         self.mouse_pos = Vec2(0, 0)
         self.tile_pos = Vec2(0, 0)
         self.type_index = 0
-        self.tile_type: TileType = assets.TILESET.get_by_index(self.type_index)
+        self.tile_type: TileType = graphics.TILESET.get_by_index(self.type_index)
         self.tile_variant = 0
 
     def run(self):
@@ -95,8 +95,8 @@ class Editor:
 
         # Calculate selected tile position
         self.tile_pos = Vec2(
-            int((self.mouse_pos.x + self.camera_offset[0]) // assets.TILESET.tile_size.x), 
-            int((self.mouse_pos.y + self.camera_offset[1]) // assets.TILESET.tile_size.y)
+            int((self.mouse_pos.x + self.camera_offset[0]) // graphics.TILESET.tile_size.x), 
+            int((self.mouse_pos.y + self.camera_offset[1]) // graphics.TILESET.tile_size.y)
         )
 
         # Change tile type and variant
@@ -109,7 +109,7 @@ class Editor:
                 self.tile_variant = (self.tile_variant + direction) % len(self.tile_type.images)
             else:
                 self.type_index += direction
-                self.tile_type = assets.TILESET.get_by_index(self.type_index)
+                self.tile_type = graphics.TILESET.get_by_index(self.type_index)
                 self.tile_variant = 0
 
         # Create or remove tile
@@ -142,7 +142,7 @@ class Editor:
                 TileMap.save(self.tilemap, join(MAP_PATH, path))
             case ['load' | 'l', path]:
                 self.last_path = join(MAP_PATH, path)
-                tilemap = TileMap.load(self.last_path, assets.TILESET)
+                tilemap = TileMap.load(self.last_path, graphics.TILESET)
                 if tilemap:
                     self.tilemap = tilemap
             case ['clear' | 'c']: 
@@ -167,7 +167,7 @@ class Editor:
         )
     
     def draw_tile_square(self, tile_pos):
-        tile_size = assets.TILESET.tile_size
+        tile_size = graphics.TILESET.tile_size
         current_tile = pygame.Surface((tile_size.x, tile_size.y), pygame.SRCALPHA)
         current_tile.set_alpha(100)
         pygame.draw.rect(
@@ -181,7 +181,7 @@ class Editor:
         )
     
     def draw_border(self):
-        tile_size = assets.TILESET.tile_size
+        tile_size = graphics.TILESET.tile_size
         size = self.tilemap.size
         border = pygame.Surface((size.x * tile_size.x, size.y * tile_size.y), pygame.SRCALPHA)
         border.set_alpha(100)

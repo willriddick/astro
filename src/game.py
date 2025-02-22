@@ -10,7 +10,7 @@ from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.level import Level
 from src.game_states import GameStates, MainMenu, Playing
-from src import assets
+import src.graphics as graphics
 
 
 class Game:
@@ -27,9 +27,9 @@ class Game:
         )
         self.set_fullscreen(SETTINGS.get('fullscreen'))
 
-        assets.load()
+        graphics.load()
         pygame.display.set_caption('Astro')
-        pygame.display.set_icon(assets.ICON)
+        pygame.display.set_icon(graphics.ICON)
 
         self.command_prompt = CommandPrompt()
 
