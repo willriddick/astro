@@ -1,9 +1,10 @@
-import os
-import pygame
+from os.path import join
+import numpy as np
 from random import randint
+import pygame
 
 
-SOUND_PATH = os.path.join('assets', 'audio')
+SOUND_PATH = join('assets', 'audio')
 
 class Sound:
     """
@@ -84,7 +85,7 @@ class Sound:
         return self.sound_count
 
 def load_sound(name: str) -> pygame.mixer.Sound:
-    return pygame.mixer.Sound(os.path.join(SOUND_PATH, f'{name}.wav'))
+    return pygame.mixer.Sound(join(SOUND_PATH, f'{name}.wav'))
 
 def change_pitch(sound: pygame.mixer.Sound, pitch_factor: float) -> pygame.mixer.Sound:
     """ Change pitch of a pygame sound by resampling the NumPy array. """

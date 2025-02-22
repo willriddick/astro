@@ -1,5 +1,5 @@
-import os
-import sys
+from os.path import join
+from sys import exit
 import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, CommandPrompt
@@ -9,7 +9,7 @@ from .tile_type import TileType
 
 
 RENDER_SCALE = 4
-MAP_PATH = os.path.join('assets', 'maps')
+MAP_PATH = join('assets', 'maps')
 
 class Editor:
     
@@ -139,9 +139,9 @@ class Editor:
                 if self.last_path:
                     TileMap.save(self.tilemap, self.last_path)
             case ['save' | 's', path]:
-                TileMap.save(self.tilemap, os.path.join(MAP_PATH, path))
+                TileMap.save(self.tilemap, join(MAP_PATH, path))
             case ['load' | 'l', path]:
-                self.last_path = os.path.join(MAP_PATH, path)
+                self.last_path = join(MAP_PATH, path)
                 tilemap = TileMap.load(self.last_path, assets.TILESET)
                 if tilemap:
                     self.tilemap = tilemap

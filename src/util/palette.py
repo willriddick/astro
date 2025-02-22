@@ -1,10 +1,11 @@
-import os
+from os.path import join
+from os import listdir
 from typing import List
 import pygame
 from .load import load_image
 
 
-IMAGE_PATH = os.path.join('assets', 'images')
+IMAGE_PATH = join('assets', 'images')
 
 Palette = List[pygame.color.Color]
 
@@ -31,6 +32,6 @@ def load_palette(path: str) -> Palette:
 
 def load_palettes(path: str) -> list[Palette]:
     palettes = []
-    for img_name in sorted(os.listdir(os.path.join(IMAGE_PATH, path))):
-        palettes.append(load_palette(os.path.join(path, img_name)))
+    for img_name in sorted(listdir(join(IMAGE_PATH, path))):
+        palettes.append(load_palette(join(path, img_name)))
     return palettes

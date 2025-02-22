@@ -1,15 +1,16 @@
-import os
+from os.path import join
+from os import listdir
 import pygame
 
 
-IMAGE_PATH = os.path.join('assets', 'images')
+IMAGE_PATH = join('assets', 'images')
 
 def load_image(path: str, convert_alpha: bool=True) -> pygame.Surface:
     try: 
         if convert_alpha:
-            image = pygame.image.load(os.path.join(IMAGE_PATH, path)).convert_alpha()
+            image = pygame.image.load(join(IMAGE_PATH, path)).convert_alpha()
         else:
-            image = pygame.image.load(os.path.join(IMAGE_PATH, path)).convert()
+            image = pygame.image.load(join(IMAGE_PATH, path)).convert()
         image.set_colorkey((0, 0, 0))
         return image
     except FileNotFoundError:
@@ -18,8 +19,8 @@ def load_image(path: str, convert_alpha: bool=True) -> pygame.Surface:
 
 def load_images(path: str, convert_alpha: bool=False) -> list[pygame.Surface]:
     images = []
-    for img_name in sorted(os.listdir(os.path.join(IMAGE_PATH, path))):
-        images.append(load_image(os.path.join(path, img_name), convert_alpha))
+    for img_name in sorted(listdir(join(IMAGE_PATH, path))):
+        images.append(load_image(join(path, img_name), convert_alpha))
     return images
 
 def load_sprite_sheet(image: pygame.surface, size: tuple[int, int]) -> list[pygame.Surface]:

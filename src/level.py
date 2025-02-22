@@ -1,5 +1,6 @@
-import os
-import random
+from os.path import join
+from os import listdir
+from random import choice
 import pygame
 from src.debug import DEBUG
 from src.level_gen import CONFIGS, generate_level, Attribute
@@ -8,7 +9,7 @@ from src.tilemap import TileMap, Tile
 from src.level_gen import LevelMap
 import src.assets as assets
 
-MAPS_PATH = 'assets/maps'
+MAPS_PATH = join('assets', 'maps')
 
 class Level:
     current: 'Level' = None
@@ -105,15 +106,15 @@ class Level:
                 
                 # if room exists at postion (x, y) in level_map
                 sub, flip = self._get_folder_flip(room.key)
-                map_folder = os.path.join(MAPS_PATH, sub)
+                map_folder = join(MAPS_PATH, sub)
                 map_paths: list[str] = []
-                for name in os.listdir(map_folder):
-                    map_paths.append(os.path.join(map_folder, name))
-                map_path = random.choice(map_paths)
+                for name in listdir(map_folder):
+                    map_paths.append(join(map_folder, name))
+                map_path = choice(map_paths)
                 new_map = TileMap.load(map_path, assets.TILESET)
 
                 if room.has_attribute(Attribute.ENTRANCE):
-                    pos = random.choice(new_map.get_valid_floor(['stone'])).tile_pos
+                    pos = choice(new_map.get_valid_floor()).tile_pos
                     self.spawn_tile = new_map.create_tile(assets.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
 
                 tilemap.place_tilemap(new_map, room.position, flip)
@@ -136,20 +137,20 @@ class Level:
         # categorize all spikes into three sets: horizontal, vertical, and corner
         spike_tiles = tilemap.get_tiles_with('spike')
         for tile in spike_tiles:
-            a = []  # up, down, left, right
-            w = []
+            s = []  # spikes: up, down, left, right
+            w = []  # walls:  up, down, left, right 
             for direction in Direction.cardinals():
                 adj = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y), direction)
-                a.append(bool(adj and adj.tile_type.name == 'spike'))
-                w.append(bool(adj and adj.tile_type.name == 'stone'))
+                s.append(bool(adj and adj.tile_type.name == 'spike'))
+                w.append(bool(adj and adj.tile_type.collision))
 
-            if any(a[2:]) and not any(a[:2]):    # row spike: left/right only
+            if any(s[2:]) and not any(s[:2]):    # row spike: left/right only
                 horizontal_tiles.add(tile)
-            elif any(a[:2]) and not any(a[2:]):  # column spike: up/down only
+            elif any(s[:2]) and not any(s[2:]):  # column spike: up/down only
                 vertical_tiles.add(tile)
-            elif not any(a[2:]) and any(w[:2]):  # single spike: but stone above/below
+            elif not any(s[2:]) and any(w[:2]):  # single spike: but stone above/below
                 horizontal_tiles.add(tile)
-            elif not any(a[:2]) and any(w[2:]):  # single spike: but stone left/right
+            elif not any(s[:2]) and any(w[2:]):  # single spike: but stone left/right
                 vertical_tiles.add(tile)
             else:                                # must be a corner spike
                 corner_tiles.add(tile)
@@ -167,7 +168,7 @@ class Level:
                 width += 1
             
             tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
-            above = tile_above is not None and tile_above.tile_type.name == 'stone'
+            above = tile_above is not None and tile_above.tile_type.collision
             spikes.add(HSpike(tile.pos, width, above))
         
         # create merged spike entities for vertical set
@@ -183,15 +184,15 @@ class Level:
                 height += 1
             
             tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
-            right = tile_right is not None and tile_right.tile_type.name == 'stone'
+            right = tile_right is not None and tile_right.collision
             spikes.add(VSpike(tile.pos, height, right))
 
         # create spike entities for corner set
         for tile in corner_tiles:
             tile_above = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y - 1))
-            above = tile_above is not None and tile_above.tile_type.name == 'stone'
+            above = tile_above is not None and tile_above.tile_type.collision
             tile_right = tilemap.get_tile(Vec2(tile.tile_pos.x + 1, tile.tile_pos.y))
-            right = tile_right is not None and tile_right.tile_type.name == 'stone'
+            right = tile_right is not None and tile_right.tile_type.collision
             spikes.add(CSpike(tile.pos, above, right))
 
         # remove tile object from tilemap now that we have created an entity
@@ -222,6 +223,6 @@ class Level:
                 flip = key == 14
             case _:
                 folder = str(key)
-                flip = random.choice([True, False])
+                flip = choice([True, False])
             
         return folder, flip

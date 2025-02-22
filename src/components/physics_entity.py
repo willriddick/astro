@@ -64,7 +64,7 @@ class PhysicsEntity(Entity):
         # Handle platform collision
         self._handle_platform_collision() 
 
-        # Filter out collision tiles
+        # Filter for collision tiles
         collisions_around = list(filter(lambda _tile: _tile.collision, self.tiles_around))
 
         # Update y position

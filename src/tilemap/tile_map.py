@@ -89,10 +89,10 @@ class TileMap:
             tile.tile_pos = Vec2(new_x, pos.y)
         self.map = new_map
     
-    def get_valid_floor(self, filter_: list[str]) -> list[Tile]:
+    def get_valid_floor(self) -> list[Tile]:
         output = []
         for tile in self.map.values():
-            if tile.tile_type.name in filter_:
+            if tile.collision and tile.tile_type.name != 'platform':
                 x, y = tile.tile_pos
                 if (
                     self.get_tile(Vec2(x, y - 1)) is None
