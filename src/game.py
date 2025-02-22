@@ -3,13 +3,13 @@ import sys
 import pygame
 from src.util import CommandPrompt, StateMachine
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, ASPECT_RATIO
-from src.game_states import GameStates
 from src.debug import DEBUG
 from src.clock import CLOCK
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.level import Level
+from src.game_states import GameStates, MainMenu, Playing
 import src.assets as assets
 
 class Game:
@@ -30,7 +30,6 @@ class Game:
 
         self.command_prompt = CommandPrompt()
 
-        from .game_states import MainMenu, Playing
         self.state_machine = StateMachine(self, [MainMenu(), Playing()])
 
         self.level = None
