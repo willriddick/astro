@@ -3,6 +3,7 @@ import sys
 import pygame
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.util import Vec2, CommandPrompt
+from src.clock import CLOCK
 import src.assets as assets
 from .tile_map import TileMap
 from .tile_type import TileType
@@ -18,7 +19,6 @@ class Editor:
         pygame.display.set_caption('Editor')
         
         self.running = False
-        self.clock = pygame.time.CLOCK()
         self.last_path = ''
         self.command_prompt = CommandPrompt()
 
@@ -79,7 +79,7 @@ class Editor:
             try:
                 self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()))
                 pygame.display.update()
-                self.clock.tick(60) 
+                CLOCK.update()
             except:
                 self.running = False
         

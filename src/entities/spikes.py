@@ -22,8 +22,8 @@ class HSpike(Spike):
         super().__init__(position, Vec2(16 * width, 16))
         self.width = width
 
-        collider_size = Vec2(16 * width, 1)
-        collider_offset = Vec2(0, 0) if above else Vec2(0, 15)
+        collider_size = Vec2(16 * width - 2, 1)
+        collider_offset = Vec2(1, 0) if above else Vec2(1, 15)
         self.collider = Collider(collider_size, collider_offset)
         self.collider.add_owner(self)
 
@@ -44,8 +44,8 @@ class VSpike(Spike):
         super().__init__(position, Vec2(16, 16 * height))
         self.height = height
 
-        collider_size = Vec2(1, 16 * height)
-        collider_offset = Vec2(14, 0) if right else Vec2(1, 0)
+        collider_size = Vec2(1, 16 * height - 2)
+        collider_offset = Vec2(14, 1) if right else Vec2(1, 1)
         self.collider = Collider(collider_size, collider_offset)
         self.collider.add_owner(self)
 
@@ -65,20 +65,20 @@ class CSpike(Spike):
     def __init__(self, position: pygame.Vector2, above: bool, right: bool):
         super().__init__(position, Vec2(16, 16))
         if above:
-            offset1 = Vec2(0, 0)
+            offset1 = Vec2(1, 0)
             self.sprite.flip_y = True
         else:
-            offset1 = Vec2(0, 15)
+            offset1 = Vec2(1, 15)
         
         if right:
-            offset2 = Vec2(14, 0)
+            offset2 = Vec2(14, 1)
             self.sprite.flip_x = True
         else:
-            offset2 = Vec2(1, 0)
+            offset2 = Vec2(1, 1)
         
-        self.collider1 = Collider(Vec2(16, 1), offset1)
+        self.collider1 = Collider(Vec2(14, 1), offset1)  # bottom collider
         self.collider1.add_owner(self)
-        self.collider2 = Collider(Vec2(1, 16), offset2)
+        self.collider2 = Collider(Vec2(1, 14), offset2)  # side collider
         self.collider2.add_owner(self)
         self.damage_component = DamageComponent([self.collider1, self.collider2], 1)
         self.damage_component.update(self.position)

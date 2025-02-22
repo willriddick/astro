@@ -38,7 +38,6 @@ class Game:
         self.level = None
         self.new_level()
 
-
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
         self.running = True
