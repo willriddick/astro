@@ -29,7 +29,7 @@ class Player(PhysicsEntity):
 
     BOOST_ACC = 100
 
-    BOOST_UP_COST = 10  # minimum fuel required to boost up and display UI
+    BOOST_UP_COST = 5  # minimum fuel required to boost up and display UI
     INITIAL_BOOST_UP = 5
     BOOST_UP_SPEED = 50
     BOOST_UP_MOVE_SPEED = 50
@@ -50,8 +50,8 @@ class Player(PhysicsEntity):
 
     SLIDE_DURATION = 200  # after this time, the player will decelerate to 0
     INITIAL_SLIDE_SPEED = 80  # minimum speed when entering slide state
-    INITIAL_SLIDE_MULTIPLIER = 1.35  # multiplies velocity when entering slide state
-    SLIDE_SPEED = 110
+    INITIAL_SLIDE_MULTIPLIER = 1.4  # multiplies velocity when entering slide state
+    SLIDE_SPEED = 115
     SLIDE_ACC = (180, 180)
 
     WALL_JUMP_DURATION = 10  # time after wall jumping before switching to AIR
