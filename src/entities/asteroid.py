@@ -59,6 +59,7 @@ class AsteroidSpawner(Entity):
         for asteroid in self.asteroids:
             asteroid.render(display, offset)
 
+
 class Asteroid(PhysicsEntity):
     def __init__(self, spawner: AsteroidSpawner):
         super().__init__(pygame.Vector2(0, 0), Vec2(16, 16))
