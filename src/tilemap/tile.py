@@ -2,6 +2,7 @@ import pygame
 from src.util import Vec2
 from .tile_type import TileType
 
+
 class Tile:
     def __init__(self, tilemap, tile_type: TileType, variant: int, tile_pos: Vec2):
         self.tilemap = tilemap 

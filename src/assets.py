@@ -1,6 +1,7 @@
 import pygame
 from src.util import load_image, load_sprite_sheet, load_palette, load_palettes, Vec2
 
+
 ICON = None
 PALETTE = None
 FONT = None
