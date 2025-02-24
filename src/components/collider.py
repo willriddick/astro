@@ -8,7 +8,7 @@ from src.components import Entity
 class Collider(Entity):
     def __init__(self, size: Vec2, offset = pygame.Vector2(0, 0)):
         super().__init__(pygame.Vector2(0, 0), size)
-        LEVEL_MANAGER.register_collider(self)
+        LEVEL_MANAGER.current.register_collider(self)
         self.offset = offset
         self.owners: set[object] = set()
         self.enabled = True
@@ -65,7 +65,7 @@ class Collider(Entity):
             return []
 
         return [
-            collider for collider in LEVEL_MANAGER.get_colliders()
+            collider for collider in LEVEL_MANAGER.current.get_colliders()
             if collider.enabled
                 and collider is not self
                 and self.rect.colliderect(collider.rect)

@@ -28,6 +28,7 @@ class Entity:
         self.position = position
         self.size = size
         self.sprite: Sprite | None = None
+        self.tile_size = LEVEL_MANAGER.current.tilemap.tile_size
     
     def update(self) -> None:
         pass
@@ -42,10 +43,9 @@ class Entity:
     
     @property
     def tile_position(self) -> Vec2:
-        tile_size = LEVEL_MANAGER.get_tilemap().tile_size
         return Vec2(
-            int(self.position.x) // tile_size.x,
-            int(self.position.y) // tile_size.y
+            int(self.position.x) // self.tile_size.x,
+            int(self.position.y) // self.tile_size.y
         )
 
     @property

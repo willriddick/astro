@@ -17,8 +17,8 @@ MAPS_PATH = join('assets', 'maps')
 class LevelManager:
 
     def __init__(self):
-        self.current = None
         self.player = None
+        self.current = None
     
     def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
         """Create a new level with the given seed and map path."""
@@ -28,6 +28,9 @@ class LevelManager:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
             level.tilemap = LevelManager.generate(level, config, seed)
+        
+        if level.spawn_tile:
+            level.spawn_pos = level.spawn_tile.pos
         
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
@@ -40,8 +43,7 @@ class LevelManager:
         if self.player is None:
             self.player = Player()
         level.entities.append(self.player)
-        if level.spawn_tile:
-            level.spawn_pos = level.spawn_tile.pos
+
         self.player.spawn(level.spawn_pos)
 
         level.tilemap.create_border(graphics.TILESET.get_by('stone'))
@@ -51,23 +53,6 @@ class LevelManager:
         CAMERA.set_boundary(level.tilemap.rect)
         print(self.current.entities)
     
-    def register_collider(self, collider: 'Collider'):
-        assert self.current, 'No level is currently loaded.'
-        self.current.colliders.append(collider)
-
-    def unregister_collider(self, collider: 'Collider'):
-        assert self.current, 'No level is currently loaded.'
-        if collider in self.colliders:
-            self.current.colliders.remove(collider)
-
-    def get_colliders(self) -> list['Collider']:
-        assert self.current, 'No level is currently loaded.'
-        return self.current.colliders
-   
-    def get_tilemap(self) -> TileMap:
-        assert self.current, 'No level is currently loaded.'
-        return self.current.tilemap
-
     @staticmethod
     def generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))

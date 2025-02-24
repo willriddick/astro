@@ -58,7 +58,7 @@ class PhysicsEntity(Entity):
             return
 
         # Update tile position
-        tilemap = LEVEL_MANAGER.get_tilemap()
+        tilemap = LEVEL_MANAGER.current.tilemap
         self.tiles_around = tilemap.get_tiles_around(self.tile_position)
 
         # Handle platform collision
