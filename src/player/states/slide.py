@@ -1,5 +1,6 @@
 from src.util import State, Timer
 from src.sounds import SOUNDS
+from src.camera import CAMERA
 from ..player import Player
 from ..enums import Animations, States
 
@@ -12,7 +13,7 @@ class Slide(State):
     def on_enter(self):
         SOUNDS.play('slide')
         self.owner.sprite.set_animation(Animations.SLIDE)
-        self.owner.camera.screenshake(20, 2)
+        CAMERA.screenshake(20, 2)
         self.owner.slide_dir = self.owner.last_facing_dir
 
         if self.owner.velocity.x == 0:

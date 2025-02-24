@@ -1,5 +1,6 @@
 from src.util import State, Direction
 from src.sounds import SOUNDS
+from src.camera import CAMERA
 from ..enums import States
 
 class Hurt(State):
@@ -11,5 +12,5 @@ class Hurt(State):
         self.owner.sprite.flash(100)
         self.owner.sprite.oscillate_alpha(self.owner.health_component.invulnerable_duration, speed=125)
         self.owner.apply_force(100, Direction.UP)
-        self.owner.camera.screenshake(30, 10)
+        CAMERA.screenshake(30, 10)
         self.owner.set_state(self.owner.state_machine.previous_state.id)

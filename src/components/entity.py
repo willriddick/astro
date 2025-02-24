@@ -1,6 +1,6 @@
 import pygame
 from src.util import Vec2
-from src.level import Level 
+from src.level_manager import LEVEL_MANAGER
 from .sprite import Sprite
 
 
@@ -42,7 +42,7 @@ class Entity:
     
     @property
     def tile_position(self) -> Vec2:
-        tile_size = Level.current.tilemap.tile_size
+        tile_size = LEVEL_MANAGER.get_tilemap().tile_size
         return Vec2(
             int(self.position.x) // tile_size.x,
             int(self.position.y) // tile_size.y

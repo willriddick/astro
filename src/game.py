@@ -8,7 +8,7 @@ from src.clock import CLOCK
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.sounds import SOUNDS
-from src.level import Level
+from src.level_manager import LEVEL_MANAGER
 from src.game_states import GameStates, MainMenu, Playing
 import src.graphics as graphics
 
@@ -34,9 +34,6 @@ class Game:
         self.command_prompt = CommandPrompt()
 
         self.state_machine = StateMachine(self, [MainMenu(), Playing()])
-
-        self.level = None
-        self.new_level()
 
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
@@ -73,29 +70,22 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def new_level(self, seed: int = None, map_path: str = None):
-        """Create a new level with the given seed and map path."""
-        self.level = Level(seed=seed, map_path=map_path)
-        self.level.player.camera = CAMERA
-        CAMERA.set_pos(self.level.spawn_pos)
-        print(self.level.entities)
-
     def handle_commands(self):
         """Handle commands from the command prompt."""
         command = self.command_prompt.pop_command()
         if command == '': 
             return
 
-        player = self.level.player
+        player = LEVEL_MANAGER.current.player
         match command.split():
             case ['d']:
                 DEBUG.toggle()
             case ['g']:
                 player.toggle_ghost()
             case ['n']:
-                self.new_level()
+                LEVEL_MANAGER.new_level()
             case ['n', seed]:
-                self.new_level(seed=seed)
+                LEVEL_MANAGER.new_level(seed=seed)
             case ['p', index]:
                 player.load_sprite(int(index))
             case ['r']:

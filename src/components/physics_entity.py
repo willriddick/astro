@@ -1,7 +1,7 @@
 import pygame
 from src.tilemap import Tile
 from src.util import approach, Direction, Vec2
-from src.level import Level
+from src.level_manager import LEVEL_MANAGER
 from src.clock import CLOCK
 from .entity import Entity
 
@@ -58,7 +58,7 @@ class PhysicsEntity(Entity):
             return
 
         # Update tile position
-        tilemap = Level.current.tilemap
+        tilemap = LEVEL_MANAGER.get_tilemap()
         self.tiles_around = tilemap.get_tiles_around(self.tile_position)
 
         # Handle platform collision

@@ -85,6 +85,9 @@ class Camera:
             self.size.y
         )
     
+    def set_boundary(self, boundary: pygame.Rect):
+        self.boundary = boundary
+    
     @property
     def clamp_pos(self) -> pygame.Vector2:
         if not self.boundary:
@@ -95,9 +98,8 @@ class Camera:
         h_height = self.size.y / 2
 
         # Ensure the position stays within the clamped bounds
-        boundary = Level.current.tilemap.rect
-        clamped_x = max(boundary.left + h_width, min(self.pos.x, boundary.right - h_width))
-        clamped_y = max(boundary.top + h_height, min(self.pos.y, boundary.bottom - h_height))
+        clamped_x = max(self.boundary.left + h_width, min(self.pos.x, self.boundary.right - h_width))
+        clamped_y = max(self.boundary.top + h_height, min(self.pos.y, self.boundary.bottom - h_height))
         
         return pygame.Vector2(clamped_x, clamped_y)
     

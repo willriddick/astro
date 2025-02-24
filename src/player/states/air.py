@@ -1,5 +1,6 @@
 from src.util import State, Timer
 from src.sounds import SOUNDS
+from src.camera import CAMERA
 from ..player import Player
 from ..enums import Animations, States
 
@@ -37,7 +38,7 @@ class Air(State):
                 SOUNDS.play('land')
 
             if self.timer.is_done:
-                self.owner.camera.screenshake(30, 3)
+                CAMERA.screenshake(30, 3)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)
