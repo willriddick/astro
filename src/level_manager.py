@@ -18,7 +18,8 @@ class LevelManager:
 
     def __init__(self):
         self.current = None
-
+        self.player = None
+    
     def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
         """Create a new level with the given seed and map path."""
         self.current = level = Level()
@@ -31,16 +32,17 @@ class LevelManager:
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
         
-        from .player import Player 
         from src.entities import StarSpawner
+        from src.player import Player
         level.star_spawner = StarSpawner(invert_depth=True)
         level.star_spawner.spawn(50)
         
-        level.player = Player()
-        level.entities.append(level.player)
+        if self.player is None:
+            self.player = Player()
+        level.entities.append(self.player)
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
-        level.player.spawn(level.spawn_pos)
+        self.player.spawn(level.spawn_pos)
 
         level.tilemap.create_border(graphics.TILESET.get_by('stone'))
         level.tilemap_surface = level.tilemap.get_surface()

@@ -14,4 +14,4 @@ class Playing(State):
     def update(self):
         LEVEL_MANAGER.current.update()
         CAMERA.set_render_callback(LEVEL_MANAGER.current.render) 
-        CAMERA.move_to(LEVEL_MANAGER.current.player.center)
+        CAMERA.move_to(LEVEL_MANAGER.player.center)

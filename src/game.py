@@ -76,7 +76,7 @@ class Game:
         if command == '': 
             return
 
-        player = LEVEL_MANAGER.current.player
+        player = LEVEL_MANAGER.player
         match command.split():
             case ['d']:
                 DEBUG.toggle()
