@@ -27,7 +27,7 @@ class LevelManager:
         if map_path:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
-            level.tilemap = LevelManager.generate(level, config, seed)
+            level.tilemap = LevelManager._generate(level, config, seed)
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
@@ -54,7 +54,7 @@ class LevelManager:
         print(self.current.entities)
     
     @staticmethod
-    def generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
+    def _generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
         level.level_map = generate_level(config, seed)
 

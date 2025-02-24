@@ -5,19 +5,17 @@ from src.util import load_image, load_sprite_sheet, load_font, load_palette, loa
 ICON = None
 PALETTE = None
 FONT = None
-FONT_ILL = None
 PLAYER_SHEET = None
 PLAYER_PALETTES = None
 STARS = None
 ASTEROIDS = None
 SPIKE = None
-SOUNDS = None
 TILESET = None
 
 def load():
     """Load all assets into module-level variables."""
-    global ICON, PALETTE, FONT, FONT_ILL, PLAYER_SHEET, PLAYER_PALETTES
-    global STARS, ASTEROIDS, SPIKE, SOUNDS, TILESET
+    global ICON, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
+    global STARS, ASTEROIDS, SPIKE, TILESET
 
     ICON = load_image('icon.png', False)
     

@@ -46,7 +46,13 @@ class SoundManager:
         """
         self.get(name).play(pitch_index, loops)
     
-    def load(self, sound: Sound):
+    def load_sounds(self, sounds: list[Sound]):
+        """Load a list of sounds into the dictionary."""
+        for sound in sounds:
+            self._load(sound)
+        self.update_sounds()
+    
+    def _load(self, sound: Sound):
         # load sound using name if path is empty
         base_sound = load_sound(sound.name if sound.path == '' else sound.path)
         sounds = []
@@ -73,16 +79,11 @@ class SoundManager:
         sound.set_sounds(sounds)
         self.sounds[sound.name] = sound
     
-    def load_all(self, sounds: list[Sound]):
-        for sound in sounds:
-            self.load(sound)
-        self.update_sounds()
-    
 
 # initialize the SoundManager and load all sounds
 pygame.mixer.init()
 SOUNDS = SoundManager()
-SOUNDS.load_all([
+SOUNDS.load_sounds([
     Sound("jump", default_volume=0.2, pitch=[0.9, 1.1, 0.05]),
     Sound("wall_jump", path="jump", default_volume=0.2, pitch=[0.7, 1.8, 0.05]),
     Sound("land", default_volume=0.7),
