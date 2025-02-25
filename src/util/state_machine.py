@@ -1,6 +1,7 @@
 from enum import Enum
 from .state import State
 
+
 class StateMachine:
     def __init__(self, owner: object, states: list[State]):
         self.owner = owner

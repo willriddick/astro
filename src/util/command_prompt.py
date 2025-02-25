@@ -1,8 +1,7 @@
 import re
 import pygame
-from .vec2 import Vec2
-from .assets import Assets
 from .draw import draw_rect
+
 
 RECT_COLOR = pygame.Color(0, 40, 80, 80)
 ALLOWED_CHARACTERS = re.compile(r'[a-zA-Z0-9/_. ]')
@@ -124,6 +123,8 @@ class CommandPrompt:
 
     def render(self, display: pygame.Surface):
         if self.enabled: 
+            import src.graphics as graphics
+
             rect = pygame.Rect(0, display.get_height() - 12, display.get_width(), 12)
             draw_rect(
                 display, 
@@ -133,7 +134,7 @@ class CommandPrompt:
                 outline_color=RECT_COLOR,
             )
             text = f'/{self.input[:self.cursor_index]}_{self.input[self.cursor_index:]}'
-            text_surf = Assets.FONT.render(text, antialias=False, color=(255, 255, 255))
+            text_surf = graphics.FONT.render(text, antialias=False, color=(255, 255, 255))
 
             display.blit(text_surf, (4, display.get_height() - 10))
     

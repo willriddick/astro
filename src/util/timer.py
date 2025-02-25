@@ -1,7 +1,8 @@
 import pygame 
 
+
 class Timer:
-    def __init__(self, duration: int):
+    def __init__(self, duration: int = 0):
         """Create a new timer with a duration in milliseconds."""
         self.duration = duration
         self.start_time = None
@@ -13,6 +14,12 @@ class Timer:
     
     def reset(self) -> None:
         self.start_time = None
+    
+    @property
+    def progress(self) -> float:
+        if self.duration == 0:
+            return 0
+        return (self.duration - self.time_left) / self.duration
     
     @property
     def time_left(self) -> float:

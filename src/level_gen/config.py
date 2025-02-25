@@ -1,6 +1,7 @@
 from random import randint
 from src.util import Direction
 
+
 class Config:
     """
     Configuration class that loads, validates, and stores the configuration data for the level generation.
@@ -91,7 +92,5 @@ CONFIGS = [
             Direction.LEFT: 5,
             Direction.RIGHT: 5,
         },
-    ),
-
-
+    )
 ]

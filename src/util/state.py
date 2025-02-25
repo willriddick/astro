@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class State:
     def __init__(self, _id: Enum):
         self.id = _id

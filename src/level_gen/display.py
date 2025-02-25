@@ -4,6 +4,7 @@ from .level_map import LevelMap
 from .room import Room
 from .status import Status
 
+
 HORIZONTAL = '─'
 VERTICAL = '│'
 TOP_LEFT_CORNER = '╭'

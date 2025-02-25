@@ -1,10 +1,10 @@
-# Byte-compiled files
+# byte-compiled files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Virtual environment directories
+# virtual environment directories
 venv/
 env/
 ENV/
@@ -14,13 +14,16 @@ ENV/
 .vscode/
 .idea/
 
-# Miscellaneous
+# miscellaneous
 *.log
 *.sqlite3
 
-# Ignore exports
+# ignore exports
 /exports/
 /build/
 /dist/
 /main.spec
+
+# ignore state information
 settings.json
+inputs.json

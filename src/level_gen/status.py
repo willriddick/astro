@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Status(Enum):
     """
     Represents the connection status of an adjacent room  .

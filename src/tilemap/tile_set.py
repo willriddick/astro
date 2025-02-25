@@ -1,6 +1,7 @@
 from src.util import Vec2
 from .tile_type import TileType
 
+
 class TileSet:
     def __init__(self, tile_size: Vec2):
         self.tileset: list[TileType] = []

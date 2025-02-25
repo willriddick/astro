@@ -1,6 +1,7 @@
 import pygame
 from src.util import Vec2
 
+
 class TileType:
     """
     Represents a type of tile that can be placed on a tilemap.

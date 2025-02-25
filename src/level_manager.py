@@ -1,0 +1,193 @@
+from os.path import join
+from os import listdir
+from random import choice
+import pygame
+from src.level_gen import CONFIGS
+from src.camera import CAMERA
+from src.level_gen import generate_level, Attribute
+from src.level import Level
+from src.util import Vec2, Direction
+from src.tilemap import TileMap, Tile
+from src.tilemap import TileMap
+import src.graphics as graphics
+
+
+MAPS_PATH = join('assets', 'maps')
+
+class LevelManager:
+
+    def __init__(self):
+        self.player = None
+        self.current = None
+    
+    def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
+        """Create a new level with the given seed and map path."""
+        self.current = level = Level()
+        
+        if map_path:
+            level.tilemap = TileMap.load(map_path, graphics.TILESET)
+        else:
+            level.tilemap = LevelManager._generate(level, config, seed)
+        
+        if level.spawn_tile:
+            level.spawn_pos = level.spawn_tile.pos
+        
+        spikes = LevelManager._create_spikes(level.tilemap)
+        level.entities.extend(spikes)
+        
+        from src.entities import StarSpawner
+        from src.player import Player
+        level.star_spawner = StarSpawner(invert_depth=True)
+        level.star_spawner.spawn(50)
+        
+        if self.player is None:
+            self.player = Player()
+        level.entities.append(self.player)
+
+        self.player.spawn(level.spawn_pos)
+
+        level.tilemap.create_border(graphics.TILESET.get_by('stone'))
+        level.tilemap_surface = level.tilemap.get_surface()
+
+        CAMERA.set_pos(level.spawn_pos)
+        CAMERA.set_boundary(level.tilemap.rect)
+        print(self.current.entities)
+    
+    @staticmethod
+    def _generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
+        level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
+        level.level_map = generate_level(config, seed)
+
+        for y in range(level.level_map.config.rows):
+            for x in range(level.level_map.config.cols):
+                room = level.level_map.get_room_at(Vec2(x, y))
+
+                # if room does not exit at postion (x, y) in level_map, fill 
+                if room is None:
+                    LevelManager._fill_empty_room(level.tilemap, Vec2(x, y), room_size)
+                    continue
+                
+                # if room exists at postion (x, y) in level_map
+                sub, flip = LevelManager._get_folder_flip(room.key)
+                map_folder = join(MAPS_PATH, sub)
+                map_paths: list[str] = []
+                for name in listdir(map_folder):
+                    map_paths.append(join(map_folder, name))
+                map_path = choice(map_paths)
+                new_map = TileMap.load(map_path, graphics.TILESET)
+
+                if room.has_attribute(Attribute.ENTRANCE):
+                    pos = choice(new_map.get_valid_floor()).tile_pos
+                    level.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
+
+                level.tilemap.place_tilemap(new_map, room.position, flip)
+               
+        return level.tilemap
+    
+    @staticmethod
+    def _create_spikes(tilemap: TileMap) -> list['Spike']:
+        """
+        Queues for the spike tiles within a TileMap and creates Spike entities for each grouping
+        based on three sets, horizontal, vertical, and corner tiles. This greatly reduces the 
+        entity/collider count by creating a single entity for a grouping of spikes.
+        """
+        from src.entities import Spike, HSpike, VSpike, CSpike
+        spikes: set[Spike] = set()
+        horizontal_tiles: set[Tile] = set()
+        vertical_tiles: set[Tile] = set()
+        corner_tiles: set[Tile] = set()
+        
+        # categorize all spikes into three sets: horizontal, vertical, and corner
+        spike_tiles = tilemap.get_tiles_with('spike')
+        tile_wall_map = {}
+
+        for tile in spike_tiles:
+            s = []  # spikes: up, down, left, right
+            w = []  # walls:  up, down, left, right 
+            for _, direction in enumerate(Direction.cardinals()):
+                adj = tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y), direction)
+                s.append(bool(adj and adj.tile_type.name == 'spike'))
+                w.append(bool(adj and adj.tile_type.collision and adj.tile_type.name != 'platform'))
+            
+            tile_wall_map[tile] = w  # store walls for later use
+
+            if any(s[2:]) and not any(s[:2]):    # row spike: left/right only
+                horizontal_tiles.add(tile)
+            elif any(s[:2]) and not any(s[2:]):  # column spike: up/down only
+                vertical_tiles.add(tile)
+            elif not any(s[2:]) and any(w[:2]):  # single spike: but stone above/below
+                horizontal_tiles.add(tile)
+            elif not any(s[:2]) and any(w[2:]):  # single spike: but stone left/right
+                vertical_tiles.add(tile)
+            else:                                # must be a corner spike
+                corner_tiles.add(tile)
+
+        # create merged spike entities for horizontal set
+        visited = set()
+        for tile in sorted(horizontal_tiles, key=lambda tile: tile.tile_pos.x):
+            if tile in visited:
+                continue
+            visited.add(tile)
+
+            width = 1
+            while tilemap.get_tile(Vec2(tile.tile_pos.x + width, tile.tile_pos.y)) in horizontal_tiles:
+                visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x + width, tile.tile_pos.y)))
+                width += 1
+            
+            above = tile_wall_map[tile][0]
+            spikes.add(HSpike(tile.pos, width, above))
+
+        # create merged spike entities for vertical set
+        visited.clear()
+        for tile in sorted(vertical_tiles, key=lambda tile: tile.tile_pos.y):
+            if tile in visited:
+                continue
+            visited.add(tile)
+
+            height = 1
+            while tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y + height)) in vertical_tiles:
+                visited.add(tilemap.get_tile(Vec2(tile.tile_pos.x, tile.tile_pos.y + height)))
+                height += 1
+            
+            right = tile_wall_map[tile][3]
+            spikes.add(VSpike(tile.pos, height, right))
+
+        # create spike entities for corner set
+        for tile in corner_tiles:
+            w = tile_wall_map[tile]  # reuse stored walls
+            spikes.add(CSpike(tile.pos, w[0], w[3]))  # above, right
+
+        # remove tile object from tilemap now that we have created an entity
+        tilemap.remove_tiles(spike_tiles)
+        return spikes
+        
+    @staticmethod
+    def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
+        tilemap.create_tile_rect(
+            graphics.TILESET.get_by('stone'), 
+            pygame.Rect(room_pos.x * room_size.x, room_pos.y * room_size.y, room_size.x, room_size.y)
+        )
+
+    @staticmethod
+    def _get_folder_flip(key: int) -> tuple[str, bool]:
+        match key:
+            case 1 | 2:  
+                folder = '1_2'
+                flip = key == 2
+            case 5 | 6:
+                folder = '5_6'
+                flip = key == 6
+            case 9 | 10:
+                folder = '9_10'
+                flip = key == 10
+            case 13 | 14:
+                folder = '13_14'
+                flip = key == 14
+            case _:
+                folder = str(key)
+                flip = choice([True, False])
+            
+        return folder, flip
+
+
+LEVEL_MANAGER = LevelManager()
