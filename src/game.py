@@ -8,8 +8,10 @@ from src.clock import CLOCK
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.sounds import SOUNDS
+from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
 from src.game_states import GameStates, MainMenu, Playing
+from src.networking import Host, Client
 import src.graphics as graphics
 
 
@@ -35,6 +37,7 @@ class Game:
 
         self.state_machine = StateMachine(self, [MainMenu(), Playing()])
 
+
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
         self.running = True
@@ -45,6 +48,8 @@ class Game:
 
             if SETTINGS.get('show_fps') or DEBUG.enabled:
                 DEBUG.add_display(f'fps: {CLOCK.fps}')
+
+            INPUTS.disabled = True if self.command_prompt.enabled else False
 
             for event in pygame.event.get():
                 self.handle_event(event)
@@ -97,10 +102,17 @@ class Game:
                 self.toggle_fullscreen()
             case ['gs', state]:
                 self.state_machine.switch(list(GameStates)[int(state)])
+            case ['s', username, host]:
+                self.start_session(username, host == 'host')
             case ['q']:
                 self.running = False
             case _:
                 print(f'Unknown command: {command}')
+
+    def start_session(self, username: str, host: bool):
+        self.node = Host(username) if host else Client(username)
+        self.node.start()
+        print(self.node)
     
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:

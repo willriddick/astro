@@ -1,4 +1,4 @@
-from network import NetworkNode, Address, MsgType, generate_join_code
+from .network import NetworkNode, Address, MsgType, generate_join_code
 
 
 class Host(NetworkNode):

@@ -1,4 +1,4 @@
-from network import NetworkNode, MsgType, decode_join_code, Address, generate_join_code
+from .network import NetworkNode, MsgType, decode_join_code, Address, generate_join_code
 
 
 class Client(NetworkNode):

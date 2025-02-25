@@ -1,7 +1,7 @@
 import argparse, threading
-from host import Host
-from client import Client
-from network import MsgType, Address
+from .host import Host
+from .client import Client
+from .network import MsgType, Address
 
 
 class Main:
