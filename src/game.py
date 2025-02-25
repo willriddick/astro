@@ -11,12 +11,14 @@ from src.sounds import SOUNDS
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
 from src.game_states import GameStates, MainMenu, Playing
-from src.networking import Host, Client
+from src.networking import Host, Client, NetworkNode, MsgType
 import src.graphics as graphics
 
 
 class Game:
-    """Main game class that handles the game loop and state machine."""
+    """
+    Main game class that handles the game loop and state machine.
+    """
 
     def __init__(self):
         pygame.init()
@@ -36,6 +38,7 @@ class Game:
         self.command_prompt = CommandPrompt()
 
         self.state_machine = StateMachine(self, [MainMenu(), Playing()])
+        self.network_node: NetworkNode = None
 
 
     async def run(self):
@@ -72,6 +75,9 @@ class Game:
             
             await asyncio.sleep(0)
 
+        if self.network_node:
+            self.network_node.stop()
+
         pygame.quit()
         sys.exit()
 
@@ -85,6 +91,8 @@ class Game:
         match command.split():
             case ['d']:
                 DEBUG.toggle()
+            case ['q']:
+                self.running = False
             case ['g']:
                 player.toggle_ghost()
             case ['n']:
@@ -102,17 +110,44 @@ class Game:
                 self.toggle_fullscreen()
             case ['gs', state]:
                 self.state_machine.switch(list(GameStates)[int(state)])
-            case ['s', username, host]:
-                self.start_session(username, host == 'host')
-            case ['q']:
-                self.running = False
+            case ['net', username, host]:
+                self.create_node(username, host == 'host' or host == 'h')
+            case ['net', username]:
+                self.create_node(username, False)
+            case ['info']:
+                if self.network_node:
+                    print(self.network_node)
+            case ['msg', msg]:
+                if self.network_node:
+                    self.network_node.broadcast_message(MsgType.CHAT, (self.network_node.id, msg))
+            case ['join', join_code]:
+                if isinstance(self.network_node, Client):
+                    print(f'Joining session with {join_code}')
+                    self.network_node.join(join_code)
+                else:
+                    print('Node is not client')
+            case ['code']:
+                if self.network_node:
+                    print(f'Join code: {self.network_node.get_join_code()}')
+            case ['disconnect']:
+                if self.network_node:
+                    print('Disconnecting')
+                    self.network_node.disconnect()
+            case ['clients']:
+                if self.network_node:
+                    print('Clients:')
+                    print(self.network_node.clients)
             case _:
                 print(f'Unknown command: {command}')
 
-    def start_session(self, username: str, host: bool):
-        self.node = Host(username) if host else Client(username)
-        self.node.start()
-        print(self.node)
+    def create_node(self, username: str, host: bool):
+        self.network_node = Host(username) if host else Client(username)
+        self.network_node.start()
+        print(self.network_node)
+
+        if host:
+            self.network_node.start_session()
+            print(f'Join code: {self.network_node.join_code}')
     
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:
