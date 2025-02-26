@@ -90,7 +90,7 @@ SOUNDS.load_sounds([
     Sound("boost", default_volume=0.8),
     Sound("cant_boost", default_volume=0.8),
     Sound("slide", default_volume=0.7),
-    Sound("teleport", default_volume=0.4),
+    Sound("teleport", default_volume=0.2),
     Sound("hurt", default_volume=0.5),
     Sound("dead", default_volume=2.8),
     Sound("blip_pitch",  path="blip2", default_volume=1, pitch=[0.7, 1.2, 0.03]),

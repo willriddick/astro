@@ -13,7 +13,7 @@ class MsgType(IntEnum):
     DISCONNECT = 2
     CHAT = 3
     PING = 4
-    UPDATE = 4
+    UPDATE = 5
 
 MsgFormat = {
     MsgType.JOIN: '16s',  # 16 character username

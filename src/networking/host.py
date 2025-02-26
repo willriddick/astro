@@ -1,4 +1,5 @@
 from .network import NetworkNode, Address, MsgType, generate_join_code
+from src.util import Timer
 
 
 class Host(NetworkNode):
@@ -7,6 +8,8 @@ class Host(NetworkNode):
         self.join_code = ''
         self.id = 0
         self.next_id = 1
+
+        self.client_ping: dict[int, Timer] = {}
 
     def start_session(self):
         self.join_code = generate_join_code(self.get_address())
@@ -31,8 +34,16 @@ class Host(NetworkNode):
                 self.handle_chat(data)
             case MsgType.UPDATE:
                 self.update_queue.put(data)
+            case MsgType.PING:
+                self.update_ping(data[0])
             case _:
                 print(f'Unknown message type: {type}')
+    
+    def update_ping(self, client_id: int):
+        self.client_ping[client_id].start(1000 * 10)
+        for cur_id, timer in self.client_ping.items():
+            if timer.is_done:
+                print(f'{self.clients[cur_id][0]} ({cur_id}) timed out')
     
     def handle_chat(self, data: tuple):
         username = self.clients[data[0]][0]

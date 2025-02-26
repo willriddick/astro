@@ -25,7 +25,10 @@ class Client(NetworkNode):
             self.send_message(MsgType.DISCONNECT, (self.id,), self.host_addr )
         self.host_addr= None
         self.clients = {}
-
+        
+    def ping(self):
+        self.send_message(MsgType.PING, (self.id,), self.host_addr)
+    
     def handle_message(self, type: MsgType, data: tuple, addr: Address):
         match type:
             case MsgType.ADD_CLIENT:
@@ -40,7 +43,7 @@ class Client(NetworkNode):
                 print(f'Received join message from: {addr}')
             case _:
                 print(f'Unknown message type: {type}')
-    
+
     def handle_chat(self, data: tuple):
         username = self.clients[data[0]][0]
         print(f'{username}: {data[1].rstrip('\x00')}')
