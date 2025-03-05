@@ -1,6 +1,5 @@
-from os.path import join
-from os import listdir
-from random import choice
+import random 
+import os
 import pygame
 from src.level_gen import CONFIGS
 from src.camera import CAMERA
@@ -12,7 +11,7 @@ from src.tilemap import TileMap
 import src.graphics as graphics
 
 
-MAPS_PATH = join('assets', 'maps')
+MAPS_PATH = os.path.join('assets', 'maps')
 
 class LevelManager:
 
@@ -22,6 +21,8 @@ class LevelManager:
     
     def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
         """Create a new level with the given seed and map path."""
+        random.seed(seed)
+
         self.current = level = Level()
         
         if map_path:
@@ -57,7 +58,7 @@ class LevelManager:
     @staticmethod
     def _generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
-        level.level_map = generate_level(config, seed)
+        level.level_map = generate_level(config)
 
         for y in range(level.level_map.config.rows):
             for x in range(level.level_map.config.cols):
@@ -70,15 +71,15 @@ class LevelManager:
                 
                 # if room exists at postion (x, y) in level_map
                 sub, flip = LevelManager._get_folder_flip(room.key)
-                map_folder = join(MAPS_PATH, sub)
+                map_folder = os.path.join(MAPS_PATH, sub)
                 map_paths: list[str] = []
-                for name in listdir(map_folder):
-                    map_paths.append(join(map_folder, name))
-                map_path = choice(map_paths)
+                for name in os.listdir(map_folder):
+                    map_paths.append(os.path.join(map_folder, name))
+                map_path = random.choice(map_paths)
                 new_map = TileMap.load(map_path, graphics.TILESET)
 
                 if room.has_attribute(Attribute.ENTRANCE):
-                    pos = choice(new_map.get_valid_floor()).tile_pos
+                    pos = random.choice(new_map.get_valid_floor()).tile_pos
                     level.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
 
                 level.tilemap.place_tilemap(new_map, room.position, flip)
@@ -186,7 +187,7 @@ class LevelManager:
                 flip = key == 14
             case _:
                 folder = str(key)
-                flip = choice([True, False])
+                flip = random.choice([True, False])
             
         return folder, flip
 

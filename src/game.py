@@ -114,6 +114,10 @@ class Game:
                 self.create_node(username, host == 'host' or host == 'h')
             case ['net', username]:
                 self.create_node(username, False)
+            case ['n1']:
+                self.create_node('player1', True)
+            case ['n2']:
+                self.create_node('player2', False)
             case ['info']:
                 if self.network_node:
                     print(self.network_node)
@@ -126,9 +130,8 @@ class Game:
                     self.network_node.join(join_code)
                 else:
                     print('Node is not client')
-            case ['code']:
-                if self.network_node:
-                    print(f'Join code: {self.network_node.get_join_code()}')
+            case ['j1']:
+                self.network_node.join('YCUADBW52U')
             case ['disconnect']:
                 if self.network_node:
                     print('Disconnecting')
@@ -141,7 +144,7 @@ class Game:
                 print(f'Unknown command: {command}')
 
     def create_node(self, username: str, host: bool):
-        self.network_node = Host(username) if host else Client(username)
+        self.network_node = Host(username, port=56789) if host else Client(username)
         self.network_node.start()
         print(self.network_node)
 

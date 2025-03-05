@@ -202,7 +202,7 @@ class NetworkNode:
 
         packed_data = self.pack_msg(msg_type, data)
         self.socket.sendto(packed_data, target_addr)
-        print(f"send_message: {msg_type.name}, Data: {data}, To: {target_addr}") 
+        #print(f"send_message: {msg_type.name}, Data: {data}, To: {target_addr}") 
 
     def receive_message(self, buffer_size: int = 1024) -> tuple[MsgType, tuple, Address]:
         """
@@ -216,7 +216,7 @@ class NetworkNode:
         """
         packed_data, addr = self.socket.recvfrom(buffer_size)
         msg_type, data = self.unpack_msg(packed_data)
-        print(f'receive_message: {msg_type.name}, Data: {data}, From: {addr}')
+        #print(f'receive_message: {msg_type.name}, Data: {data}, From: {addr}')
         return msg_type, data, addr
     
     @staticmethod

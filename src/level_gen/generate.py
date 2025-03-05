@@ -8,12 +8,8 @@ from .status import Status
 from .attribute import Attribute
 
 
-def generate_level(config: Config, _seed: int | str = None) -> LevelMap:
-    """Build a Level instance from a random seed and JSON configuration."""
-    # set seed
-    seed(_seed)
-    
-    # create config and level
+def generate_level(config: Config) -> LevelMap:
+    """Build a Level instance from a JSON configuration."""
     level = LevelMap(config)
     
     # set ENTRANCE

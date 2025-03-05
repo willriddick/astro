@@ -11,7 +11,7 @@ class Playing(State):
         super().__init__(GameStates.PLAYING)
 
     def on_enter(self):
-        LEVEL_MANAGER.new_level()
+        LEVEL_MANAGER.new_level(1)
 
         self.update_timer = Timer(20)
         self.update_timer.start()
@@ -28,7 +28,6 @@ class Playing(State):
 
                 new_ghost = Ghost()
                 self.ghosts[client] = new_ghost
-                print('GHOST CREATED')
         
     def update(self):
         LEVEL_MANAGER.current.update()
@@ -37,7 +36,6 @@ class Playing(State):
         if self.node:
             updates = self.node.get_updates()
             for update in updates:
-                print(f'UPDATE: {update}')
                 ghost = self.ghosts[update[0]]
                 ghost.update(pygame.Vector2(update[1], update[2]))
             
