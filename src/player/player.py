@@ -6,8 +6,7 @@ from src.debug import DEBUG
 from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
-import src.graphics as graphics
-from .enums import Animations, States
+from .enums import States
 
 
 class Player(PhysicsEntity):
@@ -90,10 +89,10 @@ class Player(PhysicsEntity):
         self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
 
         # setup sprite
-        self.palette_index = palette_index
-        self.palette: Palette = None
         self.rotated = False
         self.last_facing_dir = 1
+        self.palette_index = None
+        self.sprite = None
         self.load_sprite(palette_index)
     
         # setup collider
@@ -259,31 +258,10 @@ class Player(PhysicsEntity):
             self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):
-        self.palette_index = palette_index % len(graphics.PLAYER_PALETTES)
-        self.palette = graphics.PLAYER_PALETTES[self.palette_index]
-
-        self.fuel_ui_color = self.palette[Player.FUEL_UI_COLOR_INDEX]
-
-        sheet = swap_palette(
-            graphics.PLAYER_SHEET,
-            graphics.PLAYER_PALETTES[0],
-            self.palette,
-        )
-        image_list = load_sprite_sheet(sheet, (16, 18))
-        
-        self.sprite = Sprite(self.position, image_offset=Vec2(4, 5))
-        self.sprite.add_animation(Animations.IDLE_A, image_list, 0, range_=(0,1))
-        self.sprite.add_animation(Animations.IDLE_B, image_list, 5, range_=(0,4))
-        self.sprite.add_animation(Animations.RUN, image_list, 12, range_=(4,10))
-        self.sprite.add_animation(Animations.AIR_UP, image_list, 0, range_=(10,11))
-        self.sprite.add_animation(Animations.AIR_DOWN, image_list, 0, range_=(11,12))
-        self.sprite.add_animation(Animations.FRONT, image_list, 0, range_=(12,13))
-        self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
-        self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
-        self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.add_animation(Animations.BOOST_UP, image_list, 0, range_=(16,17))
-        self.sprite.add_animation(Animations.BOOST_DOWN, image_list, 0, range_=(16,17))
-
+        from .sprite import load_sprite
+        self.palette_index = palette_index
+        self.sprite, self.fuel_ui_color = load_sprite(palette_index)
+    
     def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
         """Draw a fuel bar expanding symmetrically from the center."""
         if (

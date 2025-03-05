@@ -45,7 +45,7 @@ class Game:
         """Main game loop that handles events, updates, and rendering."""
         self.running = True
         #SOUNDS.play('music/track1', loops=-1)
-       
+
         while self.running:
             DEBUG.update()
 
