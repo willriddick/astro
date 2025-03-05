@@ -51,6 +51,7 @@ class LevelManager:
 
         CAMERA.set_pos(level.spawn_pos)
         CAMERA.set_boundary(level.tilemap.rect)
+        level.start()
         print(self.current.entities)
     
     @staticmethod

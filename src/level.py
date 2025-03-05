@@ -19,6 +19,10 @@ class Level:
         from .components import Entity, Collider
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
+        self.ghosts = []
+    
+    def start(self) -> None:
+        print('Level started')
 
     def update(self) -> None:
         for entity in self.entities:

@@ -282,7 +282,7 @@ def generate_join_code(address: Address) -> str:
     ip, port = address
     ip_int = struct.unpack('!I', socket.inet_aton(ip))[0]
     packed = struct.pack('!IH', ip_int, port)
-    return base64.b64encode(packed).decode().rstrip('=')
+    return base64.b32encode(packed).decode().rstrip('=')
 
 def decode_join_code(code: str) -> Address:
     """
@@ -297,8 +297,8 @@ def decode_join_code(code: str) -> Address:
         ValueError: If the input code is malformed or cannot be decoded.
         struct.error: If the decoded binary data is not in the expected format.
     """
-    code += '=' * (-len(code) % 4)  # restore padding for decoding
-    packed = base64.b64decode(code)
+    code += '=' * (-len(code) % 8)  # restore padding for decoding
+    packed = base64.b32decode(code)
     ip_int, port = struct.unpack('!IH', packed)
     ip = socket.inet_ntoa(struct.pack('!I', ip_int))
     return ip, port

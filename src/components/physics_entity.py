@@ -54,7 +54,7 @@ class PhysicsEntity(Entity):
 
     def handle_collision(self) -> None:
         if not self.collision_enabled:
-            self.position += self.velocity * CLOCK.dt()
+            self.position += self.velocity * CLOCK.dt
             return
 
         # Update tile position

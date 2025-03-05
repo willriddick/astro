@@ -1,19 +1,19 @@
 import pygame
-from src.graphics import PLAYER_SHEET, PLAYER_PALETTES
 from src.util import Vec2, swap_palette, load_sprite_sheet
 from src.components import Sprite
 from .player import Player 
 from .enums import Animations
+import src.graphics as graphics
 
 def load_sprite(palette_index: int) -> tuple[Sprite, pygame.Color]:
-    palette_index = palette_index % len(PLAYER_PALETTES)
-    palette = PLAYER_PALETTES[palette_index]
+    palette_index = palette_index % len(graphics.PLAYER_PALETTES)
+    palette = graphics.PLAYER_PALETTES[palette_index]
 
     fuel_ui_color = palette[Player.FUEL_UI_COLOR_INDEX]
 
     sheet = swap_palette(
-        PLAYER_SHEET,
-        PLAYER_PALETTES[0],
+        graphics.PLAYER_SHEET,
+        graphics.PLAYER_PALETTES[0],
         palette,
     )
     image_list = load_sprite_sheet(sheet, (16, 18))
