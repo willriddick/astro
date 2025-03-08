@@ -1,4 +1,4 @@
-from random import seed, choice, randint
+from random import choice, randint
 from src.util import Direction, Vec2, get_weighted_choice
 from .config import Config
 from .level_map import LevelMap
@@ -76,7 +76,7 @@ def _generate_bridges(level: LevelMap, config: Config) -> bool:
 
         room1: Room = choice(rooms)
         room1.add_attribute(Attribute.BRIDGE)
-        direction = choice(list(room1.get_directions(Status.UNLINKED)))
+        direction = choice(room1.get_directions(Status.UNLINKED))
         room2: Room = level.get_room_at(room1.position, direction)
         Room.connect(room1, room2, direction, Status.LINKED)
     

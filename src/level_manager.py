@@ -28,7 +28,7 @@ class LevelManager:
         if map_path:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
-            level.tilemap = LevelManager._generate(level, config, seed)
+            level.tilemap = LevelManager._generate(level, config)
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
@@ -56,7 +56,7 @@ class LevelManager:
         print(self.current.entities)
     
     @staticmethod
-    def _generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
+    def _generate(level: Level, config: str, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
         level.level_map = generate_level(config)
 
@@ -73,9 +73,13 @@ class LevelManager:
                 sub, flip = LevelManager._get_folder_flip(room.key)
                 map_folder = os.path.join(MAPS_PATH, sub)
                 map_paths: list[str] = []
-                for name in os.listdir(map_folder):
+
+                # sort the map folder for random reproducibility
+                for name in sorted(os.listdir(map_folder)):
                     map_paths.append(os.path.join(map_folder, name))
-                map_path = random.choice(map_paths)
+
+                # choose a random map from the folder and load it
+                map_path = random.choice(sorted(map_paths))
                 new_map = TileMap.load(map_path, graphics.TILESET)
 
                 if room.has_attribute(Attribute.ENTRANCE):

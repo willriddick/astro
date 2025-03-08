@@ -16,9 +16,7 @@ import src.graphics as graphics
 
 
 class Game:
-    """
-    Main game class that handles the game loop and state machine.
-    """
+    """Main class that handles the game loop state machine."""
 
     def __init__(self):
         pygame.init()
@@ -94,26 +92,26 @@ class Game:
             case ['q']:
                 self.running = False
             case ['g']:
-                player.toggle_ghost()
+                if player:
+                    player.toggle_ghost()
             case ['n']:
                 LEVEL_MANAGER.new_level()
             case ['n', seed]:
                 LEVEL_MANAGER.new_level(seed=seed)
             case ['p', index]:
-                player.load_sprite(int(index))
+                if player:
+                    player.load_sprite(int(index))
             case ['r']:
-                player.spawn(player.spawn_position)
+                if player:
+                    player.spawn(player.spawn_position)
             case ['tp', x, y]:
-                player.set_position(pygame.Vector2(int(x), int(y)))
-                SOUNDS.play('teleport')
+                if player:
+                    player.set_position(pygame.Vector2(int(x), int(y)))
+                    SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
             case ['gs', state]:
                 self.state_machine.switch(list(GameStates)[int(state)])
-            case ['net', username, host]:
-                self.create_node(username, host == 'host' or host == 'h')
-            case ['net', username]:
-                self.create_node(username, False)
             case ['n1']:
                 self.create_node('player1', True)
             case ['n2']:
@@ -130,8 +128,6 @@ class Game:
                     self.network_node.join(join_code)
                 else:
                     print('Node is not client')
-            case ['j1']:
-                self.network_node.join('YCUADBW52U')
             case ['disconnect']:
                 if self.network_node:
                     print('Disconnecting')
