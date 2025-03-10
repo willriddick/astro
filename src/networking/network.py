@@ -1,10 +1,15 @@
-import socket, struct, base64, threading, queue
+import socket
+import struct
+import base64
+import threading
+import queue
 import http.client
 import time
 from enum import IntEnum
 
 
 Address = tuple[str, int]
+
 
 class MsgType(IntEnum):
     """Enumeration for message types."""
@@ -15,13 +20,14 @@ class MsgType(IntEnum):
     PING = 4
     UPDATE = 5
 
+
 MsgFormat = {
     MsgType.JOIN: '16s',  # 16 character username
     MsgType.ADD_CLIENT: 'i 16s 45s i',  # id, 16 character username, 45 character IP, port number 
     MsgType.DISCONNECT: 'i',  # id
     MsgType.CHAT: 'i 64s',  # id, 64 character message
     MsgType.PING: 'i',  # id
-    MsgType.UPDATE: 'i ii'  # id, position x, position y
+    MsgType.UPDATE: 'i iii???'  # id, x, y, current_anim, flip_x, flash, alpha
 }
 
 

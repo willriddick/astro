@@ -116,6 +116,8 @@ class Game:
                 self.create_node('player1', True)
             case ['n2']:
                 self.create_node('player2', False)
+            case ['j1']:
+                self.network_node.join('YCUADGG52U')
             case ['info']:
                 if self.network_node:
                     print(self.network_node)

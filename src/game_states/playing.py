@@ -21,12 +21,12 @@ class Playing(State):
 
         self.node = self.owner.network_node
         if self.node:
-            for client in self.node.clients.keys():
+            for client, (username, _) in self.node.clients.items():
                 # dont create a ghost for the current player
                 if client == self.owner.network_node.id:
                     continue
 
-                new_ghost = Ghost()
+                new_ghost = Ghost(username)
                 self.ghosts[client] = new_ghost
         
     def update(self):
@@ -36,13 +36,29 @@ class Playing(State):
         if self.node:
             updates = self.node.get_updates()
             for update in updates:
-                ghost = self.ghosts[update[0]]
-                ghost.update(pygame.Vector2(update[1], update[2]))
+                ghost = self.ghosts.get(update[0])
+                if ghost:
+                    ghost.update(
+                        new_pos=pygame.Vector2(update[1], update[2]),
+                        current_anim=update[3],
+                        flip_x=bool(update[4]),
+                        flash=bool(update[5]),
+                        alpha=bool(update[6])
+                    )
             
             if self.update_timer.is_done:
+                player = LEVEL_MANAGER.player
                 self.node.broadcast_message(
                     MsgType.UPDATE,
-                    (self.node.id, int(LEVEL_MANAGER.player.position.x), int(LEVEL_MANAGER.player.position.y))
+                    (
+                        self.node.id, 
+                        int(player .position.x), 
+                        int(player.position.y),
+                        int(player.sprite.current.value),
+                        bool(player.sprite.flip_x),
+                        bool(player.sprite.flash_timer.is_active),
+                        bool(player.sprite.alpha_timer.is_active)
+                    )
                 )
                 self.update_timer.start()
 
