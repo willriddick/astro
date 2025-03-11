@@ -7,9 +7,9 @@ from src.networking import Message, MsgType, NetworkNode
 from .game_states import GameStates
 
 
-class Playing(State):
+class Multiplayer(State):
     def __init__(self):
-        super().__init__(GameStates.PLAYING)
+        super().__init__(GameStates.MULTIPLAYER)
         self.node: NetworkNode = None
         self.update_timer = Timer(20)
 

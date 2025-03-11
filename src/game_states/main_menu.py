@@ -29,7 +29,8 @@ class MainMenu(State):
             position=Vec2(16, 180 - 16),
             pages = [
                 Page([
-                    Button('Play', self._play),
+                    Button('Singleplayer', self._play_singleplayer),
+                    Button('Multiplayer', self._play_multiplayer),
                     Button('Settings', self._switch_to_settings), 
                     Button('Quit', self._quit)
                 ]),
@@ -118,8 +119,11 @@ class MainMenu(State):
         SETTINGS.save()
         SOUNDS.update_sounds()
     
-    def _play(self):
-        self.owner.state_machine.switch(GameStates.PLAYING)
+    def _play_singleplayer(self):
+        self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
+
+    def _play_multiplayer(self):
+        self.owner.state_machine.switch(GameStates.MULTIPLAYER)
     
     def _quit(self):
         self.owner.running = False
