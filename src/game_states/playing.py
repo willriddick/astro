@@ -2,7 +2,7 @@ import pygame
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
-from src.networking import MsgType
+from src.networking import Message, MsgType
 from .game_states import GameStates
 
 
@@ -11,7 +11,9 @@ class Playing(State):
         super().__init__(GameStates.PLAYING)
 
     def on_enter(self):
-        LEVEL_MANAGER.new_level(1)
+        seed = 5
+        config_index = 0
+        LEVEL_MANAGER.new_level(seed, config_index)
 
         self.update_timer = Timer(20)
         self.update_timer.start()
@@ -21,6 +23,13 @@ class Playing(State):
 
         self.node = self.owner.network_node
         if self.node:
+            if self.node.is_host:
+                self.node.broadcast_message(
+                    MsgType.NEW_LEVEL,
+                    (seed, config_index)
+                )
+                print('Broadcasted new level')
+
             for client, (username, _) in self.node.clients.items():
                 # dont create a ghost for the current player
                 if client == self.owner.network_node.id:
@@ -34,17 +43,24 @@ class Playing(State):
         CAMERA.set_render_callback(self.render) 
 
         if self.node:
-            updates = self.node.get_updates()
-            for update in updates:
-                ghost = self.ghosts.get(update[0])
-                if ghost:
-                    ghost.update(
-                        new_pos=pygame.Vector2(update[1], update[2]),
-                        current_anim=update[3],
-                        flip_x=bool(update[4]),
-                        flash=bool(update[5]),
-                        alpha=bool(update[6])
-                    )
+            events: list[Message] = self.node.get_events()
+
+            for event in events:
+                match event.type:
+                    case MsgType.UPDATE:
+                        print(event)
+                        ghost = self.ghosts.get(event.data[0])
+                        if ghost:
+                            ghost.update(
+                                new_pos=pygame.Vector2(event.data[1], event.data[2]),
+                                current_anim=event.data[3],
+                                flip_x=bool(event.data[4]),
+                                flash=bool(event.data[5]),
+                                alpha=bool(event.data[6])
+                            )
+                    case MsgType.NEW_LEVEL:
+                        seed, config_index = event.data
+                        LEVEL_MANAGER.new_level(seed, config_index)
             
             if self.update_timer.is_done:
                 player = LEVEL_MANAGER.player

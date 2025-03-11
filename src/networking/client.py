@@ -1,4 +1,4 @@
-from .network import NetworkNode, MsgType, decode_join_code, Address, generate_join_code
+from .network import NetworkNode, MsgType, decode_join_code, Address, generate_join_code, Message
 
 
 class Client(NetworkNode):
@@ -29,20 +29,22 @@ class Client(NetworkNode):
     def ping(self):
         self.send_message(MsgType.PING, (self.id,), self.host_addr)
     
-    def handle_message(self, type: MsgType, data: tuple, addr: Address):
-        match type:
+    def handle_message(self, msg: Message):
+        match msg.type:
             case MsgType.ADD_CLIENT:
-                self.handle_add_client(data) 
+                self.handle_add_client(msg.data) 
             case MsgType.DISCONNECT:
-                self.handle_disconnect(data)
+                self.handle_disconnect(msg.data)
             case MsgType.CHAT:
-                self.handle_chat(data)
+                self.handle_chat(msg.data)
             case MsgType.UPDATE:
-                self.update_queue.put(data)
+                self.event_queue.put(msg)
+            case MsgType.NEW_LEVEL:
+                self.event_queue.put(msg)
             case MsgType.JOIN:
-                print(f'Received join message from: {addr}')
+                print(f'Received join message from: {msg.addr}')
             case _:
-                print(f'Unknown message type: {type}')
+                print(f'Unknown message type: {msg.type}')
 
     def handle_chat(self, data: tuple):
         username = self.clients[data[0]][0]

@@ -1,5 +1,4 @@
-from .network import NetworkNode, Address, MsgType, generate_join_code
-from src.util import Timer
+from .network import NetworkNode, Address, Message, MsgType, generate_join_code
 
 
 class Host(NetworkNode):
@@ -9,11 +8,8 @@ class Host(NetworkNode):
         self.id = 0
         self.next_id = 1
 
-        self.client_ping: dict[int, Timer] = {}
-
     def start_session(self):
         self.join_code = generate_join_code(self.get_address())
-        #self.join_code = generate_join_code(self.public_ip, self.port)
         self.add_client(self.id, self.username, (self.ip, self.port))
     
     def disconnect(self):
@@ -23,28 +19,19 @@ class Host(NetworkNode):
         )
         self.clients = {}
 
-    def handle_message(self, type, data, addr):
-        match type:
+    def handle_message(self, msg: Message):
+        match msg.type:
             case MsgType.JOIN:
-                self.handle_join(data, addr)
-                print(data, addr)
+                self.handle_join(msg.data, msg.address)
             case MsgType.DISCONNECT:
-                self.handle_disconnect(data)        
+                self.handle_disconnect(msg.data)        
             case MsgType.CHAT:
-                self.handle_chat(data)
+                self.handle_chat(msg.data)
             case MsgType.UPDATE:
-                self.update_queue.put(data)
-            case MsgType.PING:
-                self.update_ping(data[0])
+                self.event_queue.put(msg)
             case _:
-                print(f'Unknown message type: {type}')
-    
-    def update_ping(self, client_id: int):
-        self.client_ping[client_id].start(1000 * 10)
-        for cur_id, timer in self.client_ping.items():
-            if timer.is_done:
-                print(f'{self.clients[cur_id][0]} ({cur_id}) timed out')
-    
+                print(f'Unknown message type: {msg.type}')
+   
     def handle_chat(self, data: tuple):
         username = self.clients[data[0]][0]
         print(f'{username}: {data[1].rstrip('\x00')}')

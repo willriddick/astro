@@ -19,7 +19,7 @@ class LevelManager:
         self.player = None
         self.current = None
     
-    def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
+    def new_level(self, seed: int = None, config_index=0, map_path: str = None):
         """Create a new level with the given seed and map path."""
         random.seed(seed)
 
@@ -28,7 +28,7 @@ class LevelManager:
         if map_path:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
-            level.tilemap = LevelManager._generate(level, config)
+            level.tilemap = LevelManager._generate(level, CONFIGS[config_index])
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos

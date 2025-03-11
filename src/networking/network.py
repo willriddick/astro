@@ -5,30 +5,7 @@ import threading
 import queue
 import http.client
 import time
-from enum import IntEnum
-
-
-Address = tuple[str, int]
-
-
-class MsgType(IntEnum):
-    """Enumeration for message types."""
-    JOIN = 0
-    ADD_CLIENT = 1
-    DISCONNECT = 2
-    CHAT = 3
-    PING = 4
-    UPDATE = 5
-
-
-MsgFormat = {
-    MsgType.JOIN: '16s',  # 16 character username
-    MsgType.ADD_CLIENT: 'i 16s 45s i',  # id, 16 character username, 45 character IP, port number 
-    MsgType.DISCONNECT: 'i',  # id
-    MsgType.CHAT: 'i 64s',  # id, 64 character message
-    MsgType.PING: 'i',  # id
-    MsgType.UPDATE: 'i iii???'  # id, x, y, current_anim, flip_x, flash, alpha
-}
+from .message import Address, Message, MsgType, MsgFormat
 
 
 class NetworkNode:
@@ -61,10 +38,15 @@ class NetworkNode:
         self.receive_thread: threading.Thread = None
         self.process_thread: threading.Thread = None
         self.message_queue = queue.Queue()
-        self.update_queue = queue.Queue()
+        self.event_queue = queue.Queue()
 
     def __str__(self) -> str:
         return f'Public IP: {self.public_ip}, Address: {self.get_address()}, ID: {self.id}'
+    
+    @property
+    def is_host(self) -> bool:
+        """Check if this network node is a host."""
+        return self.id == 0 
     
     def punch(self, address: Address):
         """
@@ -101,8 +83,8 @@ class NetworkNode:
         """
         while self.running:
             try:
-                type, data, addr = self.receive_message()
-                self.message_queue.put((type, data, addr))
+                type, data, address = self.receive_message()
+                self.message_queue.put(Message(type, data, address))
             except socket.timeout:
                 continue
             except Exception as e:
@@ -115,38 +97,34 @@ class NetworkNode:
         """
         while self.running or not self.message_queue.empty():
             try:
-                type, data, addr = self.message_queue.get(timeout=1)
-                self.handle_message(type, data, addr)
+                message = self.message_queue.get(timeout=1)
+                self.handle_message(message)
             except queue.Empty:
                 continue
-            except IndexError as e:
-                print(f"IndexError processing message: {e}, Data: {data}, Type: {type}, From: {addr}")
-            except KeyError as e:
-                print(f"KeyError processing message: {e}, Data: {data}, Type: {type}, From: {addr}")
             except Exception as e:
-                print(f"Error processing message: {e}, Data: {data}, Type: {type}, From: {addr}")
+                print(f"Error processing message: {e}, Data: {message.data}, Type: {message.type}, From: {message.address}")
    
-    def handle_message(self, type: MsgType, data: tuple, addr: Address):
+    def handle_message(self, message: Message):
         """
         Handle a received message based on its type.
         """
         raise NotImplementedError("handle_message method must be implemented in a subclass.")
     
-    def get_updates(self) -> list[tuple]:
+    def get_events(self) -> list[Message]:
         """
-        Get all updates from the queue.
+        Get all event messages from the queue.
         """
-        updates = []
-        while not self.update_queue.empty():
-            updates.append(self.update_queue.get())
-        return updates
+        events = []
+        while not self.event_queue.empty():
+            events.append(self.event_queue.get())
+        return events
     
-    def add_client(self, client_id: int, username: str, addr: Address):
+    def add_client(self, client_id: int, username: str, address: Address):
         """
         Add a client to the list of clients.
         """
         if client_id not in self.clients:
-            self.clients[client_id] = (username, addr)
+            self.clients[client_id] = (username, address)
     
     def remove_client(self, client_id: int):
         """
@@ -206,7 +184,7 @@ class NetworkNode:
         if not isinstance(data, tuple):
             data = (data,)
 
-        packed_data = self.pack_msg(msg_type, data)
+        packed_data = self.pack_message(msg_type, data)
         self.socket.sendto(packed_data, target_addr)
         #print(f"send_message: {msg_type.name}, Data: {data}, To: {target_addr}") 
 
@@ -220,13 +198,13 @@ class NetworkNode:
         Raises:
             ValueError: If the received message type is invalid.
         """
-        packed_data, addr = self.socket.recvfrom(buffer_size)
-        msg_type, data = self.unpack_msg(packed_data)
-        #print(f'receive_message: {msg_type.name}, Data: {data}, From: {addr}')
-        return msg_type, data, addr
+        packed_data, address = self.socket.recvfrom(buffer_size)
+        msg_type, data = self.unpack_message(packed_data)
+        #print(f'receive_message: {msg_type.name}, Data: {data}, From: {address}')
+        return msg_type, data, address
     
     @staticmethod
-    def pack_msg(msg_type: MsgType, data: tuple) -> bytes:
+    def pack_message(msg_type: MsgType, data: tuple) -> bytes:
         """
         Pack the message type and data into binary format.
         Args:
@@ -249,7 +227,7 @@ class NetworkNode:
         return packed_data
 
     @staticmethod
-    def unpack_msg(packed_data: bytes) -> tuple[MsgType, tuple]:
+    def unpack_message(packed_data: bytes) -> tuple[MsgType, tuple]:
         """
         Unpack a byte sequence into a message type and its data.
         Args:
