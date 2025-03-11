@@ -28,7 +28,7 @@ class NetworkNode:
         self.socket.settimeout(1.0) 
         self.port = self.socket.getsockname()[1]
         self.hostname = socket.gethostname()
-        self.ip = self.get_local_ip()
+        self.ip = socket.gethostbyname(self.hostname)
         self.public_ip = self.get_public_ip()
         
         self.id = -1
@@ -45,7 +45,9 @@ class NetworkNode:
     
     @property
     def is_host(self) -> bool:
-        """Check if this network node is a host."""
+        """
+        Check if this network node is a host.
+        """
         return self.id == 0 
     
     def punch(self, address: Address):
@@ -117,6 +119,7 @@ class NetworkNode:
         events = []
         while not self.event_queue.empty():
             events.append(self.event_queue.get())
+
         return events
     
     def add_client(self, client_id: int, username: str, address: Address):
@@ -159,17 +162,6 @@ class NetworkNode:
         except Exception as e: 
             print(f"Error: {e}")  
     
-    def get_local_ip(self) -> str:
-        try:
-            # create a temporary socket and connect to an external server (Google's DNS)
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            local_ip = s.getsockname()[0]  # get the local IP assigned to this connection
-            s.close()
-            return local_ip
-        except Exception as e:
-            print(f"Error: {e}")  
-    
     def send_message(self, msg_type: MsgType, data: tuple, target_addr: Address):
         """
         Send a message to a target address.
@@ -183,10 +175,8 @@ class NetworkNode:
         # ensure data is always a tuple
         if not isinstance(data, tuple):
             data = (data,)
-
         packed_data = self.pack_message(msg_type, data)
         self.socket.sendto(packed_data, target_addr)
-        #print(f"send_message: {msg_type.name}, Data: {data}, To: {target_addr}") 
 
     def receive_message(self, buffer_size: int = 1024) -> tuple[MsgType, tuple, Address]:
         """
@@ -200,7 +190,6 @@ class NetworkNode:
         """
         packed_data, address = self.socket.recvfrom(buffer_size)
         msg_type, data = self.unpack_message(packed_data)
-        #print(f'receive_message: {msg_type.name}, Data: {data}, From: {address}')
         return msg_type, data, address
     
     @staticmethod
@@ -248,7 +237,7 @@ class NetworkNode:
         
         # convert byte values to strings where applicable
         data = tuple(d.decode().rstrip('\00') if isinstance(d, bytes) else d for d in encoded_data)
-        
+
         return msg_type, data
 
 def generate_join_code(address: Address) -> str:
@@ -266,6 +255,7 @@ def generate_join_code(address: Address) -> str:
     ip, port = address
     ip_int = struct.unpack('!I', socket.inet_aton(ip))[0]
     packed = struct.pack('!IH', ip_int, port)
+
     return base64.b32encode(packed).decode().rstrip('=')
 
 def decode_join_code(code: str) -> Address:
@@ -285,4 +275,5 @@ def decode_join_code(code: str) -> Address:
     packed = base64.b32decode(code)
     ip_int, port = struct.unpack('!IH', packed)
     ip = socket.inet_ntoa(struct.pack('!I', ip_int))
+
     return ip, port
