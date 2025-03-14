@@ -62,4 +62,10 @@ def _load_tileset():
         size=Vec2(16, 2),
     ))
 
+    tileset.add(TileType(
+        name='collectable',
+        images=[ASTEROIDS[0]],
+        size=Vec2(16, 16),
+    ))
+
     TILESET = tileset

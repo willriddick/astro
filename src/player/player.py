@@ -1,6 +1,7 @@
 import pygame
 from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
 from src.components import PhysicsEntity, Collider, HealthComponent, Sprite 
+from src.entities import Collectable
 from src.clock import CLOCK
 from src.debug import DEBUG
 from src.settings import SETTINGS
@@ -131,6 +132,10 @@ class Player(PhysicsEntity):
     def update(self):
         if DEBUG.enabled:
             DEBUG.add_display(self.debug)
+        
+        collectable = self.collider.get_nearest(Collectable)
+        if collectable:
+            collectable.collect(self)
 
         self.handle_input()
         self.sprite.update(self.position)

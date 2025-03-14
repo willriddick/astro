@@ -21,7 +21,8 @@ class LevelManager:
     
     def new_level(self, seed: int = None, config_index=0, map_path: str = None):
         """Create a new level with the given seed and map path."""
-        random.seed(seed)
+        if seed:
+            random.seed(seed)
 
         self.current = level = Level()
         
@@ -29,25 +30,33 @@ class LevelManager:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
             level.tilemap = LevelManager._generate(level, CONFIGS[config_index])
+
+        level.tilemap.create_border(graphics.TILESET.get_by('stone'))
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
-        
+
+        # spawn spikes
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
+
+        # spawn collectables
+        collectables = LevelManager._create_collectables(level.tilemap)
+        level.entities.extend(collectables)
         
+        # spawn stars
         from src.entities import StarSpawner
-        from src.player import Player
         level.star_spawner = StarSpawner(invert_depth=True)
         level.star_spawner.spawn(50)
         
+        # spawn player
+        from src.player import Player
         if self.player is None:
             self.player = Player()
-        level.entities.append(self.player)
+            level.entities.append(self.player)
 
         self.player.spawn(level.spawn_pos)
 
-        level.tilemap.create_border(graphics.TILESET.get_by('stone'))
         level.tilemap_surface = level.tilemap.get_surface()
 
         CAMERA.set_pos(level.spawn_pos)
@@ -55,6 +64,7 @@ class LevelManager:
         level.start()
         print(self.current.entities)
     
+
     @staticmethod
     def _generate(level: Level, config: str, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
@@ -90,6 +100,21 @@ class LevelManager:
                
         return level.tilemap
     
+
+    @staticmethod 
+    def _create_collectables(tilemap: TileMap) -> list['Collectable']:
+        from src.entities import Collectable
+        collectables: set[Collectable] = set()
+        tiles = tilemap.get_tiles_with('collectable')
+
+        for tile in tiles:
+            collectables.add(Collectable(tile.pos, Vec2(16, 16)))
+        
+        tilemap.remove_tiles(tiles)
+
+        return collectables
+    
+
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
         """
@@ -167,12 +192,14 @@ class LevelManager:
         tilemap.remove_tiles(spike_tiles)
         return spikes
         
+
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
         tilemap.create_tile_rect(
             graphics.TILESET.get_by('stone'), 
             pygame.Rect(room_pos.x * room_size.x, room_pos.y * room_size.y, room_size.x, room_size.y)
         )
+
 
     @staticmethod
     def _get_folder_flip(key: int) -> tuple[str, bool]:
