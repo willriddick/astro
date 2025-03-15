@@ -13,8 +13,8 @@ class Singleplayer(State):
     def on_enter(self):
         seed = round(random.random())
         config_index = 0
-        #LEVEL_MANAGER.new_level(seed, config_index)
-        LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
+        LEVEL_MANAGER.new_level(seed, config_index)
+        #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
 
     def update(self):
         LEVEL_MANAGER.current.update()

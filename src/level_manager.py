@@ -53,8 +53,8 @@ class LevelManager:
         from src.player import Player
         if self.player is None:
             self.player = Player()
-            level.entities.append(self.player)
 
+        level.entities.append(self.player)
         self.player.spawn(level.spawn_pos)
 
         level.tilemap_surface = level.tilemap.get_surface()

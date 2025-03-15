@@ -1,4 +1,4 @@
-from random import randint
+from random import choice
 import pygame
 from src.util import Vec2
 from src.clock import CLOCK
@@ -28,7 +28,9 @@ class Button():
         self.DISABLED_COLOR = graphics.PALETTE[3]
 
         if Button.HOVERED_COLOR is None:
-            Button.HOVERED_COLOR = graphics.PALETTE[randint(20, len(graphics.PALETTE) - 1)]
+            Button.HOVERED_COLOR = graphics.PALETTE[choice([
+                20, 24, 28, 32, 36, 40, 44, 48, 50, 56, 60
+            ])]
     
     def __str__(self):
         return self.text
@@ -36,7 +38,8 @@ class Button():
     def select(self):
         SOUNDS.play('select')
         CAMERA.screenshake(30, 1)
-        self.callback()
+        if self.callback:
+            self.callback()
     
     def update(self, hovered: bool):
         self.hovered = hovered

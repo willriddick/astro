@@ -10,7 +10,7 @@ from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
-from src.game_states import GameStates, MainMenu, Singleplayer, Multiplayer
+from src.game_states import GameStates, MainMenu, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
 from src.networking import Host, Client, NetworkNode, MsgType
 import src.graphics as graphics
 
@@ -35,7 +35,7 @@ class Game:
 
         self.command_prompt = CommandPrompt()
 
-        self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), Multiplayer()])
+        self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), LobbyHost(), LobbyJoin(), Multiplayer()])
         self.network_node: NetworkNode = None
 
 

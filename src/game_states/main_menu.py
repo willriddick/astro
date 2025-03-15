@@ -1,7 +1,7 @@
 from random import randint, choice
 import pygame
 from src.util import State, Vec2
-from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton
+from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton, TextButton
 from src.entities import StarSpawner
 from src.camera import CAMERA
 from src.settings import SETTINGS
@@ -17,6 +17,8 @@ class MainMenu(State):
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
+        self.join_code = ''
+
         self.resolution_slider = SliderButton(
             'Resolution', 
             key='window_scale', 
@@ -30,7 +32,7 @@ class MainMenu(State):
             pages = [
                 Page([
                     Button('Singleplayer', self._play_singleplayer),
-                    Button('Multiplayer', self._play_multiplayer),
+                    Button('Multiplayer', self._switch_to_multiplayer),
                     Button('Settings', self._switch_to_settings), 
                     Button('Quit', self._quit)
                 ]),
@@ -61,7 +63,12 @@ class MainMenu(State):
                     InputButton('Right', key='right', callback=lambda x: self._set_movement(x)),
                     InputButton('Jump', key='jump', callback=lambda x: self._set_movement(x)),
                     Button('Back', self._switch_to_settings)
-                ])
+                ]),
+                Page([
+                    Button('Host', self._host_session),
+                    Button('Join', self._join_session),
+                    Button('Back', self._switch_to_main), 
+                ]),
             ],
         )
     
@@ -101,7 +108,13 @@ class MainMenu(State):
     
     def _switch_to_controls(self):
         self.menu.change_page(4)
+
+    def _switch_to_multiplayer(self):
+        self.menu.change_page(5)
     
+    def _play_singleplayer(self):
+        self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
+  
     def _reset_defaults(self):
         if not SETTINGS.get('fullscreen'):
             self.owner.set_fullscreen(True)
@@ -119,11 +132,11 @@ class MainMenu(State):
         SETTINGS.save()
         SOUNDS.update_sounds()
     
-    def _play_singleplayer(self):
-        self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
-
-    def _play_multiplayer(self):
-        self.owner.state_machine.switch(GameStates.MULTIPLAYER)
+    def _join_session(self):
+        self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
+    
+    def _host_session(self):
+        self.owner.state_machine.switch(GameStates.LOBBY_HOST)
     
     def _quit(self):
         self.owner.running = False
