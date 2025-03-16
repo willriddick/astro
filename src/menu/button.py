@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, randint
 import pygame
 from src.util import Vec2
 from src.clock import CLOCK
@@ -29,7 +29,7 @@ class Button():
 
         if Button.HOVERED_COLOR is None:
             Button.HOVERED_COLOR = graphics.PALETTE[choice([
-                20, 24, 28, 32, 36, 40, 44, 48, 50, 56, 60
+                randint(22, 36),
             ])]
     
     def __str__(self):

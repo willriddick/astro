@@ -33,6 +33,7 @@ class Game:
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(graphics.ICON)
 
+        self.events: list[pygame.event.Event] = []  
         self.command_prompt = CommandPrompt()
 
         self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), LobbyHost(), LobbyJoin(), Multiplayer()])
@@ -52,7 +53,8 @@ class Game:
 
             INPUTS.disabled = True if self.command_prompt.enabled else False
 
-            for event in pygame.event.get():
+            self.events = pygame.event.get()
+            for event in self.events:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
