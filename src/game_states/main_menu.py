@@ -1,4 +1,4 @@
-from random import randint, choice
+import random
 import pygame
 from src.util import State, Vec2
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton, TextButton
@@ -8,6 +8,7 @@ from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
+from src.networking import Host, Client
 from .game_states import GameStates
 
 
@@ -18,6 +19,7 @@ class MainMenu(State):
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
+        # settings
         self.resolution_slider = SliderButton(
             'Resolution', 
             key='window_scale', 
@@ -26,12 +28,21 @@ class MainMenu(State):
         )
         self.resolution_slider.disabled = SETTINGS.get('fullscreen')
 
+
+        # multiplayer 
+        self.username = ''
+        self.join_code = ''
+        self.join_button = Button('Join', self._join)
+        self.join_button.disabled = True
+        self.start_button = Button('Start', self._start)
+        self.start_button.disabled = True
+
+        # create pages
         self.menu = Menu(
             position=Vec2(16, 180 - 16),
             pages = [
                 Page([
-                    Button('Singleplayer', self._play_singleplayer),
-                    Button('Multiplayer', self._switch_to_multiplayer),
+                    Button('Play', self._switch_to_play),
                     Button('Settings', self._switch_to_settings), 
                     Button('Quit', self._quit)
                 ]),
@@ -64,9 +75,21 @@ class MainMenu(State):
                     Button('Back', self._switch_to_settings)
                 ]),
                 Page([
-                    Button('Host', self._host_session),
-                    Button('Join', self._join_session),
+                    Button('Singleplayer', self._start_singleplayer),
+                    Button('Host', self._switch_to_host),
+                    Button('Join', self._switch_to_join),
                     Button('Back', self._switch_to_main), 
+                ]),
+                Page([
+                    TextButton('Username', callback=lambda x, y: self._set_host_username(x, y)),
+                    self.start_button,
+                    Button('Canel', self._switch_to_play)
+                ]),
+                Page([
+                    TextButton('Username', callback=lambda x, y: self._set_join_username(x, y)),
+                    TextButton('Join Code', callback=lambda x, y: self._set_join_code(x, y)),
+                    self.join_button,
+                    Button('Cancel', self._switch_to_play)
                 ]),
             ],
         )
@@ -75,8 +98,8 @@ class MainMenu(State):
         self.star_spawner.spawn(30)
         CAMERA.boundary = None
         self.camera_movement = pygame.Vector2(
-            choice([-1, 1]) * randint(500, 3000),
-            choice([-1, 1]) * randint(500, 3000)
+            random.choice([-1, 1]) * random.randint(500, 3000),
+            random.choice([-1, 1]) * random.randint(500, 3000)
         )
     
     def on_exit(self):
@@ -108,12 +131,59 @@ class MainMenu(State):
     def _switch_to_controls(self):
         self.menu.change_page(4)
 
-    def _switch_to_multiplayer(self):
+    def _switch_to_play(self):
+        self.owner.network_node = None
         self.menu.change_page(5)
     
-    def _play_singleplayer(self):
+    def _switch_to_host(self):
+        self.menu.change_page(6)
+    
+    def _switch_to_join(self):
+        self.menu.change_page(7)
+    
+    def _start_singleplayer(self):
         self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
-  
+    
+    def _start_multiplayer(self):
+        self.owner.state_machine.switch(GameStates.MULTIPLAYER)
+    
+    def _join_session(self):
+        self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
+    
+    def _host_session(self):
+        self.owner.state_machine.switch(GameStates.LOBBY_HOST)
+    
+    def _set_join_username(self, selected: bool, value: str):
+        self.menu.movement_enabled = not selected 
+        self.username = value
+        self.join_button.disabled = self.username == '' or self.join_code == ''
+    
+    def _set_join_code(self, selected: bool, value: str):
+        self.menu.movement_enabled = not selected 
+        self.join_code = value
+        self.join_button.disabled = self.username == '' or self.join_code == ''
+    
+    def _set_host_username(self, selected: bool, value: str):
+        self.menu.movement_enabled = not selected 
+        self.username = value
+        self.start_button.disabled = self.username == ''
+    
+    async def _join(self):
+        self.owner.network_node = Client(self.username)
+        self.owner.network_node.start()
+        joined = await self.owner.network_node.join(self.join_code.upper())
+
+        if joined:
+            self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
+        else:
+            print('Failed to join session')
+
+    def _start(self):
+        self.owner.network_node = Host(self.username, port=45678)
+        self.owner.network_node.start()
+        self.owner.network_node.start_session()
+        self.owner.state_machine.switch(GameStates.LOBBY_HOST)
+    
     def _reset_defaults(self):
         if not SETTINGS.get('fullscreen'):
             self.owner.set_fullscreen(True)
@@ -130,13 +200,7 @@ class MainMenu(State):
     def _update_volume(self, _):
         SETTINGS.save()
         SOUNDS.update_sounds()
-    
-    def _join_session(self):
-        self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
-    
-    def _host_session(self):
-        self.owner.state_machine.switch(GameStates.LOBBY_HOST)
-    
+
     def _quit(self):
         self.owner.running = False
 

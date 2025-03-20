@@ -1,3 +1,4 @@
+import binascii
 import socket
 import struct
 import base64
@@ -45,24 +46,11 @@ class NetworkNode:
     
     @property
     def is_host(self) -> bool:
-        """
-        Check if this network node is a host.
-        """
+        """Check if this network node is a host."""
         return self.id == 0 
     
-    def punch(self, address: Address):
-        """
-        Send a message to the server to establish a connection.
-        """
-        start_time = time.time()
-        while time.time() - start_time < 60:
-            self.send_message(MsgType.JOIN, (self.username), address)
-            time.sleep(1)  # sends every second for 60 seconds
-    
     def start(self):
-        """
-        Start the network node to begin sending and receiving messages.
-        """
+        """Start the network node to begin sending and receiving messages."""
         self.running = True
         self.receive_thread = threading.Thread(target=self.receive_messages)
         self.receive_thread.start()
@@ -70,19 +58,22 @@ class NetworkNode:
         self.process_thread.start()
     
     def stop(self):
-        """
-        Stop the network node from sending and receiving messages.
-        """
+        """Stop the network node from sending and receiving messages."""
         self.running = False
         if self.receive_thread:
             self.receive_thread.join()
         if self.process_thread:
             self.process_thread.join()
     
+    def close(self):
+        """Properly close the socket to free the port."""
+        self.stop()
+        if self.socket:
+            self.socket.close()
+            self.socket = None
+    
     def receive_messages(self):
-        """
-        Continuously receive messages from the network.
-        """
+        """Continuously receive messages from the network."""
         while self.running:
             try:
                 type, data, address = self.receive_message()
@@ -94,9 +85,7 @@ class NetworkNode:
                 break
     
     def process_messages(self):
-        """
-        Continuously process messages from the queue.
-        """
+        """Continuously process messages from the queue."""
         while self.running or not self.message_queue.empty():
             try:
                 message = self.message_queue.get(timeout=1)
@@ -107,15 +96,11 @@ class NetworkNode:
                 print(f"Error processing message: {e}, Data: {message.data}, Type: {message.type}, From: {message.address}")
    
     def handle_message(self, message: Message):
-        """
-        Handle a received message based on its type.
-        """
+        """Handle a received message based on its type."""
         raise NotImplementedError("handle_message method must be implemented in a subclass.")
     
     def get_events(self) -> list[Message]:
-        """
-        Get all event messages from the queue.
-        """
+        """Get all event messages from the queue."""
         events = []
         while not self.event_queue.empty():
             events.append(self.event_queue.get())
@@ -123,23 +108,17 @@ class NetworkNode:
         return events
     
     def add_client(self, client_id: int, username: str, address: Address):
-        """
-        Add a client to the list of clients.
-        """
+        """Add a client to the list of clients."""
         if client_id not in self.clients:
             self.clients[client_id] = (username, address)
     
     def remove_client(self, client_id: int):
-        """
-        Remove a client from the list of clients.
-        """
+        """Remove a client from the list of clients."""
         if client_id in self.clients:
             del self.clients[client_id]
     
     def broadcast_message(self, type: MsgType, data: tuple, exclude: list[int]=[]): 
-        """
-        Send a message to all clients except the sender and those in the exclude list.
-        """
+        """Send a message to all clients except the sender and those in the exclude list."""
         for client_id, info in self.clients.items():
             if client_id != self.id and client_id not in exclude:
                 address = info[1]
@@ -273,9 +252,18 @@ def decode_join_code(code: str) -> Address:
         ValueError: If the input code is malformed or cannot be decoded.
         struct.error: If the decoded binary data is not in the expected format.
     """
-    code += '=' * (-len(code) % 8)  # restore padding for decoding
-    packed = base64.b32decode(code)
-    ip_int, port = struct.unpack('!IH', packed)
-    ip = socket.inet_ntoa(struct.pack('!I', ip_int))
+    try:
+        code = code.upper().replace(' ', '')  # Normalize input
+        code += '=' * (-len(code) % 8)  # Restore padding for decoding
+        packed = base64.b32decode(code, casefold=True)
 
-    return ip, port
+        if len(packed) != 6:
+            raise ValueError("Decoded data length is incorrect. Expected 6 bytes.")
+        
+        ip_int, port = struct.unpack('!IH', packed)
+        ip = socket.inet_ntoa(struct.pack('!I', ip_int))
+        
+        return ip, port
+    except (binascii.Error, struct.error, ValueError) as e:
+        raise ValueError(f"Invalid join code: {e}")
+    

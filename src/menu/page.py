@@ -14,7 +14,7 @@ class Page:
         button_index = int((self.button_index + input_dir) % self.button_count)
         self.button_index = button_index 
         if self.buttons[button_index].disabled:
-            self.button_index += int(sign(input_dir))
+            self.change_index(int(sign(input_dir)))
     
     @property
     def selected_button(self) -> Button:

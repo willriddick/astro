@@ -14,9 +14,9 @@ class TextButton(Button):
 
     TEXT_POS = Vec2(116, 2)
 
-    def __init__(self, text: str, callback: Callable[[bool], None]=None):
+    def __init__(self, text: str, callback: Callable[[bool], None]=None, default_value=''):
         super().__init__(text, callback)
-        self.value = ''
+        self.value = default_value
         self.selected = False
     
     def update(self, hovered: bool):
@@ -45,7 +45,7 @@ class TextButton(Button):
         if self.value == '' and not self.selected:
             text = '_____________'
         else:
-            text = self.value 
+            text = self.value.upper()
 
         surface.blit(graphics.FONT.render(text, antialias=False, color=color), self.TEXT_POS) 
         return surface

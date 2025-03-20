@@ -1,3 +1,4 @@
+import asyncio
 from .network import NetworkNode, MsgType, decode_join_code, Address, generate_join_code, Message
 
 
@@ -5,18 +6,23 @@ class Client(NetworkNode):
     def __init__(self, username: str, ip: str = '', port: int = 0):
         super().__init__(username, ip, port)
         self.host_addr: Address = None
+        self.join_event = asyncio.Event()
    
-    def join(self, join_code: str):
-        print(join_code)
-        self.host_addr = decode_join_code(join_code)
-        print('Decoded join code:')
-        print(f'Host address: {self.host_addr}')
-        self.send_message(MsgType.JOIN, (self.username,), self.host_addr)
-    
-    def join_addr(self, host_addr: tuple[str, int]):
-        self.host_addr = host_addr
-        self.send_message(MsgType.JOIN, (self.username,), self.host_addr)
+    async def join(self, join_code: str, timeout=5) -> bool:
+        try: 
+            self.host_addr = decode_join_code(join_code)
+            print(f'Decoded join code to host address: {self.host_addr}')
+            self.send_message(MsgType.JOIN, (self.username,), self.host_addr)
 
+            try:
+                await asyncio.wait_for(self.join_event.wait(), timeout)
+                return True  # successfully joined
+            except asyncio.TimeoutError:
+                print("Join attempt timed out: No response from host.")
+                return False  # failed to join
+        except:
+            return False
+    
     def get_join_code(self) -> str:
         return generate_join_code(self.get_address())
     
@@ -26,9 +32,6 @@ class Client(NetworkNode):
         self.host_addr= None
         self.clients = {}
         
-    def ping(self):
-        self.send_message(MsgType.PING, (self.id,), self.host_addr)
-    
     def handle_message(self, msg: Message):
         match msg.type:
             case MsgType.ADD_CLIENT:
@@ -68,5 +71,6 @@ class Client(NetworkNode):
 
         if self.get_address() == address:
             self.id = client_id
+            self.join_event.set()
             print(f'Joined {self.clients[0][0]}\'s session')
     

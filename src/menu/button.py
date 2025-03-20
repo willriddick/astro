@@ -1,4 +1,6 @@
-from random import choice, randint
+import asyncio
+import inspect
+import random
 import pygame
 from src.util import Vec2
 from src.clock import CLOCK
@@ -28,8 +30,13 @@ class Button():
         self.DISABLED_COLOR = graphics.PALETTE[4]
 
         if Button.HOVERED_COLOR is None:
-            Button.HOVERED_COLOR = graphics.PALETTE[choice([
-                randint(22, 36)
+            Button.HOVERED_COLOR = graphics.PALETTE[random.choice([
+                random.randint(24, 26),
+                random.randint(28, 31),
+                random.randint(34, 37),
+                random.randint(41, 44),
+                random.randint(47, 48),
+                random.randint(55, 61)
             ])]
     
     def __str__(self):
@@ -38,8 +45,12 @@ class Button():
     def select(self):
         SOUNDS.play('select')
         CAMERA.screenshake(30, 1)
+
         if self.callback:
-            self.callback()
+            if inspect.iscoroutinefunction(self.callback):
+                asyncio.create_task(self.callback())  # Run async function in background
+            else:
+                self.callback()
     
     def update(self, hovered: bool):
         self.hovered = hovered
