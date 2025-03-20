@@ -4,13 +4,14 @@ from src.menu import Menu, Page, Button
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
 from src.networking import MsgType
+import src.graphics as graphics
 from .game_states import GameStates
 
 
 class LobbyJoin(State):
     def __init__(self):
         super().__init__(GameStates.LOBBY_JOIN)
-        self.background_color = (24, 20, 37)
+        self.background_color = graphics.PALETTE[15]
     
         self.menu = Menu(
             position=Vec2(16, 180 - 16),
@@ -20,9 +21,6 @@ class LobbyJoin(State):
                 ])
             ]
         ) 
-    
-    def on_enter(self):
-        print(self.owner.network_node.username)
     
     def update(self):
         CAMERA.set_render_callback(self.render)

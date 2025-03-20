@@ -15,7 +15,10 @@ class Button():
     X_OFFSET = 7
     OFFSET_SPEED = 15 
 
-    HOVERED_COLOR = None  # placeholder 
+    # placeholders
+    DEFAULT_COLOR = None  
+    DISABLED_COLOR = None
+    HOVERED_COLOR = None
 
     def __init__(self, text: str, callback: callable):
         self.text = text
@@ -23,13 +26,11 @@ class Button():
         self.hovered = False
         self.x_offset = 0
         self.target_offset = 0 
-
         self.disabled = False
 
-        self.DEFAULT_COLOR = graphics.PALETTE[6]
-        self.DISABLED_COLOR = graphics.PALETTE[4]
-
-        if Button.HOVERED_COLOR is None:
+        if Button.DEFAULT_COLOR is None:
+            Button.DEFAULT_COLOR = graphics.PALETTE[6]
+            Button.DISABLED_COLOR = graphics.PALETTE[4]
             Button.HOVERED_COLOR = graphics.PALETTE[random.choice([
                 random.randint(24, 26),
                 random.randint(28, 31),

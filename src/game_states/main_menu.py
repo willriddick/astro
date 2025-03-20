@@ -9,13 +9,14 @@ from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
 from src.networking import Host, Client
+import src.graphics as graphics
 from .game_states import GameStates
 
 
 class MainMenu(State):
     def __init__(self):
         super().__init__(GameStates.MAIN_MENU)
-        self.background_color = (24, 20, 37)
+        self.background_color = graphics.PALETTE[15]
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
@@ -27,7 +28,6 @@ class MainMenu(State):
             callback=lambda _: self.owner.set_fullscreen(SETTINGS.get('fullscreen'))
         )
         self.resolution_slider.disabled = SETTINGS.get('fullscreen')
-
 
         # multiplayer 
         self.username = ''

@@ -2,12 +2,13 @@ import pygame
 from src.debug import DEBUG
 from src.tilemap import TileMap
 from src.level_gen import LevelMap
+import src.graphics as graphics
 
 
 class Level:
 
     def __init__(self):
-        self.background_color = (24, 20, 37)
+        self.background_color = graphics.PALETTE[15]
         self.star_spawner = None
 
         self.level_map: LevelMap = None

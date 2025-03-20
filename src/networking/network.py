@@ -5,7 +5,6 @@ import base64
 import threading
 import queue
 import http.client
-import time
 from .message import Address, Message, MsgType, MsgFormat
 
 

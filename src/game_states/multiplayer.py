@@ -1,5 +1,4 @@
 import pygame
-import random
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
@@ -52,7 +51,7 @@ class Multiplayer(State):
                 MsgType.UPDATE,
                 (
                     self.node.id, 
-                    int(player .position.x), 
+                    int(player.position.x), 
                     int(player.position.y),
                     int(player.sprite.current.value),
                     bool(player.sprite.flip_x),
