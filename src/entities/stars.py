@@ -12,10 +12,6 @@ class StarSpawner():
         self.buffer = buffer
         self.stars = []
     
-    def update(self):
-        for star in self.stars:
-            star.update()
-        
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         for star in self.stars:
             star.render(display, offset)

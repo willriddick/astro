@@ -3,6 +3,7 @@ import pygame
 from src.util import State, Vec2
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton, TextButton
 from src.entities import StarSpawner
+from src.clock import CLOCK
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.inputs import INPUTS
@@ -16,8 +17,6 @@ class MainMenu(State):
         self.background_color = (24, 20, 37)
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
-
-        self.join_code = ''
 
         self.resolution_slider = SliderButton(
             'Resolution', 
@@ -76,8 +75,8 @@ class MainMenu(State):
         self.star_spawner.spawn(30)
         CAMERA.boundary = None
         self.camera_movement = pygame.Vector2(
-            choice([-1, 1]) * randint(5, 30),
-            choice([-1, 1]) * randint(5, 30)
+            choice([-1, 1]) * randint(500, 3000),
+            choice([-1, 1]) * randint(500, 3000)
         )
     
     def on_exit(self):
@@ -85,7 +84,7 @@ class MainMenu(State):
 
     def update(self):
         CAMERA.set_render_callback(self.render)
-        CAMERA.move_to(CAMERA.pos + self.camera_movement)
+        CAMERA.move_to(CAMERA.pos + (self.camera_movement * CLOCK.dt))
         self.menu.update()
     
     def render(self, display, offset):

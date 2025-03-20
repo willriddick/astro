@@ -28,8 +28,6 @@ class Level:
         for entity in self.entities:
             entity.update()
         
-        self.star_spawner.update()
-    
     def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
         # background
         display.fill(self.background_color)

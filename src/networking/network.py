@@ -176,6 +176,7 @@ class NetworkNode:
         if not isinstance(data, tuple):
             data = (data,)
         packed_data = self.pack_message(msg_type, data)
+        #print(f"Sent message {msg_type.name} to {target_addr}: {data}")
         self.socket.sendto(packed_data, target_addr)
 
     def receive_message(self, buffer_size: int = 1024) -> tuple[MsgType, tuple, Address]:
@@ -190,6 +191,7 @@ class NetworkNode:
         """
         packed_data, address = self.socket.recvfrom(buffer_size)
         msg_type, data = self.unpack_message(packed_data)
+        #print(f"Received message {msg_type.name} from {address}: {data}")
         return msg_type, data, address
     
     @staticmethod

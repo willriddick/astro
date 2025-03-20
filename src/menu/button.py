@@ -24,12 +24,12 @@ class Button():
 
         self.disabled = False
 
-        self.DEFAULT_COLOR = graphics.PALETTE[5]
-        self.DISABLED_COLOR = graphics.PALETTE[3]
+        self.DEFAULT_COLOR = graphics.PALETTE[6]
+        self.DISABLED_COLOR = graphics.PALETTE[4]
 
         if Button.HOVERED_COLOR is None:
             Button.HOVERED_COLOR = graphics.PALETTE[choice([
-                randint(22, 36),
+                randint(22, 36)
             ])]
     
     def __str__(self):

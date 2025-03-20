@@ -18,28 +18,18 @@ class Multiplayer(State):
 
     def on_enter(self):
         from src.player.ghost import Ghost
-        seed = round(random.random())
-        config_index = 0
-        LEVEL_MANAGER.new_level(seed, config_index)
-
         self.node = self.owner.network_node
         self.update_timer.start()
+        LEVEL_MANAGER.new_level()
 
-        if self.node:
-            if self.node.is_host:
-                self.node.broadcast_message(
-                    MsgType.NEW_LEVEL,
-                    (seed, config_index)
-                )
+        for client, (username, _) in self.node.clients.items():
+            # dont create a ghost for the current player
+            if client == self.node.id:
+                continue
 
-            for client, (username, _) in self.node.clients.items():
-                # dont create a ghost for the current player
-                if client == self.owner.network_node.id:
-                    continue
-
-                new_ghost = Ghost(username)
-                self.ghosts[client] = new_ghost
-        
+            new_ghost = Ghost(username)
+            self.ghosts[client] = new_ghost
+    
     def update(self):
         LEVEL_MANAGER.current.update()
         CAMERA.set_render_callback(self.render) 
