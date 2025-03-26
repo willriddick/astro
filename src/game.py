@@ -151,15 +151,6 @@ class Game:
             case _:
                 print(f'Unknown command: {command}')
     
-    def create_node(self, username: str, host: bool):
-        self.network_node = Host(username, port=56789) if host else Client(username)
-        self.network_node.start()
-        print(self.network_node)
-
-        if host:
-            self.network_node.start_session()
-            print(f'Join code: {self.network_node.join_code}')
-    
     def handle_event(self, event: pygame.Event):
         if event.type == pygame.QUIT:
             self.running = False

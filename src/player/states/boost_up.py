@@ -18,8 +18,6 @@ class BoostUp(State):
         self.owner.fuel -= Player.BOOST_UP_COST
         self.owner.sprite.set_next(Animations.BOOST_UP)
         self.owner.velocity.y = min(self.owner.velocity.y, -Player.INITIAL_BOOST_UP)
-
-        self.timer.start()
     
     def on_exit(self):
         self.owner.refuel_timer.start()
@@ -30,12 +28,15 @@ class BoostUp(State):
         self.owner.fuel = approach(self.owner.fuel, 0, 100 * CLOCK.dt)
         self.owner.accelerate_y(-1, Player.BOOST_UP_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
         self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_UP_SPEED)
-
         self.owner.handle_wall_jump()
 
-
+        # emit particles
         if self.timer.is_done:
-            self.owner.particle_emitter.emit(BoostUpParticle, self.owner.position + pygame.Vector2(4, 2), 3)
+            self.owner.particle_emitter.emit(
+                type=BoostUpParticle, 
+                position=self.owner.position + pygame.Vector2(6, 4),
+                count=3
+            )
             self.timer.start()
 
         # switch states

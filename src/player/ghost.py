@@ -7,6 +7,10 @@ import src.graphics as graphics
 from src.menu import Button
 
 class Ghost(Entity):
+
+    TAG_OFFSET = Vec2(4, -16)
+    TAG_ALPHA = 100
+
     def __init__(self, username: str, palette_index=2):
         super().__init__(pygame.Vector2(0, 0), Vec2(8, 13))
         self.username = username
@@ -15,8 +19,9 @@ class Ghost(Entity):
         self.load_sprite(palette_index)
 
         self.TAG_COLOR = graphics.PALETTE[6]
-        self.TAG_OFFSET = -8
         self.TAG_SURF = graphics.FONT.render(self.username, antialias=False, color=Button.DEFAULT_COLOR)
+        self.TAG_SURF.set_alpha(self.TAG_ALPHA)
+        self.TAG_WIDTH = self.TAG_SURF.get_width()
 
     def load_sprite(self, palette_index):
         self.palette_index = palette_index
@@ -34,5 +39,11 @@ class Ghost(Entity):
     
     def render(self, display, offset):
         super().render(display, offset)
-        display.blit(self.TAG_SURF, (self.position.x, self.position.y + self.TAG_OFFSET))
+        display.blit(
+            self.TAG_SURF, 
+            (
+                self.position.x + self.TAG_OFFSET.x - self.TAG_WIDTH // 2 + offset.x, 
+                self.position.y + self.TAG_OFFSET.y + offset.y
+            )
+        )
     

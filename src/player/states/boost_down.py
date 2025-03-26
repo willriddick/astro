@@ -1,7 +1,10 @@
+import pygame
 from src.util import State
 from src.sounds import SOUNDS
+from src.particles import BoostDownParticle
 from ..player import Player
 from ..enums import Animations, States
+
 
 class BoostDown(State):
     def __init__(self):
@@ -14,6 +17,12 @@ class BoostDown(State):
         self.owner.fuel -= Player.BOOST_DOWN_COST
         self.owner.sprite.set_next(Animations.BOOST_DOWN)
         self.dir = self.owner.input_dir.x
+
+        self.owner.particle_emitter.emit(
+            type=BoostDownParticle, 
+            position=self.owner.position + pygame.Vector2(6, 10),
+            count=15
+        )
     
     def on_exit(self):
         self.owner.refuel_timer.start()

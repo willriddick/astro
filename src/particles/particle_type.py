@@ -4,7 +4,7 @@ from src.util import Vec2
 class ParticleType:
     """Defines the properties of a particle, allowing flexible behavior changes."""
     def __init__(self, 
-        size: Vec2, duration: int = 500, color=(255, 255, 255),
+        size: Vec2 = Vec2(2, 2), duration: int = 300, color=(255, 255, 255),
         x_velocity: tuple[float, float] = (-1, 1), y_velocity: tuple[float, float] = (-1, 1)
     ):
         self.size = size
@@ -15,3 +15,5 @@ class ParticleType:
 
 
 BoostUpParticle = ParticleType(Vec2(2, 2), 500, (255, 255, 255), (-0.5, 0,5), (0.5, 1.5))
+BoostDownParticle = ParticleType(Vec2(2, 2), 500, (255, 255, 255), (-0.5, 0,5), (-0.5, -1))
+

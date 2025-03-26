@@ -76,7 +76,7 @@ class Player(PhysicsEntity):
         self.fuel = Player.MAX_FUEL 
         self.refuel_timer = Timer(Player.REFUEL_TIME)
 
-        self.particle_emitter = ParticleEmitter(30)
+        self.particle_emitter = ParticleEmitter(50)
 
         # jumping and wall sliding
         self.jumps_remaining = 0
