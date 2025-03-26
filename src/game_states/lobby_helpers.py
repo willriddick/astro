@@ -1,11 +1,12 @@
 from src.util import Vec2
 from src.menu import Button
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
+from src.networking import Host
 import src.graphics as graphics
 
 
 BUFFER = 32
-SLOT = (DISPLAY_WIDTH - (BUFFER * 2)) / 4
+SLOT = (DISPLAY_WIDTH - (BUFFER * 2)) / Host.MAX_CLIENTS
 
 
 def render_clients(display, node):

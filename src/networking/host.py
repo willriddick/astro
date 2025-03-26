@@ -2,6 +2,9 @@ from .network import NetworkNode, Address, Message, MsgType, generate_join_code
 
 
 class Host(NetworkNode):
+
+    MAX_CLIENTS = 4
+
     def __init__(self, username: str, ip: str = '', port: int = 0):
         super().__init__(username, ip, port)
         self.join_code = ''
@@ -47,6 +50,10 @@ class Host(NetworkNode):
         )
 
     def handle_join(self, data: tuple, address: Address):
+        if len(self.clients) > self.MAX_CLIENTS:
+            print('Session full')
+            return
+
         if len(data) > 0:
             client_id = self.next_id
             self.next_id += 1
