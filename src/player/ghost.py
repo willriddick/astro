@@ -1,10 +1,10 @@
 import pygame
 from src.util import Vec2
 from src.components import Entity
+from src.settings import SETTINGS
+import src.graphics as graphics
 from .enums import Animations
 from .sprite import load_sprite
-import src.graphics as graphics
-from src.menu import Button
 
 class Ghost(Entity):
 
@@ -19,7 +19,7 @@ class Ghost(Entity):
         self.load_sprite(palette_index)
 
         self.TAG_COLOR = graphics.PALETTE[6]
-        self.TAG_SURF = graphics.FONT.render(self.username, antialias=False, color=Button.DEFAULT_COLOR)
+        self.TAG_SURF = graphics.FONT.render(self.username, antialias=False, color=(255, 255, 255))
         self.TAG_SURF.set_alpha(self.TAG_ALPHA)
         self.TAG_WIDTH = self.TAG_SURF.get_width()
 
@@ -39,11 +39,13 @@ class Ghost(Entity):
     
     def render(self, display, offset):
         super().render(display, offset)
-        display.blit(
-            self.TAG_SURF, 
-            (
-                self.position.x + self.TAG_OFFSET.x - self.TAG_WIDTH // 2 + offset.x, 
-                self.position.y + self.TAG_OFFSET.y + offset.y
+
+        if SETTINGS.get("show_gamertag"):
+            display.blit(
+                self.TAG_SURF, 
+                (
+                    self.position.x + self.TAG_OFFSET.x - self.TAG_WIDTH // 2 + offset.x, 
+                    self.position.y + self.TAG_OFFSET.y + offset.y
+                )
             )
-        )
     

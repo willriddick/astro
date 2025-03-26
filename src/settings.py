@@ -42,6 +42,7 @@ class SettingsManager:
         """Reset settings to default values."""
         self._settings = {
             "show_fps": False,
+            "show_gamertag": True,
             "fullscreen": True,
             "window_scale": 3,
             "master_volume": 10,

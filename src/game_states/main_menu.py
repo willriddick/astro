@@ -55,6 +55,7 @@ class MainMenu(State):
                 ]),
                 Page([
                     ToggleButton('Show FPS', key='show_fps', callback=lambda _: SETTINGS.save()),
+                    ToggleButton('Show Gamertag', key='show_gamertag', callback=lambda _: SETTINGS.save()),
                     ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self._set_fullscreen(x)),
                     self.resolution_slider,
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
