@@ -1,5 +1,5 @@
 import pygame
-from src.util import State
+from src.util import State, Timer
 from src.sounds import SOUNDS
 from src.particles import BoostDownParticle
 from ..player import Player
@@ -10,6 +10,7 @@ class BoostDown(State):
     def __init__(self):
         super().__init__(States.BOOST_DOWN)
         self.dir = 0
+        self.timer = Timer(100)
     
     def on_enter(self):
         SOUNDS.play('boost')
@@ -18,18 +19,20 @@ class BoostDown(State):
         self.owner.sprite.set_next(Animations.BOOST_DOWN)
         self.dir = self.owner.input_dir.x
 
-        self.owner.particle_emitter.emit(
-            type=BoostDownParticle, 
-            position=self.owner.position + pygame.Vector2(6, 10),
-            count=15
-        )
-    
     def on_exit(self):
         self.owner.refuel_timer.start()
 
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.BOOST_DOWN_SPEED)
         self.owner.accelerate_x(self.dir, Player.BOOST_DOWN_MOVE_SPEED, Player.BOOST_DOWN_MOVE_ACC)
+
+        if self.timer.is_done:
+            self.owner.particle_emitter.emit(
+                type=BoostDownParticle, 
+                position=self.owner.position + pygame.Vector2(6, 10),
+                count=2
+            )
+            self.timer.start()
 
         # switch states
         if not self.owner.input_dir.y == 1:

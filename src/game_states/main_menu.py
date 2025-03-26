@@ -24,7 +24,7 @@ class MainMenu(State):
         self.resolution_slider = SliderButton(
             'Resolution', 
             key='window_scale', 
-            min_value=1, max_value=7, 
+            min_value=1, max_value=7,
             callback=lambda _: self.owner.set_fullscreen(SETTINGS.get('fullscreen'))
         )
         self.resolution_slider.disabled = SETTINGS.get('fullscreen')

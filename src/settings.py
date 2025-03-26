@@ -44,8 +44,8 @@ class SettingsManager:
             "show_fps": False,
             "show_gamertag": True,
             "fullscreen": True,
-            "window_scale": 3,
-            "master_volume": 10,
+            "window_scale": 2,
+            "master_volume": 5,
             "sfx_volume": 5,
             "music_volume": 5,
             "fuel_ui_alpha": 5
