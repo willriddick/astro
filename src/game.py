@@ -114,12 +114,20 @@ class Game:
                 self.toggle_fullscreen()
             case ['gs', state]:
                 self.state_machine.switch(list(GameStates)[int(state)])
-            case ['n1']:
-                self.create_node('player1', True)
-            case ['n2']:
-                self.create_node('player2', False)
-            case ['j1']:
-                self.network_node.join('YCUADGG52U')
+            case ['q1']:
+                self.network_node = Host('will', port=45678)
+                self.network_node.start()
+                self.network_node.start_session()
+                self.state_machine.switch(GameStates.LOBBY_HOST)
+            case ['q2']:
+                async def join():
+                    self.network_node = Client('drew')
+                    self.network_node.start()
+                    joined = await self.network_node.join('YCUADU5SNY')
+                    if joined:
+                        self.state_machine.switch(GameStates.LOBBY_JOIN)
+                
+                asyncio.create_task(join())
             case ['info']:
                 if self.network_node:
                     print(self.network_node)
@@ -142,7 +150,7 @@ class Game:
                     print(self.network_node.clients)
             case _:
                 print(f'Unknown command: {command}')
-
+    
     def create_node(self, username: str, host: bool):
         self.network_node = Host(username, port=56789) if host else Client(username)
         self.network_node.start()

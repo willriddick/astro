@@ -3,6 +3,8 @@ from src.util import Vec2
 from src.components import Entity
 from .enums import Animations
 from .sprite import load_sprite
+import src.graphics as graphics
+from src.menu import Button
 
 class Ghost(Entity):
     def __init__(self, username: str, palette_index=2):
@@ -11,6 +13,10 @@ class Ghost(Entity):
         self.sprite = None
         self.palette_index = palette_index
         self.load_sprite(palette_index)
+
+        self.TAG_COLOR = graphics.PALETTE[6]
+        self.TAG_OFFSET = -8
+        self.TAG_SURF = graphics.FONT.render(self.username, antialias=False, color=Button.DEFAULT_COLOR)
 
     def load_sprite(self, palette_index):
         self.palette_index = palette_index
@@ -25,4 +31,8 @@ class Ghost(Entity):
             self.sprite.flash(100)
         if alpha:
             self.sprite.oscillate_alpha(100)
+    
+    def render(self, display, offset):
+        super().render(display, offset)
+        display.blit(self.TAG_SURF, (self.position.x, self.position.y + self.TAG_OFFSET))
     

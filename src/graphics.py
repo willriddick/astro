@@ -12,6 +12,7 @@ ASTEROIDS = None
 SPIKE = None
 TILESET = None
 
+
 def load():
     """Load all assets into module-level variables."""
     global ICON, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
