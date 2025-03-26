@@ -1,7 +1,8 @@
 import pygame
-from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
-from src.components import PhysicsEntity, Collider, HealthComponent, Sprite 
-from src.entities import Collectable
+from src.util import Direction, StateMachine, Vec2, Timer, approach
+from src.components import PhysicsEntity, Collider, HealthComponent
+from src.entities import Collectable 
+from src.particles import ParticleEmitter
 from src.clock import CLOCK
 from src.debug import DEBUG
 from src.settings import SETTINGS
@@ -75,6 +76,8 @@ class Player(PhysicsEntity):
         self.fuel = Player.MAX_FUEL 
         self.refuel_timer = Timer(Player.REFUEL_TIME)
 
+        self.particle_emitter = ParticleEmitter(30)
+
         # jumping and wall sliding
         self.jumps_remaining = 0
         self.coyote_timer = Timer(Player.COYOTE_BUFFER)
@@ -126,8 +129,9 @@ class Player(PhysicsEntity):
         )
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        super().render(display, offset)
+        self.particle_emitter.render(display, offset)
         self.draw_fuel_bar(display, offset)
+        super().render(display, offset)
     
     def update(self):
         if DEBUG.enabled:
@@ -141,6 +145,7 @@ class Player(PhysicsEntity):
         self.sprite.update(self.position)
         self.health_component.update(self.position)
         self.state_machine.update()
+        self.particle_emitter.update()
         self.handle_collision()
         self.handle_fuel()
         
