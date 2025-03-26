@@ -6,6 +6,7 @@ from src.level_manager import LEVEL_MANAGER
 from src.networking import MsgType
 import src.graphics as graphics
 from .game_states import GameStates
+from .lobby_helpers import render_clients
 
 
 class LobbyJoin(State):
@@ -26,19 +27,31 @@ class LobbyJoin(State):
         CAMERA.set_render_callback(self.render)
         self.menu.update()
 
-        if self.owner.network_node:
-            events = self.owner.network_node.get_events()
-            for event in events:
-                if event.type == MsgType.NEW_LEVEL:
-                    seed, config_index = event.data
-                    print(f'recieved NEW_LEVEL message: {seed} {config_index}')
-                    LEVEL_MANAGER.new_level(seed, config_index)
-                    self.owner.state_machine.switch(GameStates.MULTIPLAYER)
+        node = self.owner.network_node
+        if not node:
+            return
+
+        events = self.owner.network_node.get_events()
+        for event in events:
+            # if host starts game, switch to multiplayer state
+            if event.type == MsgType.NEW_LEVEL:
+                seed, config_index = event.data
+                print(f'recieved NEW_LEVEL message: {seed} {config_index}')
+                LEVEL_MANAGER.new_level(seed, config_index)
+                self.owner.state_machine.switch(GameStates.MULTIPLAYER)
+
+            # if host disconnects, leave game
+            if event.type == MsgType.DISCONNECT:
+                if event.data[0] == 0:
+                    self._leave() 
     
     def render(self, display, offset):
         display.fill(self.background_color)
         self.menu.render(display, offset)
-    
+
+        node = self.owner.network_node
+        render_clients(display, node)
+
     def _leave(self):
         self.owner.network_node.disconnect()
         self.owner.network_node.close()

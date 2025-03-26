@@ -6,6 +6,7 @@ from src.camera import CAMERA
 from src.networking import MsgType
 import src.graphics as graphics
 from .game_states import GameStates
+from .lobby_helpers import render_clients
 
 
 class LobbyHost(State):
@@ -34,12 +35,15 @@ class LobbyHost(State):
         self.menu.render(display, offset)
 
         # render join code
-        if self.owner.network_node:
-            text = self.owner.network_node.join_code
+        node = self.owner.network_node
+        if node:
+            text = node.join_code
             display.blit(
                 graphics.FONT.render(text, antialias=False, color=Button.DEFAULT_COLOR), 
                 self.JOIN_CODE_POS
             ) 
+
+        render_clients(display, node)
     
     def _play(self):
         seed = round(random.random())

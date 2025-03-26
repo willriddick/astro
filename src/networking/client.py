@@ -38,6 +38,7 @@ class Client(NetworkNode):
                 self.handle_add_client(msg.data) 
             case MsgType.DISCONNECT:
                 self.handle_disconnect(msg.data)
+                self.event_queue.put(msg)
             case MsgType.CHAT:
                 self.handle_chat(msg.data)
             case MsgType.UPDATE:
