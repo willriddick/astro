@@ -2,9 +2,13 @@ import pygame
 from src.util import State, approach, Timer
 from src.clock import CLOCK
 from src.sounds import SOUNDS
+from src.camera import CAMERA
 from src.particles import BoostUpParticle
 from ..player import Player
 from ..enums import Animations, States
+
+
+BOOST_OFFSET = 9
 
 
 class BoostUp(State):
@@ -12,6 +16,7 @@ class BoostUp(State):
         super().__init__(States.BOOST_UP)
         self.dir = 0
         self.timer = Timer(100)
+        self.particle_offset = pygame.Vector2(0, 6)
     
     def on_enter(self):
         SOUNDS.play('boost')
@@ -24,18 +29,19 @@ class BoostUp(State):
     
     def update(self):
         self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_UP_MOVE_SPEED, Player.BOOST_UP_MOVE_ACC)
-
         self.owner.fuel = approach(self.owner.fuel, 0, 100 * CLOCK.dt)
         self.owner.accelerate_y(-1, Player.BOOST_UP_SPEED, (Player.BOOST_ACC, Player.BOOST_ACC))
         self.owner.velocity.y = max(self.owner.velocity.y, -Player.BOOST_UP_SPEED)
         self.owner.handle_wall_jump()
 
+        CAMERA.screenshake(1, 0.2)
+
         # emit particles
         if self.timer.is_done:
             self.owner.particle_emitter.emit(
                 type=BoostUpParticle, 
-                position=self.owner.position + pygame.Vector2(6, 4),
-                count=3
+                position=self.owner.position + pygame.Vector2(BOOST_OFFSET * self.owner.sprite.flip_x, 7),
+                count=4
             )
             self.timer.start()
 

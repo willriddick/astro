@@ -108,7 +108,7 @@ class Camera:
         # Clamp the position and update
         self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
 
-    def screenshake(self, duration: int, intensity: int):
+    def screenshake(self, duration: int, intensity: float):
         self.screenshake_timer.start(duration)
         self.screenshake_intensity = intensity
     

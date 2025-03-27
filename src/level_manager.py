@@ -12,9 +12,10 @@ import src.graphics as graphics
 
 
 MAPS_PATH = os.path.join('assets', 'maps')
+STAR_COUNT = 100
+
 
 class LevelManager:
-
     def __init__(self):
         self.player = None
         self.current = None
@@ -47,7 +48,7 @@ class LevelManager:
         # spawn stars
         from src.entities import StarSpawner
         level.star_spawner = StarSpawner(invert_depth=True)
-        level.star_spawner.spawn(50)
+        level.star_spawner.spawn(STAR_COUNT)
         
         # spawn player
         from src.player import Player

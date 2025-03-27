@@ -14,6 +14,6 @@ class ParticleType:
         self.y_velocity = y_velocity
 
 
-BoostUpParticle = ParticleType(Vec2(2, 2), 500, (255, 255, 255), (-0.5, 0,5), (0.5, 1.5))
+BoostUpParticle = ParticleType(Vec2(2, 2), 500, (255, 255, 255), (-0.3, 0,3), (0.5, 1.5))
 BoostDownParticle = ParticleType(Vec2(2, 2), 500, (255, 255, 255), (-0.5, 0,5), (-0.5, -1))
 

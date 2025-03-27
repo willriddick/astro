@@ -38,7 +38,7 @@ class Air(State):
                 SOUNDS.play('land')
 
             if self.timer.is_done:
-                CAMERA.screenshake(30, 3)
+                CAMERA.screenshake(50, 3)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)

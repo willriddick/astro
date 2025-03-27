@@ -86,7 +86,7 @@ SOUNDS = SoundManager()
 SOUNDS.load_sounds([
     Sound("jump", default_volume=0.2, pitch=[0.9, 1.1, 0.05]),
     Sound("wall_jump", path="jump", default_volume=0.2, pitch=[0.7, 1.8, 0.05]),
-    Sound("land", default_volume=0.7),
+    Sound("land", default_volume=0.5),
     Sound("boost", default_volume=0.8),
     Sound("cant_boost", default_volume=0.8),
     Sound("slide", default_volume=0.7),

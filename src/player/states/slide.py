@@ -13,7 +13,7 @@ class Slide(State):
     def on_enter(self):
         SOUNDS.play('slide')
         self.owner.sprite.set_animation(Animations.SLIDE)
-        CAMERA.screenshake(20, 2)
+        CAMERA.screenshake(30, 3)
         self.owner.slide_dir = self.owner.last_facing_dir
 
         if self.owner.velocity.x == 0:
