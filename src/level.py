@@ -15,7 +15,9 @@ class Level:
 
         self.tilemap: TileMap = None
         self.spawn_tile = None
-        self.spawn_pos = pygame.Vector2(16, 16)
+        self.spawn_pos = pygame.Vector2(0, 0)
+        self.exit_tile = None
+        self.exit_pos = pygame.Vector2(0, 0)
 
         from .components import Entity, Collider
         self.entities: list[Entity] = []

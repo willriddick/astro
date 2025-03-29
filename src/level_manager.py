@@ -36,6 +36,9 @@ class LevelManager:
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
+        
+        if level.exit_tile:
+            level.exit_pos = level.exit_tile.pos
 
         # spawn spikes
         spikes = LevelManager._create_spikes(level.tilemap)
@@ -96,6 +99,11 @@ class LevelManager:
                 if room.has_attribute(Attribute.ENTRANCE):
                     pos = random.choice(new_map.get_valid_floor()).tile_pos
                     level.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
+                
+                if room.has_attribute(Attribute.EXIT):
+                    pos = random.choice(new_map.get_valid_floor()).tile_pos
+                    level.exit_tile = new_map.create_tile(graphics.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
+
 
                 level.tilemap.place_tilemap(new_map, room.position, flip)
                
