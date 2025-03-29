@@ -118,7 +118,7 @@ class Camera:
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
             )
-            self.screenshake_intensity *= 0.9
+            self.screenshake_intensity *= 0.95
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     

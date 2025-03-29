@@ -45,7 +45,7 @@ def _load_tileset():
 
     tileset.add(TileType(
         name='stone',
-        images=load_sprite_sheet(load_image(join('tiles', 'rock.png')), (16, 16)),
+        images=load_sprite_sheet(load_image(join('tiles', 'stone.png')), (16, 16)),
         collision=True,
         autotile=True,
     ))
