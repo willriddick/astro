@@ -1,6 +1,8 @@
+import pygame
 from src.util import State, Timer
 from src.sounds import SOUNDS
 from src.camera import CAMERA
+from src.particles import LandParticle
 from ..player import Player
 from ..enums import Animations, States
 
@@ -15,6 +17,12 @@ class Slide(State):
         self.owner.sprite.set_animation(Animations.SLIDE)
         CAMERA.screenshake(30, 3)
         self.owner.slide_dir = self.owner.last_facing_dir
+
+        self.owner.particle_emitter.emit(
+            type=LandParticle, 
+            position=self.owner.position + pygame.Vector2(4, 14),
+            count=6
+        )
 
         if self.owner.velocity.x == 0:
             self.owner.velocity.x = self.owner.slide_dir * Player.INITIAL_SLIDE_SPEED

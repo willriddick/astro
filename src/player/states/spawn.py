@@ -9,6 +9,7 @@ class Spawn(State):
         self.timer = Timer(20)
 
     def on_enter(self):
+        self.owner.collision_enabled = True
         self.owner.velocity = pygame.Vector2(0, 0)
         self.owner.set_position(self.owner.spawn_position + pygame.Vector2(0, 4))
         self.owner.health_component.reset()

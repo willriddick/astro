@@ -30,5 +30,6 @@ def load_sprite(palette_index: int) -> tuple[Sprite, pygame.Color]:
     sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
     sprite.add_animation(Animations.BOOST_UP, image_list, 0, range_=(16,17))
     sprite.add_animation(Animations.BOOST_DOWN, image_list, 0, range_=(16,17))
+    sprite.add_animation(Animations.DEAD, image_list, 0, range_=(17,18))
 
     return sprite, fuel_ui_color

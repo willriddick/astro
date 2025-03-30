@@ -20,6 +20,12 @@ class Particle(Entity):
         
         self.position += self.velocity * CLOCK.dt
         self.alpha = 255 * (1 - self.timer.progress)
+
+        if self.type.gravity:
+            self.velocity = pygame.Vector2(
+                self.velocity.x,
+                self.velocity.y + self.type.gravity * CLOCK.dt
+            )
         
         if self.timer.is_done:
             self.despawn()

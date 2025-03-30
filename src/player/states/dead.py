@@ -13,10 +13,11 @@ class Dead(State):
         self.timer.start()
         SOUNDS.play('dead')
         self.owner.sprite.reset()
-        self.owner.sprite.flash(self.timer.duration, pygame.Color(255, 0, 0), pygame.BLEND_RGB_MULT)
-        self.owner.sprite.set_animation(Animations.IDLE_A)
-        self.owner.apply_force(100, Direction.UP)
+        self.owner.sprite.flash(100, pygame.Color(255, 255, 255))
+        self.owner.sprite.set_animation(Animations.DEAD)
+        self.owner.apply_force(130, Direction.UP)
         self.owner.health_component.disable()
+        self.owner.collision_enabled = False
     
     def update(self):
         self.owner.accelerate_x(1, 0, Player.AIR_ACC)

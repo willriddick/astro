@@ -1,6 +1,8 @@
+import pygame
 from src.util import State, Timer
 from src.sounds import SOUNDS
 from src.camera import CAMERA
+from src.particles import LandParticle
 from ..player import Player
 from ..enums import Animations, States
 
@@ -37,8 +39,14 @@ class Air(State):
             if self.owner.velocity.y >= 0:
                 SOUNDS.play('land')
 
-            if self.timer.is_done:
-                CAMERA.screenshake(50, 3)
+                self.owner.particle_emitter.emit(
+                    type=LandParticle, 
+                    position=self.owner.position + pygame.Vector2(4, 14),
+                    count=5
+                )
+
+                if self.timer.is_done:
+                    CAMERA.screenshake(50, 3)
 
             if self.owner.velocity.x == 0:
                 self.switch(States.IDLE)
