@@ -14,12 +14,22 @@ class Particle(Entity):
         self.alpha = 255
         self.timer = Timer()
 
+        self.current_size = 0
+        self.size = 0
+        self.size_growth = 1
+        self.position = pygame.Vector2(0, 0)
+
     def update(self):
         if not self.active:
             return
         
         self.position += self.velocity * CLOCK.dt
         self.alpha = 255 * (1 - self.timer.progress)
+
+        # calculate current size:
+        # for a positive growth factor, the particle increases in size
+        # for a negative value, it decreases
+        self.current_size = self.size * (1 + self.size_growth * self.timer.progress)
 
         if self.type.gravity:
             self.velocity = pygame.Vector2(
@@ -33,9 +43,9 @@ class Particle(Entity):
     def render(self, display, offset):
         draw_circle(
             display, offset, 
-            self.position, 
-            self.type.size.x, 
-            (*self.type.color, self.alpha),
+            center=self.position, 
+            radius=self.current_size,
+            fill_color=(*self.type.color, self.alpha),
         )
 
     def spawn(self, type: ParticleType, position: pygame.Vector2):
@@ -45,6 +55,14 @@ class Particle(Entity):
         self.timer.start(type.duration)
 
         self.position = position.copy()
+
+        if type.size[0] == type.size[1]:
+            self.size = type.size[0]
+        else:
+            self.size = random.randint(type.size[0], type.size[1])
+
+        self.size_growth = type.size_growth
+
         self.velocity = Vec2(
             random.uniform(type.x_velocity[0], type.x_velocity[1]) * 100, 
             random.uniform(type.y_velocity[0], type.y_velocity[1]) * 100

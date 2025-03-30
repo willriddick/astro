@@ -4,19 +4,25 @@ from src.util import Vec2
 class ParticleType:
     """Defines the properties of a particle, allowing flexible behavior changes."""
     def __init__(self, 
-        size: Vec2 = Vec2(2, 2), duration: int = 300, color=(255, 255, 255),
+        size: tuple[int, int] = (2, 2), 
+        size_growth: float = 0,
+        duration: int = 300, 
+        color=(255, 255, 255),
         x_velocity: tuple[float, float] = (-1, 1), y_velocity: tuple[float, float] = (-1, 1),
         gravity: int = 0
     ):
         self.size = size
+        self.size_growth = size_growth
         self.duration = duration
         self.color = color
         self.x_velocity = x_velocity
         self.y_velocity = y_velocity
         self.gravity = gravity
 
+
 BoostUpParticle = ParticleType(
-    size=Vec2(2, 2), 
+    size=(3, 5), 
+    size_growth=-0.75,
     duration=700, 
     color=(255, 255, 255), 
     x_velocity=(-0.3, 0.3), 
@@ -25,7 +31,8 @@ BoostUpParticle = ParticleType(
 )
 
 BoostDownParticle = ParticleType(
-    size=Vec2(2, 2), 
+    size=(3, 5), 
+    size_growth=-0.75,
     duration=700, 
     color=(255, 255, 255), 
     x_velocity=(-0.3, 0.3), 
@@ -34,20 +41,41 @@ BoostDownParticle = ParticleType(
 )
 
 LandParticle = ParticleType(
-    size=Vec2(2, 2),
+    size=(2, 4),
+    size_growth=-0.3,
     duration=500, 
     color=(66, 76, 110), 
     x_velocity=(-0.5, 0.5), 
-    y_velocity=(-0.2, -0.3), 
-    gravity=100
+    y_velocity=(-0.2, -0.4), 
+    gravity=120
 )
 
 HurtParticle = ParticleType(
-    size=Vec2(2, 2),
-    duration=400, 
+    size=(2, 3),
+    size_growth=0.2,
+    duration=1000, 
     color=(137, 30, 45), 
-    x_velocity=(-0.3, 0.3), 
-    y_velocity=(0, -0.6), 
-    gravity=100
+    x_velocity=(-0.4, 0.4), 
+    y_velocity=(0, -0.8), 
+    gravity=150
 )
 
+WallSlideLeftParticle = ParticleType(
+    size=(2, 3),
+    size_growth=0,
+    duration=400,
+    color=(66, 76, 110), 
+    x_velocity=(0.1, 0.3),
+    y_velocity=(-0.2, -0.3),
+    gravity=50
+)
+
+WallSlideRightParticle = ParticleType(
+    size=(2, 3),
+    size_growth=0,
+    duration=400,
+    color=(66, 76, 110), 
+    x_velocity=(-0.1, -0.3),
+    y_velocity=(-0.2, -0.3),
+    gravity=50
+)
