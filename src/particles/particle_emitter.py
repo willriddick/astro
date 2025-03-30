@@ -17,7 +17,7 @@ class ParticleEmitter():
             if p.active:
                 p.render(display, offset)
     
-    def emit(self, type: ParticleType, position: pygame.Vector2, count: int):
+    def emit(self, type: ParticleType, position: pygame.Vector2, count: int=1):
         """Attempt to spawn the given number of particles at the given position."""
         emitted = 0
         for particle in self.pool:

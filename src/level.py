@@ -2,15 +2,14 @@ import pygame
 from src.debug import DEBUG
 from src.tilemap import TileMap
 from src.level_gen import LevelMap
-from src.sounds import SOUNDS
 import src.graphics as graphics
 
 
 class Level:
-
     def __init__(self):
         self.background_color = graphics.PALETTE[15]
         self.star_spawner = None
+        self.shooting_star = None
 
         self.level_map: LevelMap = None
 
@@ -29,6 +28,7 @@ class Level:
         print('Level started')
 
     def update(self) -> None:
+        self.shooting_star.update()
         for entity in self.entities:
             entity.update()
         
@@ -38,6 +38,7 @@ class Level:
 
         # display stars
         self.star_spawner.render(display, offset)
+        self.shooting_star.render(display, offset)
 
         # display prerendered tilemap surface
         if self.tilemap_surface:

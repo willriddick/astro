@@ -79,3 +79,12 @@ WallSlideRightParticle = ParticleType(
     y_velocity=(-0.2, -0.3),
     gravity=50
 )
+
+ShootingStarParticle = ParticleType(
+    size=(2, 3),
+    size_growth=-0.5,
+    duration=1000,
+    color=(255, 255, 255), 
+    x_velocity=(-3, 3),
+    y_velocity=(-3, 3)
+)

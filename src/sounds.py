@@ -88,7 +88,7 @@ SOUNDS.load_sounds([
     Sound("wall_jump", path="jump", default_volume=0.1, pitch=[0.7, 1.8, 0.05]),
     Sound("wall", default_volume=0.7, pitch=[0.8, 1, 0.05]),
     Sound("land", default_volume=0.15, pitch=[0.8, 1.1, 0.05]),
-    Sound("step", default_volume=0.45, pitch=[0.9, 1.1, 0.05]),
+    Sound("step", default_volume=0.3, pitch=[0.9, 1.1, 0.05]),
     Sound("boost", default_volume=0.4),
     Sound("cant_boost", default_volume=0.7),
     Sound("slide", default_volume=0.4),

@@ -49,9 +49,10 @@ class LevelManager:
         level.entities.extend(collectables)
         
         # spawn stars
-        from src.entities import StarSpawner
+        from src.entities import StarSpawner, ShootingStar
         level.star_spawner = StarSpawner(invert_depth=True)
         level.star_spawner.spawn(STAR_COUNT)
+        level.shooting_star = ShootingStar()
         
         # spawn player
         from src.player import Player
