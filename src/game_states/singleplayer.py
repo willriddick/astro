@@ -12,7 +12,7 @@ class Singleplayer(State):
 
     def on_enter(self):
         seed = round(random.random())
-        config_index = 0
+        config_index = 1
         LEVEL_MANAGER.new_level(seed, config_index)
         #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
 

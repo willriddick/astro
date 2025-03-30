@@ -201,6 +201,7 @@ class MainMenu(State):
     def _update_volume(self, _):
         SETTINGS.save()
         SOUNDS.update_sounds()
+        print('updating')
 
     def _quit(self):
         self.owner.running = False

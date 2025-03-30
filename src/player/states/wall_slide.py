@@ -14,6 +14,7 @@ class WallSlide(State):
     def on_enter(self):
         self.owner.sprite.flip_x = (self.owner.wall_slide_dir == 1)
         self.owner.sprite.set_animation(Animations.WALL_SLIDE)
+        SOUNDS.play('wall')
     
     def on_exit(self):
         self.owner.last_rotate_dir = -self.owner.wall_slide_dir

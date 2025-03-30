@@ -2,6 +2,7 @@ import pygame
 from src.debug import DEBUG
 from src.tilemap import TileMap
 from src.level_gen import LevelMap
+from src.sounds import SOUNDS
 import src.graphics as graphics
 
 
