@@ -1,29 +1,20 @@
 import random
+import pygame
 from src.util import State, Timer
 from src.sounds import SOUNDS
+from src.particles import StepParticle
 from ..player import Player
 from ..enums import Animations, States
-
-VARIATION = 5
-DURATION = 320
 
 
 class Run(State):
     def __init__(self):
         super().__init__(States.RUN)
-        self.timer = Timer(DURATION)
 
     def on_enter(self):
         self.owner.sprite.set_next(Animations.RUN)
         if self.owner.rotated:
             self.owner.sprite.set_animation_duration(Animations.FRONT, Player.ROTATE_DURATION, Animations.RUN)
-        
-        # play step sound
-        SOUNDS.play('step')
-        self.timer.start(DURATION + random.randint(-VARIATION, VARIATION))
-    
-    def on_exit(self):
-        self.timer.reset()
         
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.FALL_SPEED)
@@ -32,9 +23,10 @@ class Run(State):
         self.owner.handle_boost()
 
         # play step sound
-        if self.timer.is_done:
+        frame = self.owner.sprite.frame
+        if (frame == 2 or frame == 5) and self.owner.sprite.frame_changed:
             SOUNDS.play('step')
-            self.timer.start(DURATION + random.randint(-VARIATION, VARIATION))
+            self.owner.particle_emitter.emit(StepParticle, self.owner.position + pygame.Vector2(4, 14))
 
         # animate player
         if self.owner.rotated:

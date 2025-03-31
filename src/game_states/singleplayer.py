@@ -11,7 +11,7 @@ class Singleplayer(State):
         super().__init__(GameStates.SINGLEPLAYER)
 
     def on_enter(self):
-        seed = round(random.random())
+        seed = random.random()
         config_index = 1
         LEVEL_MANAGER.new_level(seed, config_index)
         #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')

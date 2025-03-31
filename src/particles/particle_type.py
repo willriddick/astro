@@ -43,11 +43,21 @@ BoostDownParticle = ParticleType(
 LandParticle = ParticleType(
     size=(2, 4),
     size_growth=-0.3,
+    duration=700, 
+    color=(42, 47, 78), 
+    x_velocity=(-0.6, 0.6), 
+    y_velocity=(-0.2, -0.4), 
+    gravity=120
+)
+
+StepParticle = ParticleType(
+    size=(2, 2),
+    size_growth=0,
     duration=500, 
     color=(66, 76, 110), 
     x_velocity=(-0.5, 0.5), 
     y_velocity=(-0.2, -0.4), 
-    gravity=120
+    gravity=100
 )
 
 HurtParticle = ParticleType(
