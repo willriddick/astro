@@ -6,8 +6,10 @@ import src.graphics as graphics
 
 
 class Level:
+
+
     def __init__(self):
-        self.background_color = graphics.PALETTE[15]
+        self.BACKGROUND_COLOR = graphics.PALETTE[15]
         self.star_spawner = None
         self.shooting_star = None
 
@@ -34,7 +36,7 @@ class Level:
         
     def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
         # background
-        display.fill(self.background_color)
+        display.fill(self.BACKGROUND_COLOR)
 
         # display stars
         self.star_spawner.render(display, offset)

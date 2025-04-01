@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from typing import Callable
 import pygame
@@ -14,6 +15,9 @@ class Camera:
     """
 
     DISTANCE_BUFFER = 16  # minimum distance from target before Camera position is updated
+    SHAPE_BUFFER = 0.1  # transition buffer for circle shape
+    MIN_TRANSITION_ALPHA = 50
+    TRANSITION_COLOR = (14, 7, 27)
 
     def __init__(self, size: Vec2):
         self.size = size
@@ -27,6 +31,9 @@ class Camera:
         self.screenshake_offset = pygame.Vector2(0, 0)
         self.screenshake_timer = Timer()
         self.screenshake_intensity = 0
+
+        self.transition_timer = Timer()
+        self.transition_focus = 0.5 
 
         self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
     
@@ -79,8 +86,26 @@ class Camera:
 
         # render the callback
         self.render_callback(self.display, -self.offset)
+
+        # render transition
+        if self.transition_timer.is_active:
+            self._render_transition(self.display)
+
+        # render debug
         self._render_debug()
     
+    def transition(self, duration: int, focus: float = 0.5, fade: int = 0):
+        """
+        Start a transition effect for the specified duration.
+
+        duration: The duration of the transition in milliseconds.
+        focus: set to 1 to enable circular transition entire duration, 0.5 for half, etc.
+        fade: set to 0 for fade in and out, 1 for fade in, -1 for fade out.
+        """
+        self.transition_timer.start(duration)
+        self.transition_focus = focus
+        self.transition_fade = fade
+
     def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
         """Set a new render function for the camera."""
         self.render_callback = callback
@@ -121,6 +146,36 @@ class Camera:
             self.screenshake_intensity *= 0.95
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
+    
+    def _render_transition(self, display):
+        """Render a transition effect over the display surface."""
+        # Create a transition surface
+        transition_surface = pygame.Surface(display.get_size())
+        transition_surface.fill(self.TRANSITION_COLOR) 
+
+        progress = self.transition_timer.progress
+
+        if self.transition_fade == 0:
+            multiplier = abs(math.sin(math.pi * progress))
+        elif self.transition_fade == 1:
+            multiplier = progress
+        else:
+            multiplier = (1 - progress)
+
+        if progress < self.transition_focus:
+            radius = int(display.get_width() * (1 - multiplier - self.SHAPE_BUFFER))
+            pygame.draw.circle(
+                surface=transition_surface, 
+                color=(255, 255, 255),
+                center=self.pos - self.offset,
+                radius=radius
+            )
+            transition_surface.set_colorkey((255, 255, 255))
+        else:
+            transition_surface.fill(self.TRANSITION_COLOR)
+        
+        transition_surface.set_alpha(self.MIN_TRANSITION_ALPHA + multiplier * 255)
+        display.blit(transition_surface, (0, 0))
     
     def _render_debug(self):
         if DEBUG.display == '':

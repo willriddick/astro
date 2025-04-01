@@ -19,6 +19,7 @@ class Multiplayer(State):
         from src.player.ghost import Ghost
         self.node = self.owner.network_node
         self.update_timer.start()
+        CAMERA.transition(1000, focus=1, fade=-1)
         LEVEL_MANAGER.new_level()
 
         for client, (username, _) in self.node.clients.items():

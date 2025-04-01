@@ -144,6 +144,7 @@ class MainMenu(State):
     
     def _start_singleplayer(self):
         self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
+        CAMERA.transition(1000, focus=1, fade=-1)
     
     def _start_multiplayer(self):
         self.owner.state_machine.switch(GameStates.MULTIPLAYER)
@@ -201,7 +202,6 @@ class MainMenu(State):
     def _update_volume(self, _):
         SETTINGS.save()
         SOUNDS.update_sounds()
-        print('updating')
 
     def _quit(self):
         self.owner.running = False

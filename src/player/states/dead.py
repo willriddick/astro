@@ -1,6 +1,7 @@
 import pygame
 from src.util import State, Direction, Timer
 from src.sounds import SOUNDS
+from src.camera import CAMERA
 from ..player import Player
 from ..enums import Animations, States
 
@@ -12,6 +13,7 @@ class Dead(State):
     def on_enter(self):
         self.timer.start()
         SOUNDS.play('dead')
+        CAMERA.transition(duration=1500, focus=0.5)
         self.owner.sprite.reset()
         self.owner.sprite.flash(100, pygame.Color(255, 255, 255))
         self.owner.sprite.set_animation(Animations.DEAD)
