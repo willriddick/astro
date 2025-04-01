@@ -1,7 +1,7 @@
 import pygame
 from src.util import Direction, StateMachine, Vec2, Timer, approach
 from src.components import PhysicsEntity, Collider, HealthComponent
-from src.entities import Collectable 
+from src.entities import Rocket 
 from src.particles import ParticleEmitter
 from src.clock import CLOCK
 from src.debug import DEBUG
@@ -202,9 +202,9 @@ class Player(PhysicsEntity):
             self.set_state(States.GHOST)
     
     def handle_collectables(self):
-        collectable = self.collider.get_nearest(Collectable)
-        if collectable:
-            collectable.collect(self)
+        rocket = self.collider.get_nearest(Rocket)
+        if rocket:
+            rocket.collect(self)
     
     def handle_fuel(self):
         if (

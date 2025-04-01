@@ -36,17 +36,23 @@ class LevelManager:
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
+            level.tilemap.remove_tile(level.spawn_tile.tile_pos)    
         
         if level.exit_tile:
+            from src.entities import Rocket
             level.exit_pos = level.exit_tile.pos
-
+            rocket = Rocket(level.exit_tile.pos, Vec2(16, 16)) 
+            rocket.spawn()
+            level.entities.append(rocket)
+            level.tilemap.remove_tile(level.exit_tile.tile_pos)    
+            
         # spawn spikes
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
 
         # spawn collectables
-        collectables = LevelManager._create_collectables(level.tilemap)
-        level.entities.extend(collectables)
+        #collectables = LevelManager._create_collectables(level.tilemap)
+        #level.entities.extend(collectables)
         
         # spawn stars
         from src.entities import StarSpawner, ShootingStar
