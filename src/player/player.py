@@ -68,6 +68,8 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
+        self.visible = True
+
         self.paused = False
         self.paused_timer = Timer()
 
@@ -133,9 +135,10 @@ class Player(PhysicsEntity):
         )
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        self.particle_emitter.render(display, offset)
-        self.draw_fuel_bar(display, offset)
-        super().render(display, offset)
+        if self.visible:
+            self.particle_emitter.render(display, offset)
+            self.draw_fuel_bar(display, offset)
+            super().render(display, offset)
     
     def update(self):
         if DEBUG.enabled:
@@ -165,7 +168,11 @@ class Player(PhysicsEntity):
             self.paused_timer.duration = duration
         else:
             self.paused_timer.start(duration)
+
         self.paused = True
+        self.input_dir = Vec2(0, 0)
+        self.holding_jump = False
+        self.pressed_down = False
     
     def unpause(self):
         self.paused_timer.reset()

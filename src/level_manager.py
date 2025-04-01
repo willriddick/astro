@@ -41,9 +41,9 @@ class LevelManager:
         if level.exit_tile:
             from src.entities import Rocket
             level.exit_pos = level.exit_tile.pos
-            rocket = Rocket(level.exit_tile.pos, Vec2(16, 16)) 
-            rocket.spawn()
-            level.entities.append(rocket)
+            level.rocket = Rocket(level.exit_tile.pos, Vec2(16, 16)) 
+            level.rocket.spawn()
+            level.entities.append(level.rocket)
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
             
         # spawn spikes
@@ -67,7 +67,6 @@ class LevelManager:
 
         level.entities.append(self.player)
         self.player.spawn(level.spawn_pos)
-        self.player.pause(1000)
 
         level.tilemap_surface = level.tilemap.get_surface()
 

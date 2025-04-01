@@ -56,6 +56,10 @@ class Sprite:
         )
 
     def reset(self):
+        self.visible = True
+        self.alpha = 255
+        self.flip_x = False
+        self.flip_y = False
         self.next_timer.reset()
         self.flash_timer.reset()
         self.alpha_timer.reset()

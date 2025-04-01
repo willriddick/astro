@@ -24,6 +24,7 @@ class Level:
         from .components import Entity, Collider
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
+        self.rocket = None
         self.ghosts = []
     
     def start(self) -> None:

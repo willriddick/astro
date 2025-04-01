@@ -96,11 +96,14 @@ class Camera:
     
     def transition(self, duration: int, focus: float = 0.5, fade: int = 0):
         """
-        Start a transition effect for the specified duration.
+        Initiates a transition effect for the specified duration.
 
-        duration: The duration of the transition in milliseconds.
-        focus: set to 1 to enable circular transition entire duration, 0.5 for half, etc.
-        fade: set to 0 for fade in and out, 1 for fade in, -1 for fade out.
+        Args:
+            duration (int): Duration of the transition in milliseconds.
+            focus (float, optional): Determines the portion of the duration the circular transition is active. 
+                Set to 1 for the entire duration, 0.5 for half, etc. Defaults to 0.5.
+            fade (int, optional): Controls the fade effect. 
+                Set to 0 for both fade-in and fade-out, 1 for fade-in only, and -1 for fade-out only. Defaults to 0.
         """
         self.transition_timer.start(duration)
         self.transition_focus = focus
