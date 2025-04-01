@@ -68,7 +68,10 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
-        self.input_dir = None
+        self.paused = False
+        self.paused_timer = Timer()
+
+        self.input_dir = Vec2(0, 0)
         self.spawn_position = pygame.Vector2(0, 0)
         self.slide_dir = 0
 
@@ -88,6 +91,7 @@ class Player(PhysicsEntity):
 
         # inputs
         self.holding_jump = False
+        self.pressed_down = False
         self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
         self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
         self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
@@ -136,18 +140,36 @@ class Player(PhysicsEntity):
     def update(self):
         if DEBUG.enabled:
             DEBUG.add_display(self.debug)
-        
-        collectable = self.collider.get_nearest(Collectable)
-        if collectable:
-            collectable.collect(self)
 
-        self.handle_input()
+        if not self.paused:
+            self.handle_input()
+        
+        if self.paused_timer.duration != -1:
+            self.paused = self.paused_timer.is_active
+
         self.sprite.update(self.position)
         self.health_component.update(self.position)
         self.state_machine.update()
         self.particle_emitter.update()
         self.handle_collision()
+        self.handle_collectables()
         self.handle_fuel()
+    
+    def pause(self, duration: int):
+        """
+        Pause the player for a given duration.
+
+        duration: use -1 to pause indefinitely
+        """
+        if duration == -1:
+            self.paused_timer.duration = duration
+        else:
+            self.paused_timer.start(duration)
+        self.paused = True
+    
+    def unpause(self):
+        self.paused_timer.reset()
+        self.paused = False
         
     def set_position(self, position: pygame.Vector2):
         self.position = position
@@ -179,6 +201,11 @@ class Player(PhysicsEntity):
         else:
             self.set_state(States.GHOST)
     
+    def handle_collectables(self):
+        collectable = self.collider.get_nearest(Collectable)
+        if collectable:
+            collectable.collect(self)
+    
     def handle_fuel(self):
         if (
             self.state_machine.current_state.id != States.BOOST_UP
@@ -196,7 +223,7 @@ class Player(PhysicsEntity):
         if self.fuel < Player.BOOST_UP_COST and INPUTS.get('up', just_pressed=True):
             SOUNDS.play('cant_boost')
 
-        if INPUTS.get('down', just_pressed=True):
+        if self.pressed_down:
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
@@ -260,6 +287,9 @@ class Player(PhysicsEntity):
         self.holding_jump = INPUTS.get('jump')
         if INPUTS.get('jump', just_pressed=True):
             self.jump_input_timer.start()
+        
+        # boost down
+        self.pressed_down = INPUTS.get('down', just_pressed=True)
 
         # update pressed left/right input timer
         if self.input_dir.x == -1:

@@ -1,12 +1,12 @@
 import pygame
 from src.debug import DEBUG
+from src.camera import CAMERA
 from src.tilemap import TileMap
 from src.level_gen import LevelMap
 import src.graphics as graphics
 
 
 class Level:
-
 
     def __init__(self):
         self.BACKGROUND_COLOR = graphics.PALETTE[15]
@@ -27,7 +27,7 @@ class Level:
         self.ghosts = []
     
     def start(self) -> None:
-        print('Level started')
+        pass
 
     def update(self) -> None:
         self.shooting_star.update()
@@ -46,9 +46,10 @@ class Level:
         if self.tilemap_surface:
             display.blit(self.tilemap_surface, offset)
         
-        # display all entities relative to the offset
+        # display entities relative to the offset
         for entity in self.entities:
-            entity.render(display, offset)
+            if CAMERA.is_visible(entity.center):
+                entity.render(display, offset)
         
         # debug display colliders 
         if DEBUG.enabled:

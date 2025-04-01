@@ -61,13 +61,13 @@ class LevelManager:
 
         level.entities.append(self.player)
         self.player.spawn(level.spawn_pos)
+        self.player.pause(1000)
 
         level.tilemap_surface = level.tilemap.get_surface()
 
         CAMERA.set_pos(level.spawn_pos)
         CAMERA.set_boundary(level.tilemap.rect)
         level.start()
-        print(self.current.entities)
     
 
     @staticmethod
