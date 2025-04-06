@@ -8,6 +8,8 @@ from src.debug import DEBUG
 from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
+from src.level_manager import LEVEL_MANAGER
+from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from .enums import States
 
 
@@ -21,6 +23,8 @@ class Player(PhysicsEntity):
 
     GRAVITY = 485
     FALL_SPEED = 180
+
+    INDICATOR_OFFSET = 70
 
     FUEL_UI_COLOR_INDEX = 13
     FUEL_UI_OFFSET = pygame.Vector2(-2, -8)
@@ -138,6 +142,7 @@ class Player(PhysicsEntity):
         if self.visible:
             self.particle_emitter.render(display, offset)
             self.draw_fuel_bar(display, offset)
+            #self.draw_indicator(display, offset)
             super().render(display, offset)
     
     def update(self):
@@ -308,7 +313,13 @@ class Player(PhysicsEntity):
         from .sprite import load_sprite
         self.palette_index = palette_index
         self.sprite, self.fuel_ui_color = load_sprite(palette_index)
-    
+
+    def draw_indicator(self, display: pygame.Surface, offset: pygame.Vector2):
+        exit_pos = LEVEL_MANAGER.current.exit_pos
+        if exit_pos and exit_pos.distance_to(self.center) > (Player.INDICATOR_OFFSET * 2):
+            indicator_pos = self.center + (exit_pos - self.position).normalize() * Player.INDICATOR_OFFSET 
+            pygame.draw.circle(display, (255, 255, 255), indicator_pos + offset, 3)
+            
     def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
         """Draw a fuel bar expanding symmetrically from the center."""
         if (

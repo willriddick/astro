@@ -10,7 +10,7 @@ class Multiplayer(State):
     def __init__(self):
         super().__init__(GameStates.MULTIPLAYER)
         self.node: NetworkNode = None
-        self.update_timer = Timer(20)
+        self.update_timer = Timer(40)
 
         from src.player.ghost import Ghost
         self.ghosts: dict[int, Ghost] = {} 

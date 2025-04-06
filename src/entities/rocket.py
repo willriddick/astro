@@ -28,7 +28,8 @@ class Rocket(Entity):
         self.particle_timer = Timer()
         self.particle_emitter = None
 
-        self.next_timer = Timer()
+        self.speed = 50
+        self.acceleration = 100
 
         self.collider = Collider(size)
         self.collider.add_owner(self)
@@ -42,7 +43,9 @@ class Rocket(Entity):
 
         if self.collected:
             CAMERA.screenshake(10, 1)
-            self.position.y -= (50 * CLOCK.dt)
+            self.speed += self.acceleration * CLOCK.dt
+            self.position.y -= (self.speed * CLOCK.dt)
+            self.speed += 30 * CLOCK.dt
 
             if self.particle_timer.is_done:
                 self.particle_emitter.emit(
@@ -51,9 +54,6 @@ class Rocket(Entity):
                     count=5
                 )
                 self.particle_timer.start(100)
-            
-            if self.next_timer.is_done:
-                LEVEL_MANAGER.new_level(config_index=1)
     
     def render(self, display, offset):
         super().render(display, offset)
@@ -62,14 +62,10 @@ class Rocket(Entity):
     def spawn(self):
         self.particle_emitter = ParticleEmitter(30)
     
-    def collect(self, player: Entity):
+    def collect(self, _: Entity):
         self.collected = True
         self.collider.enabled = False
         self.particle_timer.start(1)
-
-        player.visible = False
-        player.pause(2500)
         SOUNDS.play('rocket')
-        CAMERA.transition(3000, 0)
-        self.next_timer.start(1500)
+    
   

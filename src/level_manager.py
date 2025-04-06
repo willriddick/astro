@@ -110,7 +110,6 @@ class LevelManager:
                     pos = random.choice(new_map.get_valid_floor()).tile_pos
                     level.exit_tile = new_map.create_tile(graphics.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
 
-
                 level.tilemap.place_tilemap(new_map, room.position, flip)
                
         return level.tilemap
