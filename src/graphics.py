@@ -11,13 +11,14 @@ STARS = None
 ASTEROIDS = None
 SPIKE = None
 ROCKET = None
+FUEL_CELL = None
 TILESET = None
 
 
 def load():
     """Load all assets into module-level variables."""
     global ICON, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
-    global STARS, ASTEROIDS, SPIKE, TILESET, ROCKET
+    global STARS, ASTEROIDS, SPIKE, TILESET, ROCKET, FUEL_CELL
 
     ICON = load_image('icon.png', False)
     
@@ -32,6 +33,7 @@ def load():
     ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
     SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
     ROCKET = load_image('rocket.png', True)
+    FUEL_CELL = load_image('fuel_cell.png', True)
 
     _load_tileset()
 

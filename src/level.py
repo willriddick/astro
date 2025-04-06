@@ -7,8 +7,8 @@ import src.graphics as graphics
 
 
 class Level:
-
     def __init__(self):
+        from .components import Entity, Collider
         self.BACKGROUND_COLOR = graphics.PALETTE[15]
         self.star_spawner = None
         self.shooting_star = None
@@ -16,15 +16,19 @@ class Level:
         self.level_map: LevelMap = None
 
         self.tilemap: TileMap = None
+
         self.spawn_tile = None
         self.spawn_pos = pygame.Vector2(0, 0)
+
         self.exit_tile = None
         self.exit_pos = pygame.Vector2(0, 0)
+        self.rocket = None
 
-        from .components import Entity, Collider
+        self.fuel_cell_tiles = []
+        self.fuel_cells = []
+
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
-        self.rocket = None
         self.ghosts = []
     
     def start(self) -> None:

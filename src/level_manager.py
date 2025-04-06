@@ -38,22 +38,26 @@ class LevelManager:
             level.spawn_pos = level.spawn_tile.pos
             level.tilemap.remove_tile(level.spawn_tile.tile_pos)    
         
+        from src.entities import Rocket, FuelCell
+
         if level.exit_tile:
-            from src.entities import Rocket
             level.exit_pos = level.exit_tile.pos
             level.rocket = Rocket(level.exit_tile.pos, Vec2(16, 16)) 
             level.rocket.spawn()
             level.entities.append(level.rocket)
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
+        
+        for fuel_cell in level.fuel_cell_tiles:
+            new_cell = FuelCell(fuel_cell.pos, Vec2(16, 16))
+            level.fuel_cells.append(new_cell)
+            level.entities.append(new_cell)
+            new_cell.spawn()
+            level.tilemap.remove_tile(fuel_cell.tile_pos)
             
         # spawn spikes
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
 
-        # spawn collectables
-        #collectables = LevelManager._create_collectables(level.tilemap)
-        #level.entities.extend(collectables)
-        
         # spawn stars
         from src.entities import StarSpawner, ShootingStar
         level.star_spawner = StarSpawner(invert_depth=True)
@@ -80,6 +84,10 @@ class LevelManager:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
         level.level_map = generate_level(config)
 
+        entrance_tile = graphics.TILESET.get_by('entrance')
+        exit_tile = graphics.TILESET.get_by('exit')
+        collectable_tile = graphics.TILESET.get_by('collectable')
+
         for y in range(level.level_map.config.rows):
             for x in range(level.level_map.config.cols):
                 room = level.level_map.get_room_at(Vec2(x, y))
@@ -104,29 +112,19 @@ class LevelManager:
 
                 if room.has_attribute(Attribute.ENTRANCE):
                     pos = random.choice(new_map.get_valid_floor()).tile_pos
-                    level.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
+                    level.spawn_tile = new_map.create_tile(entrance_tile, 0, Vec2(pos.x, pos.y - 1))
                 
                 if room.has_attribute(Attribute.EXIT):
                     pos = random.choice(new_map.get_valid_floor()).tile_pos
-                    level.exit_tile = new_map.create_tile(graphics.TILESET.get_by('exit'), 0, Vec2(pos.x, pos.y - 1))
+                    level.exit_tile = new_map.create_tile(exit_tile, 0, Vec2(pos.x, pos.y - 1))
+                
+                if room.has_attribute(Attribute.COLLECTABLE):
+                    pos = random.choice(new_map.get_valid_floor()).tile_pos
+                    level.fuel_cell_tiles.append(new_map.create_tile(collectable_tile, 0, Vec2(pos.x, pos.y - 1)))
 
                 level.tilemap.place_tilemap(new_map, room.position, flip)
                
         return level.tilemap
-    
-
-    @staticmethod 
-    def _create_collectables(tilemap: TileMap) -> list['Collectable']:
-        from src.entities import Collectable
-        collectables: set[Collectable] = set()
-        tiles = tilemap.get_tiles_with('collectable')
-
-        for tile in tiles:
-            collectables.add(Collectable(tile.pos, Vec2(16, 16)))
-        
-        tilemap.remove_tiles(tiles)
-
-        return collectables
     
 
     @staticmethod

@@ -7,8 +7,7 @@ class Attribute(Enum):
     EXIT     = '★'
     BRANCH   = '╳'
     BRIDGE   = '╲'
-    ITEM_ONE = 'i'
-    ITEM_TWO = 'i'
+    COLLECTABLE = 'i'
 
     def __init__(self, symbol: str):
         self.symbol = symbol

@@ -96,6 +96,7 @@ SOUNDS.load_sounds([
     Sound("hurt", default_volume=0.2),
     Sound("dead", default_volume=1.8),
     Sound("rocket", default_volume=0.1),
+    Sound("fuel_cell", default_volume=0.5),
     Sound("spawn", default_volume=0.35),
     Sound("blip_pitch", path='blip', default_volume=0.8, pitch=[0.7, 1.2, 0.03]),
     Sound("blip", default_volume=0.8, pitch=[0.9, 1.1, 0.025]),

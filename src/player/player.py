@@ -1,7 +1,7 @@
 import pygame
 from src.util import Direction, StateMachine, Vec2, Timer, approach
 from src.components import PhysicsEntity, Collider, HealthComponent
-from src.entities import Rocket 
+from src.entities import Rocket, FuelCell
 from src.particles import ParticleEmitter
 from src.clock import CLOCK
 from src.debug import DEBUG
@@ -9,7 +9,6 @@ from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
 from src.level_manager import LEVEL_MANAGER
-from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from .enums import States
 
 
@@ -217,6 +216,10 @@ class Player(PhysicsEntity):
         rocket = self.collider.get_nearest(Rocket)
         if rocket:
             rocket.collect(self)
+        
+        fuel_cell = self.collider.get_nearest(FuelCell)
+        if fuel_cell:
+            fuel_cell.collect(self)
     
     def handle_fuel(self):
         if (

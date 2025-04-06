@@ -98,3 +98,12 @@ ShootingStarParticle = ParticleType(
     x_velocity=(-3, 3),
     y_velocity=(-3, 3)
 )
+
+FuelCellParticle = ParticleType(
+    size=(3, 6),
+    size_growth=-0.5,
+    duration=1000, 
+    color=(255, 255, 255), 
+    x_velocity=(-0.3, 0.3), 
+    y_velocity=(-0.3, 0.3)
+)

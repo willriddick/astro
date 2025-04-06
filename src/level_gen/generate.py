@@ -89,7 +89,7 @@ def _generate_items(level: LevelMap, config: Config) -> bool:
             return False
         
         room: Room = choice(rooms)
-        room.add_attribute(Attribute.ITEM_ONE)
+        room.add_attribute(Attribute.COLLECTABLE)
     
     return True
 

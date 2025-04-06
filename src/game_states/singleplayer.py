@@ -3,6 +3,7 @@ import random
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
+from src.sounds import SOUNDS
 from .game_states import GameStates
 
 
@@ -28,6 +29,14 @@ class Singleplayer(State):
         CAMERA.set_render_callback(self.render) 
         CAMERA.move_to(LEVEL_MANAGER.player.center)
 
+        enable = True
+        for cell in LEVEL_MANAGER.current.fuel_cells:
+            if not cell.collected:
+                enable = False
+                
+        if enable:
+            LEVEL_MANAGER.current.rocket.enable()
+
         if self.next_timer.is_done and self.next:
             LEVEL_MANAGER.new_level(
                 seed=random.random(),
@@ -36,8 +45,10 @@ class Singleplayer(State):
             self.next = False
 
         if LEVEL_MANAGER.current.rocket.collected and not self.next:
-            self.next_timer.start()
             self.next = True
+            self.next_timer.start()
+
+            SOUNDS.play('rocket')
             LEVEL_MANAGER.player.visible = False
             LEVEL_MANAGER.player.pause(TRANSITION_DURATION)
             CAMERA.transition(TRANSITION_DURATION * 2, 0)
