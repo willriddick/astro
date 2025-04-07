@@ -1,9 +1,12 @@
+import random
+import math
 import pygame
 from src.util import swap_palette 
 from src.components import Entity, Collider, Sprite 
 from src.particles import ParticleEmitter, FuelCellParticle
 from src.camera import CAMERA
 from src.sounds import SOUNDS
+from src.clock import CLOCK
 import src.graphics as graphics
 
 
@@ -13,7 +16,7 @@ class FuelCell(Entity):
 
     def __init__(self, position, size, palette_index=1):
         super().__init__(position, size)
-
+        self.spawn_position = position.copy()
         self.sprite = Sprite(position)
         palette = graphics.PLAYER_PALETTES[palette_index]
         sheet = swap_palette(
@@ -29,11 +32,19 @@ class FuelCell(Entity):
         self.collider.add_owner(self)
         self.collider.update(position)
 
+        self.bob_speed = random.randint(900, 1100)
+        self.bob_offset = random.randint(-10, 10) * 1000
+
         self.collected = False
     
     def update(self):
+        offset = math.sin(self.bob_offset + CLOCK.ticks * math.pi / self.bob_speed) * 2
+        self.position.y = self.spawn_position.y + offset 
+
+
         self.particle_emitter.update()
         self.sprite.update(self.position)
+        self.collider.update(self.position)
     
     def render(self, display, offset):
         super().render(display, offset)
