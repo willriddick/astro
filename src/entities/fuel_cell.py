@@ -41,7 +41,6 @@ class FuelCell(Entity):
         offset = math.sin(self.bob_offset + CLOCK.ticks * math.pi / self.bob_speed) * 2
         self.position.y = self.spawn_position.y + offset 
 
-
         self.particle_emitter.update()
         self.sprite.update(self.position)
         self.collider.update(self.position)

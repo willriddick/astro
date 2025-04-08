@@ -27,6 +27,8 @@ class Level:
         self.fuel_cell_tiles = []
         self.fuel_cells = []
 
+        self.asteroid_spawner = None
+
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
         self.ghosts = []
@@ -36,6 +38,10 @@ class Level:
 
     def update(self) -> None:
         self.shooting_star.update()
+
+        if self.asteroid_spawner:
+            self.asteroid_spawner.update()
+
         for entity in self.entities:
             entity.update()
         
@@ -51,6 +57,10 @@ class Level:
         if self.tilemap_surface:
             display.blit(self.tilemap_surface, offset)
         
+        # display asteroids
+        if self.asteroid_spawner:
+            self.asteroid_spawner.render(display, offset)
+
         # display entities relative to the offset
         for entity in self.entities:
             if CAMERA.is_visible(entity.center):

@@ -100,10 +100,10 @@ ShootingStarParticle = ParticleType(
 )
 
 FuelCellParticle = ParticleType(
-    size=(3, 6),
+    size=(4, 6),
     size_growth=-0.5,
     duration=1000, 
-    color=(255, 255, 255), 
+    color=(245, 160, 151), 
     x_velocity=(-0.3, 0.3), 
     y_velocity=(-0.3, 0.3)
 )

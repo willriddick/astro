@@ -4,6 +4,7 @@ from src.components import Entity, Collider, Sprite
 from src.particles import ParticleEmitter, BoostUpParticle
 from src.camera import CAMERA
 from src.clock import CLOCK
+from src.sounds import SOUNDS
 import src.graphics as graphics
 
 
@@ -34,6 +35,7 @@ class Rocket(Entity):
         self.collider.update(position)
         self.collider.enabled = False
 
+        self.enabled = False
         self.collected = False
         self.sprite.alpha = 100
     
@@ -42,12 +44,11 @@ class Rocket(Entity):
         self.sprite.update(self.position)
 
         if self.collected:
-            CAMERA.screenshake(10, 1)
             self.speed += self.acceleration * CLOCK.dt
             self.position.y -= (self.speed * CLOCK.dt)
-            self.speed += 30 * CLOCK.dt
 
             if self.particle_timer.is_done:
+                CAMERA.screenshake(20, 3)
                 self.particle_emitter.emit(
                     type=BoostUpParticle, 
                     position=self.position + self.PARTICLE_OFFSET,
@@ -61,11 +62,14 @@ class Rocket(Entity):
     
     def enable(self):
         self.collider.enabled = True
+        self.enabled = True
         self.sprite.alpha = 255
     
     def disable(self):
         self.collider.enabled = False
+        self.enabled = False
         self.sprite.alpha = 100
+    
     
     def spawn(self):
         self.particle_emitter = ParticleEmitter(30)
@@ -73,5 +77,6 @@ class Rocket(Entity):
     def collect(self, _: Entity):
         self.collected = True
         self.collider.enabled = False
+        SOUNDS.play('rocket')
         self.particle_timer.start(1)
     

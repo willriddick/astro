@@ -27,8 +27,8 @@ class Player(PhysicsEntity):
 
     FUEL_UI_COLOR_INDEX = 13
     FUEL_UI_OFFSET = pygame.Vector2(-2, -8)
-    MAX_FUEL = 100
-    REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
+    MAX_FUEL = 120
+    REFUEL_TIME = 800  # duration in milliseconds after boosting to start refueling
     REFUEL_RATE = 40  # rate of refueling (fuel per second)
 
     BOOST_ACC = 100
