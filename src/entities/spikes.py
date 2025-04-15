@@ -14,7 +14,7 @@ class Spike(Entity):
         self.sprite.set_animation(0)
 
     def render(self, display, offset):
-        self.sprite.render(display, offset)
+        self.sprite.render(display, round(offset))
 
 
 class HSpike(Spike):
@@ -36,7 +36,7 @@ class HSpike(Spike):
     def render(self, display, offset):
         """Render each segment of the horizontal spike."""
         for i in range(self.width):
-            self.sprite.render(display, offset + pygame.Vector2(i * 16, 0))
+            self.sprite.render(display, round(offset) + pygame.Vector2(i * 16, 0))
 
 
 class VSpike(Spike):
@@ -58,7 +58,7 @@ class VSpike(Spike):
     def render(self, display, offset):
         """Render each segment of the vertical spike."""
         for i in range(self.height):
-            self.sprite.render(display, offset + pygame.Vector2(0, i * 16))
+            self.sprite.render(display, round(offset) + pygame.Vector2(0, i * 16))
 
 
 class CSpike(Spike):

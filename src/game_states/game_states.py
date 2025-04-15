@@ -3,5 +3,7 @@ from enum import Enum
 
 class GameStates(Enum):
     MAIN_MENU = 0
-    PLAYING = 1
-    SETTINGS = 2
+    SINGLEPLAYER = 1
+    LOBBY_HOST = 2
+    LOBBY_JOIN = 3
+    MULTIPLAYER = 4

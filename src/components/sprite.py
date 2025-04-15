@@ -15,6 +15,7 @@ class Sprite:
         self.animations: dict[Enum, tuple[list[pygame.Surface], int]] = {} # id: (frames, frame_rate)
         self.current = 0
         self.frame = 0
+        self.frame_changed = False
 
         self.next_timer = Timer(0)
         self.next_animation = None
@@ -30,6 +31,7 @@ class Sprite:
    
     def update(self, pos: pygame.math.Vector2):
         self.pos = pos
+        self.frame_changed = False
 
         if self.next_timer.is_done and self.next_animation:
             self.set_animation(self.next_animation)
@@ -42,6 +44,7 @@ class Sprite:
             if current_time - self.last_update_time >= time_per_frame:
                 self.last_update_time = current_time
                 self.frame = (self.frame + 1) % len(frames)        
+                self.frame_changed = True
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         display.blit( 
@@ -53,6 +56,10 @@ class Sprite:
         )
 
     def reset(self):
+        self.visible = True
+        self.alpha = 255
+        self.flip_x = False
+        self.flip_y = False
         self.next_timer.reset()
         self.flash_timer.reset()
         self.alpha_timer.reset()

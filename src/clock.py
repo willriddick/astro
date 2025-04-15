@@ -22,7 +22,7 @@ class Clock:
     def ticks(self) -> int:
         """Returns time since pygame.init() was called in milliseconds."""
         return pygame.time.get_ticks()
-
+    
     def update(self):
         """Updates delta time to `_clock.tick() / 1000`."""
         self._dt = self._clock.tick() / 1000

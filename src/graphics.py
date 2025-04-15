@@ -10,12 +10,15 @@ PLAYER_PALETTES = None
 STARS = None
 ASTEROIDS = None
 SPIKE = None
+ROCKET = None
+FUEL_CELL = None
 TILESET = None
+
 
 def load():
     """Load all assets into module-level variables."""
     global ICON, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
-    global STARS, ASTEROIDS, SPIKE, TILESET
+    global STARS, ASTEROIDS, SPIKE, TILESET, ROCKET, FUEL_CELL
 
     ICON = load_image('icon.png', False)
     
@@ -29,6 +32,8 @@ def load():
     STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
     ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
     SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
+    ROCKET = load_image('rocket.png', True)
+    FUEL_CELL = load_image('fuel_cell.png', True)
 
     _load_tileset()
 
@@ -44,7 +49,7 @@ def _load_tileset():
 
     tileset.add(TileType(
         name='stone',
-        images=load_sprite_sheet(load_image(join('tiles', 'rock.png')), (16, 16)),
+        images=load_sprite_sheet(load_image(join('tiles', 'stone.png')), (16, 16)),
         collision=True,
         autotile=True,
     ))
@@ -60,6 +65,12 @@ def _load_tileset():
         name='spike',
         images=[SPIKE[0]],
         size=Vec2(16, 2),
+    ))
+
+    tileset.add(TileType(
+        name='collectable',
+        images=[ASTEROIDS[0]],
+        size=Vec2(16, 16),
     ))
 
     TILESET = tileset

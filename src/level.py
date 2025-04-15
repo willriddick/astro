@@ -1,45 +1,70 @@
 import pygame
 from src.debug import DEBUG
+from src.camera import CAMERA
 from src.tilemap import TileMap
 from src.level_gen import LevelMap
+import src.graphics as graphics
 
 
 class Level:
-
     def __init__(self):
-        self.background_color = (24, 20, 37)
+        from .components import Entity, Collider
+        self.BACKGROUND_COLOR = graphics.PALETTE[15]
         self.star_spawner = None
+        self.shooting_star = None
 
         self.level_map: LevelMap = None
 
         self.tilemap: TileMap = None
-        self.spawn_tile = None
-        self.spawn_pos = pygame.Vector2(16, 16)
 
-        from .components import Entity, Collider
+        self.spawn_tile = None
+        self.spawn_pos = pygame.Vector2(0, 0)
+
+        self.exit_tile = None
+        self.exit_pos = pygame.Vector2(0, 0)
+        self.rocket = None
+
+        self.fuel_cell_tiles = []
+        self.fuel_cells = []
+
+        self.asteroid_spawner = None
+
         self.entities: list[Entity] = []
         self.colliders: list[Collider] = []
+        self.ghosts = []
+    
+    def start(self) -> None:
+        pass
 
     def update(self) -> None:
+        self.shooting_star.update()
+
+        if self.asteroid_spawner:
+            self.asteroid_spawner.update()
+
         for entity in self.entities:
             entity.update()
         
-        self.star_spawner.update()
-    
     def render(self, display: pygame.Surface, offset: pygame.Vector2) -> None:
         # background
-        display.fill(self.background_color)
+        display.fill(self.BACKGROUND_COLOR)
 
         # display stars
         self.star_spawner.render(display, offset)
+        self.shooting_star.render(display, offset)
 
         # display prerendered tilemap surface
         if self.tilemap_surface:
             display.blit(self.tilemap_surface, offset)
         
-        # display all entities relative to the offset
+        # display asteroids
+        if self.asteroid_spawner:
+            self.asteroid_spawner.render(display, offset)
+
+        # display entities relative to the offset
         for entity in self.entities:
-            entity.render(display, offset)
+            if CAMERA.is_visible(entity.center):
+                entity.render(display, offset)
         
         # debug display colliders 
         if DEBUG.enabled:

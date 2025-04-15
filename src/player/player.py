@@ -1,13 +1,15 @@
 import pygame
-from src.util import Direction, StateMachine, load_sprite_sheet, swap_palette, Vec2, Timer, approach, Palette
-from src.components import PhysicsEntity, Collider, HealthComponent, Sprite 
+from src.util import Direction, StateMachine, Vec2, Timer, approach
+from src.components import PhysicsEntity, Collider, HealthComponent
+from src.entities import Rocket, FuelCell
+from src.particles import ParticleEmitter
 from src.clock import CLOCK
 from src.debug import DEBUG
 from src.settings import SETTINGS
 from src.inputs import INPUTS
 from src.sounds import SOUNDS
-import src.graphics as graphics
-from .enums import Animations, States
+from src.level_manager import LEVEL_MANAGER
+from .enums import States
 
 
 class Player(PhysicsEntity):
@@ -21,18 +23,20 @@ class Player(PhysicsEntity):
     GRAVITY = 485
     FALL_SPEED = 180
 
+    INDICATOR_OFFSET = 70
+
     FUEL_UI_COLOR_INDEX = 13
     FUEL_UI_OFFSET = pygame.Vector2(-2, -8)
     MAX_FUEL = 100
-    REFUEL_TIME = 1000  # duration in milliseconds after boosting to start refueling
-    REFUEL_RATE = 40  # rate of refueling (fuel per second)
+    REFUEL_TIME = 500  # duration in milliseconds after boosting to start refueling
+    REFUEL_RATE = 50  # rate of refueling (fuel per second)
 
     BOOST_ACC = 100
 
     BOOST_UP_COST = 5  # minimum fuel required to boost up and display UI
     INITIAL_BOOST_UP = 5
     BOOST_UP_SPEED = 50
-    BOOST_UP_MOVE_SPEED = 50
+    BOOST_UP_MOVE_SPEED = 60
     BOOST_UP_MOVE_ACC = Vec2(100, 20)
 
     BOOST_DOWN_COST = 25
@@ -49,9 +53,9 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_BUFFER = 300  # time after jumping to allow variable jump
 
     SLIDE_DURATION = 200  # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_SPEED = 80  # minimum speed when entering slide state
-    INITIAL_SLIDE_MULTIPLIER = 1.4  # multiplies velocity when entering slide state
-    SLIDE_SPEED = 115
+    INITIAL_SLIDE_SPEED = 85  # minimum speed when entering slide state
+    INITIAL_SLIDE_MULTIPLIER = 1.5  # multiplies velocity when entering slide state
+    SLIDE_SPEED = 120
     SLIDE_ACC = (180, 180)
 
     WALL_JUMP_DURATION = 10  # time after wall jumping before switching to AIR
@@ -67,13 +71,20 @@ class Player(PhysicsEntity):
     def __init__(self, palette_index: int=1):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
-        self.input_dir = None
+        self.visible = True
+
+        self.paused = False
+        self.paused_timer = Timer()
+
+        self.input_dir = Vec2(0, 0)
         self.spawn_position = pygame.Vector2(0, 0)
         self.slide_dir = 0
 
         self.fuel_ui_color = None
         self.fuel = Player.MAX_FUEL 
         self.refuel_timer = Timer(Player.REFUEL_TIME)
+
+        self.particle_emitter = ParticleEmitter(50)
 
         # jumping and wall sliding
         self.jumps_remaining = 0
@@ -85,15 +96,16 @@ class Player(PhysicsEntity):
 
         # inputs
         self.holding_jump = False
+        self.pressed_down = False
         self.jump_input_timer = Timer(Player.JUMP_INPUT_BUFFER)
         self.pressed_left_timer = Timer(Player.PRESSED_LEFT_BUFFER)
         self.pressed_right_timer = Timer(Player.PRESSED_RIGHT_BUFFER)
 
         # setup sprite
-        self.palette_index = palette_index
-        self.palette: Palette = None
         self.rotated = False
         self.last_facing_dir = 1
+        self.palette_index = None
+        self.sprite = None
         self.load_sprite(palette_index)
     
         # setup collider
@@ -126,19 +138,49 @@ class Player(PhysicsEntity):
         )
     
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
-        super().render(display, offset)
-        self.draw_fuel_bar(display, offset)
+        if self.visible:
+            self.particle_emitter.render(display, offset)
+            self.draw_fuel_bar(display, offset)
+            #self.draw_indicator(display, offset)
+            super().render(display, offset)
     
     def update(self):
         if DEBUG.enabled:
             DEBUG.add_display(self.debug)
 
-        self.handle_input()
+        if not self.paused:
+            self.handle_input()
+        
+        if self.paused_timer.duration != -1:
+            self.paused = self.paused_timer.is_active
+
         self.sprite.update(self.position)
         self.health_component.update(self.position)
         self.state_machine.update()
+        self.particle_emitter.update()
         self.handle_collision()
+        self.handle_collectables()
         self.handle_fuel()
+    
+    def pause(self, duration: int):
+        """
+        Pause the player for a given duration.
+
+        duration: use -1 to pause indefinitely
+        """
+        if duration == -1:
+            self.paused_timer.duration = duration
+        else:
+            self.paused_timer.start(duration)
+
+        self.paused = True
+        self.input_dir = Vec2(0, 0)
+        self.holding_jump = False
+        self.pressed_down = False
+    
+    def unpause(self):
+        self.paused_timer.reset()
+        self.paused = False
         
     def set_position(self, position: pygame.Vector2):
         self.position = position
@@ -170,6 +212,15 @@ class Player(PhysicsEntity):
         else:
             self.set_state(States.GHOST)
     
+    def handle_collectables(self):
+        rocket = self.collider.get_nearest(Rocket)
+        if rocket:
+            rocket.collect(self)
+        
+        fuel_cell = self.collider.get_nearest(FuelCell)
+        if fuel_cell:
+            fuel_cell.collect(self)
+    
     def handle_fuel(self):
         if (
             self.state_machine.current_state.id != States.BOOST_UP
@@ -187,7 +238,7 @@ class Player(PhysicsEntity):
         if self.fuel < Player.BOOST_UP_COST and INPUTS.get('up', just_pressed=True):
             SOUNDS.play('cant_boost')
 
-        if INPUTS.get('down', just_pressed=True):
+        if self.pressed_down:
             if self.fuel > Player.BOOST_DOWN_COST:
                 self.set_state(States.BOOST_DOWN)
             else:
@@ -251,6 +302,9 @@ class Player(PhysicsEntity):
         self.holding_jump = INPUTS.get('jump')
         if INPUTS.get('jump', just_pressed=True):
             self.jump_input_timer.start()
+        
+        # boost down
+        self.pressed_down = INPUTS.get('down', just_pressed=True)
 
         # update pressed left/right input timer
         if self.input_dir.x == -1:
@@ -259,31 +313,16 @@ class Player(PhysicsEntity):
             self.pressed_right_timer.start()
     
     def load_sprite(self, palette_index: int):
-        self.palette_index = palette_index % len(graphics.PLAYER_PALETTES)
-        self.palette = graphics.PLAYER_PALETTES[self.palette_index]
+        from .sprite import load_sprite
+        self.palette_index = palette_index
+        self.sprite, self.fuel_ui_color = load_sprite(palette_index)
 
-        self.fuel_ui_color = self.palette[Player.FUEL_UI_COLOR_INDEX]
-
-        sheet = swap_palette(
-            graphics.PLAYER_SHEET,
-            graphics.PLAYER_PALETTES[0],
-            self.palette,
-        )
-        image_list = load_sprite_sheet(sheet, (16, 18))
-        
-        self.sprite = Sprite(self.position, image_offset=Vec2(4, 5))
-        self.sprite.add_animation(Animations.IDLE_A, image_list, 0, range_=(0,1))
-        self.sprite.add_animation(Animations.IDLE_B, image_list, 5, range_=(0,4))
-        self.sprite.add_animation(Animations.RUN, image_list, 12, range_=(4,10))
-        self.sprite.add_animation(Animations.AIR_UP, image_list, 0, range_=(10,11))
-        self.sprite.add_animation(Animations.AIR_DOWN, image_list, 0, range_=(11,12))
-        self.sprite.add_animation(Animations.FRONT, image_list, 0, range_=(12,13))
-        self.sprite.add_animation(Animations.BACK, image_list, 0, range_=(13,14))
-        self.sprite.add_animation(Animations.WALL_SLIDE, image_list, 0, range_=(14,15))
-        self.sprite.add_animation(Animations.SLIDE, image_list, 0, range_=(15,16))
-        self.sprite.add_animation(Animations.BOOST_UP, image_list, 0, range_=(16,17))
-        self.sprite.add_animation(Animations.BOOST_DOWN, image_list, 0, range_=(16,17))
-
+    def draw_indicator(self, display: pygame.Surface, offset: pygame.Vector2):
+        exit_pos = LEVEL_MANAGER.current.exit_pos
+        if exit_pos and exit_pos.distance_to(self.center) > (Player.INDICATOR_OFFSET * 2):
+            indicator_pos = self.center + (exit_pos - self.position).normalize() * Player.INDICATOR_OFFSET 
+            pygame.draw.circle(display, (255, 255, 255), indicator_pos + offset, 3)
+            
     def draw_fuel_bar(self, display: pygame.Surface, offset: pygame.Vector2):
         """Draw a fuel bar expanding symmetrically from the center."""
         if (

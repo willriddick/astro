@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from typing import Callable
 import pygame
@@ -5,14 +6,18 @@ from src.util import Vec2, randf, draw_rect, Timer
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from src.clock import CLOCK
 from src.debug import DEBUG
-from src.level import Level
 import src.graphics as graphics
 
 
 class Camera:
-    """A global class for rendering."""
+    """
+    A global class for rendering the game window.
+    """
 
-    DISTANCE_BUFFER = 7
+    DISTANCE_BUFFER = 16  # minimum distance from target before Camera position is updated
+    SHAPE_BUFFER = 0.1  # transition buffer for circle shape
+    MIN_TRANSITION_ALPHA = 50
+    TRANSITION_COLOR = (14, 7, 27)
 
     def __init__(self, size: Vec2):
         self.size = size
@@ -27,46 +32,11 @@ class Camera:
         self.screenshake_timer = Timer()
         self.screenshake_intensity = 0
 
+        self.transition_timer = Timer()
+        self.transition_focus = 0.5 
+
         self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
-
-    def update(self) -> None:
-        """Update the camera and render the display surface."""
-        # clear display surface
-        self.display.fill((0, 0, 0))
-
-        # update screenshake effect
-        self._handle_screenshake()
-
-        # calculate the offset from the in-game position
-        self.offset = pygame.Vector2(
-            round(self.clamp_pos.x - self.size.x // 2),
-            round(self.clamp_pos.y - self.size.y // 2)
-        ) + self.screenshake_offset
-
-        # render the callback
-        self.render_callback(self.display, -self.offset)
-
-        # render debug display
-        self._debug_display()
     
-    def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
-        """Set a new render function for the camera."""
-        self.render_callback = callback
-    
-    def _debug_display(self):
-        # display debug information
-        text_surf = graphics.FONT.render(str(DEBUG.display), antialias=False, color=(255, 255, 255))
-        text_surf.set_alpha(70)
-        text_rect = text_surf.get_rect()
-        buffer = 2
-        draw_rect(
-            self.display,
-            rect=pygame.Rect(0, 0, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
-            fill_color=(0, 0, 0, 40),
-            outline_color=(0, 0, 0, 0)
-        )
-        self.display.blit(text_surf, (buffer, buffer))
-
     @property
     def debug(self) -> str:
         return (
@@ -85,23 +55,69 @@ class Camera:
             self.size.y
         )
     
-    def set_boundary(self, boundary: pygame.Rect):
-        self.boundary = boundary
-    
     @property
     def clamp_pos(self) -> pygame.Vector2:
         if not self.boundary:
             return self.pos
         
-        # Half the width and height of the boundary (use float division for precision)
+        # half the width and height of the boundary (use float division for precision)
         h_width = self.size.x / 2
         h_height = self.size.y / 2
 
-        # Ensure the position stays within the clamped bounds
+        # ensure the position stays within the clamped bounds
         clamped_x = max(self.boundary.left + h_width, min(self.pos.x, self.boundary.right - h_width))
         clamped_y = max(self.boundary.top + h_height, min(self.pos.y, self.boundary.bottom - h_height))
         
         return pygame.Vector2(clamped_x, clamped_y)
+
+    def update(self) -> None:
+        """Update the camera and render the display surface."""
+        # clear display surface
+        self.display.fill((0, 0, 0))
+
+        # update screenshake effect
+        self._handle_screenshake()
+
+        # calculate the offset from the in-game position
+        self.offset = pygame.Vector2(
+            round(self.clamp_pos.x - self.size.x // 2),
+            round(self.clamp_pos.y - self.size.y // 2)
+        ) + self.screenshake_offset
+
+        # render the callback
+        self.render_callback(self.display, -self.offset)
+
+        # render transition
+        if self.transition_timer.is_active:
+            self._render_transition(self.display)
+
+        # render debug
+        self._render_debug()
+    
+    def transition(self, duration: int, focus: float = 0.5, fade: int = 0):
+        """
+        Initiates a transition effect for the specified duration.
+
+        Args:
+            duration (int): Duration of the transition in milliseconds.
+            focus (float, optional): Determines the portion of the duration the circular transition is active. 
+                Set to 1 for the entire duration, 0.5 for half, etc. Defaults to 0.5.
+            fade (int, optional): Controls the fade effect. 
+                Set to 0 for both fade-in and fade-out, 1 for fade-in only, and -1 for fade-out only. Defaults to 0.
+        """
+        self.transition_timer.start(duration)
+        self.transition_focus = focus
+        self.transition_fade = fade
+    
+    def is_visible(self, point: Vec2) -> bool:
+        return self.rect.collidepoint(point)
+
+    def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
+        """Set a new render function for the camera."""
+        self.render_callback = callback
+    
+    def set_boundary(self, boundary: pygame.Rect):
+        self.boundary = boundary
     
     def set_pos(self, target_pos: pygame.Vector2):
         """Set the camera's position to a target position."""
@@ -123,7 +139,7 @@ class Camera:
         # Clamp the position and update
         self.pos = self.pos * (1 - self.smoothing) + target_pos * self.smoothing
 
-    def screenshake(self, duration: int, intensity: int):
+    def screenshake(self, duration: int, intensity: float):
         self.screenshake_timer.start(duration)
         self.screenshake_intensity = intensity
     
@@ -133,12 +149,55 @@ class Camera:
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
                 randf(-self.screenshake_intensity, self.screenshake_intensity, 0.1),
             )
-            self.screenshake_intensity *= 0.9
+            self.screenshake_intensity *= 0.95
         else:
             self.screenshake_offset = pygame.Vector2(0, 0)
     
-    def get_blank(self) -> pygame.Surface:
-        return pygame.Surface(self.size)
+    def _render_transition(self, display):
+        """Render a transition effect over the display surface."""
+        # Create a transition surface
+        transition_surface = pygame.Surface(display.get_size())
+        transition_surface.fill(self.TRANSITION_COLOR) 
+
+        progress = self.transition_timer.progress
+
+        if self.transition_fade == 0:
+            multiplier = abs(math.sin(math.pi * progress))
+        elif self.transition_fade == 1:
+            multiplier = progress
+        else:
+            multiplier = (1 - progress)
+
+        if progress < self.transition_focus:
+            radius = int(display.get_width() * (1 - multiplier - self.SHAPE_BUFFER))
+            pygame.draw.circle(
+                surface=transition_surface, 
+                color=(255, 255, 255),
+                center=self.pos - self.offset,
+                radius=radius
+            )
+            transition_surface.set_colorkey((255, 255, 255))
+        else:
+            transition_surface.fill(self.TRANSITION_COLOR)
+        
+        transition_surface.set_alpha(self.MIN_TRANSITION_ALPHA + multiplier * 255)
+        display.blit(transition_surface, (0, 0))
+    
+    def _render_debug(self):
+        if DEBUG.display == '':
+            return
+
+        text_surf = graphics.FONT.render(DEBUG.display, antialias=False, color=(255, 255, 255))
+        text_surf.set_alpha(70)
+        text_rect = text_surf.get_rect()
+        buffer = 2
+        draw_rect(
+            self.display,
+            rect=pygame.Rect(0, 16, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
+            fill_color=(0, 0, 0, 40),
+            outline_color=(0, 0, 0, 0)
+        )
+        self.display.blit(text_surf, (buffer, 16 + buffer))
     
 
 CAMERA = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))

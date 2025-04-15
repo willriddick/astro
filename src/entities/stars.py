@@ -12,10 +12,6 @@ class StarSpawner():
         self.buffer = buffer
         self.stars = []
     
-    def update(self):
-        for star in self.stars:
-            star.update()
-        
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         for star in self.stars:
             star.render(display, offset)
@@ -29,8 +25,8 @@ class StarSpawner():
     
 class Star(Entity):
 
-    DEPTH = [0.05, 0.25]
-    ALPHA = [20, 200]
+    DEPTH = [0.05, 0.3]
+    ALPHA = [30, 220]
     TINT_BASE = 220
     TINT_VARIATION = 35
     WEIGHTS: list[int] = []

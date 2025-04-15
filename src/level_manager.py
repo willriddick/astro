@@ -1,6 +1,5 @@
-from os.path import join
-from os import listdir
-from random import choice
+import random 
+import os
 import pygame
 from src.level_gen import CONFIGS
 from src.camera import CAMERA
@@ -12,51 +11,82 @@ from src.tilemap import TileMap
 import src.graphics as graphics
 
 
-MAPS_PATH = join('assets', 'maps')
+MAPS_PATH = os.path.join('assets', 'maps')
+STAR_COUNT = 100
+
 
 class LevelManager:
-
     def __init__(self):
         self.player = None
         self.current = None
     
-    def new_level(self, seed: int = None, config=CONFIGS[0], map_path: str = None):
+    def new_level(self, seed: int = None, config_index=0, map_path: str = None):
         """Create a new level with the given seed and map path."""
+        if seed:
+            random.seed(seed)
+
         self.current = level = Level()
         
         if map_path:
             level.tilemap = TileMap.load(map_path, graphics.TILESET)
         else:
-            level.tilemap = LevelManager._generate(level, config, seed)
+            level.tilemap = LevelManager._generate(level, CONFIGS[config_index])
+
+        level.tilemap.create_border(graphics.TILESET.get_by('stone'))
         
         if level.spawn_tile:
             level.spawn_pos = level.spawn_tile.pos
+            level.tilemap.remove_tile(level.spawn_tile.tile_pos)    
         
+        from src.entities import Rocket, FuelCell
+
+        if level.exit_tile:
+            level.exit_pos = level.exit_tile.pos
+            level.rocket = Rocket(level.exit_tile.pos) 
+            level.rocket.spawn()
+            level.entities.append(level.rocket)
+            level.tilemap.remove_tile(level.exit_tile.tile_pos)    
+        
+        for fuel_cell in level.fuel_cell_tiles:
+            new_cell = FuelCell(fuel_cell.pos)
+            level.fuel_cells.append(new_cell)
+            level.entities.append(new_cell)
+            new_cell.spawn()
+            level.tilemap.remove_tile(fuel_cell.tile_pos)
+            
+        # spawn spikes
         spikes = LevelManager._create_spikes(level.tilemap)
         level.entities.extend(spikes)
-        
-        from src.entities import StarSpawner
-        from src.player import Player
+
+        # spawn stars
+        from src.entities import StarSpawner, ShootingStar
         level.star_spawner = StarSpawner(invert_depth=True)
-        level.star_spawner.spawn(50)
+        level.star_spawner.spawn(STAR_COUNT)
+        level.shooting_star = ShootingStar()
         
+        # spawn player
+        from src.player import Player
         if self.player is None:
             self.player = Player()
-        level.entities.append(self.player)
 
+        level.entities.append(self.player)
         self.player.spawn(level.spawn_pos)
 
-        level.tilemap.create_border(graphics.TILESET.get_by('stone'))
         level.tilemap_surface = level.tilemap.get_surface()
 
         CAMERA.set_pos(level.spawn_pos)
         CAMERA.set_boundary(level.tilemap.rect)
-        print(self.current.entities)
+        level.start()
     
+
     @staticmethod
-    def _generate(level: Level, config: str, seed: int | str = None, room_size = Vec2(14, 10)) -> None:
+    def _generate(level: Level, config: str, room_size = Vec2(14, 10)) -> None:
         level.tilemap = TileMap(graphics.TILESET, size=Vec2(0, 0))
-        level.level_map = generate_level(config, seed)
+        level.level_map = generate_level(config)
+
+        entrance_tile = graphics.TILESET.get_by('entrance')
+        exit_tile = graphics.TILESET.get_by('exit')
+        collectable_tile = graphics.TILESET.get_by('collectable')
 
         for y in range(level.level_map.config.rows):
             for x in range(level.level_map.config.cols):
@@ -69,21 +99,34 @@ class LevelManager:
                 
                 # if room exists at postion (x, y) in level_map
                 sub, flip = LevelManager._get_folder_flip(room.key)
-                map_folder = join(MAPS_PATH, sub)
+                map_folder = os.path.join(MAPS_PATH, sub)
                 map_paths: list[str] = []
-                for name in listdir(map_folder):
-                    map_paths.append(join(map_folder, name))
-                map_path = choice(map_paths)
+
+                # sort the map folder for random reproducibility
+                for name in sorted(os.listdir(map_folder)):
+                    map_paths.append(os.path.join(map_folder, name))
+
+                # choose a random map from the folder and load it
+                map_path = random.choice(sorted(map_paths))
                 new_map = TileMap.load(map_path, graphics.TILESET)
 
                 if room.has_attribute(Attribute.ENTRANCE):
-                    pos = choice(new_map.get_valid_floor()).tile_pos
-                    level.spawn_tile = new_map.create_tile(graphics.TILESET.get_by('entrance'), 0, Vec2(pos.x, pos.y - 1))
+                    pos = random.choice(new_map.get_valid_floor()).tile_pos
+                    level.spawn_tile = new_map.create_tile(entrance_tile, 0, Vec2(pos.x, pos.y - 1))
+                
+                if room.has_attribute(Attribute.EXIT):
+                    pos = random.choice(new_map.get_valid_floor()).tile_pos
+                    level.exit_tile = new_map.create_tile(exit_tile, 0, Vec2(pos.x, pos.y - 1))
+                
+                if room.has_attribute(Attribute.COLLECTABLE):
+                    pos = random.choice(new_map.get_empty_positions())
+                    level.fuel_cell_tiles.append(new_map.create_tile(collectable_tile, 0, Vec2(pos.x, pos.y)))
 
                 level.tilemap.place_tilemap(new_map, room.position, flip)
                
         return level.tilemap
     
+
     @staticmethod
     def _create_spikes(tilemap: TileMap) -> list['Spike']:
         """
@@ -161,12 +204,14 @@ class LevelManager:
         tilemap.remove_tiles(spike_tiles)
         return spikes
         
+
     @staticmethod
     def _fill_empty_room(tilemap: TileMap, room_pos: Vec2, room_size: Vec2) -> None:
         tilemap.create_tile_rect(
             graphics.TILESET.get_by('stone'), 
             pygame.Rect(room_pos.x * room_size.x, room_pos.y * room_size.y, room_size.x, room_size.y)
         )
+
 
     @staticmethod
     def _get_folder_flip(key: int) -> tuple[str, bool]:
@@ -185,7 +230,7 @@ class LevelManager:
                 flip = key == 14
             case _:
                 folder = str(key)
-                flip = choice([True, False])
+                flip = random.choice([True, False])
             
         return folder, flip
 

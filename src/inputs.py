@@ -10,6 +10,7 @@ class InputManager:
     def __init__(self):
         self._inputs = {}
         self.reset_defaults()
+        self.disabled = False
         self.load()
 
     def get(self, action: str, just_pressed=False) -> bool:
@@ -17,11 +18,17 @@ class InputManager:
         if action not in self._inputs:
             raise ValueError(f'Invalid input key: {action}')
         
+        if self.disabled:
+            return False
+        
         keys = pygame.key.get_just_pressed() if just_pressed else pygame.key.get_pressed()
         return keys[self._inputs[action]]
 
     def get_dir(self, just_pressed=False) -> Vec2:
         """Returns a vector based on the directional input keys."""
+        if self.disabled:
+            return Vec2(0, 0)
+
         keys = pygame.key.get_just_pressed() if just_pressed else pygame.key.get_pressed()
 
         up = keys[self.get_input('up')]
@@ -33,6 +40,9 @@ class InputManager:
 
     def get_next_keydown(self) -> int | None:
         """Returns the first key that was just pressed, or None if no key was pressed."""
+        if self.disabled:
+            return None
+
         just_pressed = pygame.key.get_just_pressed()
         for key in range(len(just_pressed)):  
             if just_pressed[key]: return key  

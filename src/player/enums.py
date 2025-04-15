@@ -13,6 +13,7 @@ class Animations(Enum):
     SLIDE = 8
     BOOST_UP = 9
     BOOST_DOWN = 10
+    DEAD = 11
 
 
 class States(Enum):

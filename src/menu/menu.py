@@ -6,7 +6,6 @@ from .page import Page
 
 
 class Menu():
-
     def __init__(self, pages: list[Page], position=Vec2(16, 16), draw_direction=-1, transition_duration=200):
         self.pages = pages
         self.position = position
@@ -22,8 +21,10 @@ class Menu():
 
     def change_page(self, page_index: int):
         self.previous_page = self.current_page
+        self.previous_page.exit_page()
         self.page_index = page_index % len(self.pages)
         self.current_page = self.pages[self.page_index]
+        self.current_page.enter_page()
         self.transition_timer.start(self.transition_duration)
 
     def update(self):

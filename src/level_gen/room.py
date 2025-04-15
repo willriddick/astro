@@ -144,7 +144,7 @@ class Room:
     @staticmethod
     def is_itemable(room: 'Room') -> bool:
         """Determine if the given room is eligible for the ITEM attribute. Useful for filter function."""
-        return not room.has_attributes([Attribute.ENTRANCE, Attribute.EXIT])
+        return not room.has_attributes([Attribute.ENTRANCE, Attribute.EXIT, Attribute.COLLECTABLE])
     
     @staticmethod
     def connect(room1: 'Room', room2: Optional['Room'], direction: Direction, status: Status):

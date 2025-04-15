@@ -8,13 +8,15 @@ from src.clock import CLOCK
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.sounds import SOUNDS
+from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
-from src.game_states import GameStates, MainMenu, Playing
+from src.game_states import GameStates, MainMenu, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
+from src.networking import Host, Client, NetworkNode, MsgType
 import src.graphics as graphics
 
 
 class Game:
-    """Main game class that handles the game loop and state machine."""
+    """Main class that handles the game loop state machine."""
 
     def __init__(self):
         pygame.init()
@@ -31,22 +33,28 @@ class Game:
         pygame.display.set_caption('Astro')
         pygame.display.set_icon(graphics.ICON)
 
+        self.events: list[pygame.event.Event] = []  
         self.command_prompt = CommandPrompt()
 
-        self.state_machine = StateMachine(self, [MainMenu(), Playing()])
+        self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), LobbyHost(), LobbyJoin(), Multiplayer()])
+        self.network_node: NetworkNode = None
+
 
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
         self.running = True
         #SOUNDS.play('music/track1', loops=-1)
-       
+
         while self.running:
             DEBUG.update()
 
             if SETTINGS.get('show_fps') or DEBUG.enabled:
                 DEBUG.add_display(f'fps: {CLOCK.fps}')
 
-            for event in pygame.event.get():
+            INPUTS.disabled = True if self.command_prompt.enabled else False
+
+            self.events = pygame.event.get()
+            for event in self.events:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
@@ -67,6 +75,9 @@ class Game:
             
             await asyncio.sleep(0)
 
+        if self.network_node:
+            self.network_node.stop()
+
         pygame.quit()
         sys.exit()
 
@@ -80,25 +91,63 @@ class Game:
         match command.split():
             case ['d']:
                 DEBUG.toggle()
+            case ['q']:
+                self.running = False
             case ['g']:
-                player.toggle_ghost()
+                if player:
+                    player.toggle_ghost()
             case ['n']:
                 LEVEL_MANAGER.new_level()
             case ['n', seed]:
                 LEVEL_MANAGER.new_level(seed=seed)
             case ['p', index]:
-                player.load_sprite(int(index))
+                if player:
+                    player.load_sprite(int(index))
             case ['r']:
-                player.spawn(player.spawn_position)
+                if player:
+                    player.spawn(player.spawn_position)
             case ['tp', x, y]:
-                player.set_position(pygame.Vector2(int(x), int(y)))
-                SOUNDS.play('teleport')
+                if player:
+                    player.set_position(pygame.Vector2(int(x), int(y)))
+                    SOUNDS.play('teleport')
             case ['f']:
                 self.toggle_fullscreen()
             case ['gs', state]:
                 self.state_machine.switch(list(GameStates)[int(state)])
-            case ['q']:
-                self.running = False
+            case ['q1']:
+                self.network_node = Host('will', port=45678)
+                self.network_node.start()
+                self.network_node.start_session()
+                self.state_machine.switch(GameStates.LOBBY_HOST)
+            case ['q2']:
+                async def join():
+                    self.network_node = Client('drew')
+                    self.network_node.start()
+                    joined = await self.network_node.join('YCUADU5SNY')
+                    if joined:
+                        self.state_machine.switch(GameStates.LOBBY_JOIN)
+                
+                asyncio.create_task(join())
+            case ['info']:
+                if self.network_node:
+                    print(self.network_node)
+            case ['msg', msg]:
+                if self.network_node:
+                    self.network_node.broadcast_message(MsgType.CHAT, (self.network_node.id, msg))
+            case ['join', join_code]:
+                if isinstance(self.network_node, Client):
+                    print(f'Joining session with {join_code}')
+                    self.network_node.join(join_code)
+                else:
+                    print('Node is not client')
+            case ['disconnect']:
+                if self.network_node:
+                    print('Disconnecting')
+                    self.network_node.disconnect()
+            case ['clients']:
+                if self.network_node:
+                    print('Clients:')
+                    print(self.network_node.clients)
             case _:
                 print(f'Unknown command: {command}')
     

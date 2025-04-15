@@ -1,6 +1,11 @@
+import random
+import pygame
 from src.util import State, Timer
+from src.sounds import SOUNDS
+from src.particles import StepParticle
 from ..player import Player
 from ..enums import Animations, States
+
 
 class Run(State):
     def __init__(self):
@@ -16,6 +21,12 @@ class Run(State):
         self.owner.accelerate_x(self.owner.input_dir.x, Player.GROUND_MOVE_SPEED, Player.GROUND_ACC)
         self.owner.handle_jump()
         self.owner.handle_boost()
+
+        # play step sound
+        frame = self.owner.sprite.frame
+        if (frame == 2 or frame == 5) and self.owner.sprite.frame_changed:
+            SOUNDS.play('step')
+            self.owner.particle_emitter.emit(StepParticle, self.owner.position + pygame.Vector2(4, 14))
 
         # animate player
         if self.owner.rotated:

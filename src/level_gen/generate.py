@@ -1,4 +1,4 @@
-from random import seed, choice, randint
+from random import choice, randint
 from src.util import Direction, Vec2, get_weighted_choice
 from .config import Config
 from .level_map import LevelMap
@@ -8,12 +8,8 @@ from .status import Status
 from .attribute import Attribute
 
 
-def generate_level(config: Config, _seed: int | str = None) -> LevelMap:
-    """Build a Level instance from a random seed and JSON configuration."""
-    # set seed
-    seed(_seed)
-    
-    # create config and level
+def generate_level(config: Config) -> LevelMap:
+    """Build a Level instance from a JSON configuration."""
     level = LevelMap(config)
     
     # set ENTRANCE
@@ -31,11 +27,11 @@ def generate_level(config: Config, _seed: int | str = None) -> LevelMap:
     # generate branches
     _generate_branches(level, config)
 
-    # add links
+    # generate links
     _generate_bridges(level, config)
 
-    # add collectables
-    _generate_items(level, config)
+    # generate collectables
+    _generate_collectables(level, config)
 
     # update keys
     for room in level.get_rooms():
@@ -65,7 +61,10 @@ def _generate_branches(level: LevelMap, config: Config) -> bool:
         room.add_attribute(Attribute.BRANCH)
 
         # generate a branch starting at room
-        _create_path(level, room, length, config.weights)
+        path = _create_path(level, room, length, config.weights)
+        if level.item_count < config.item_count:
+            path.end.add_attribute(Attribute.COLLECTABLE)
+            level.item_count += 1
 
         count = config.room_count - level.index
     
@@ -80,20 +79,24 @@ def _generate_bridges(level: LevelMap, config: Config) -> bool:
 
         room1: Room = choice(rooms)
         room1.add_attribute(Attribute.BRIDGE)
-        direction = choice(list(room1.get_directions(Status.UNLINKED)))
+        direction = choice(room1.get_directions(Status.UNLINKED))
         room2: Room = level.get_room_at(room1.position, direction)
         Room.connect(room1, room2, direction, Status.LINKED)
     
     return True
 
-def _generate_items(level: LevelMap, config: Config) -> bool:
-    for _ in range(config.item_count):
+def _generate_collectables(level: LevelMap, config: Config) -> bool:
+    if level.item_count >= config.item_count:
+        return True
+
+    for _ in range(config.item_count - level.item_count):
         rooms = list(filter(Room.is_itemable, level.get_rooms()))
         if not rooms:
             return False
         
         room: Room = choice(rooms)
-        room.add_attribute(Attribute.ITEM_ONE)
+        room.add_attribute(Attribute.COLLECTABLE)
+        level.item_count += 1
     
     return True
 

@@ -1,4 +1,6 @@
-from random import randint
+import asyncio
+import inspect
+import random
 import pygame
 from src.util import Vec2
 from src.clock import CLOCK
@@ -13,7 +15,10 @@ class Button():
     X_OFFSET = 7
     OFFSET_SPEED = 15 
 
-    HOVERED_COLOR = None  # placeholder 
+    # placeholders
+    DEFAULT_COLOR = None  
+    DISABLED_COLOR = None
+    HOVERED_COLOR = None
 
     def __init__(self, text: str, callback: callable):
         self.text = text
@@ -21,14 +26,19 @@ class Button():
         self.hovered = False
         self.x_offset = 0
         self.target_offset = 0 
-
         self.disabled = False
 
-        self.DEFAULT_COLOR = graphics.PALETTE[5]
-        self.DISABLED_COLOR = graphics.PALETTE[3]
-
-        if Button.HOVERED_COLOR is None:
-            Button.HOVERED_COLOR = graphics.PALETTE[randint(20, len(graphics.PALETTE) - 1)]
+        if Button.DEFAULT_COLOR is None:
+            Button.DEFAULT_COLOR = graphics.PALETTE[6]
+            Button.DISABLED_COLOR = graphics.PALETTE[4]
+            Button.HOVERED_COLOR = graphics.PALETTE[random.choice([
+                random.randint(24, 26),
+                random.randint(28, 31),
+                random.randint(34, 37),
+                random.randint(41, 44),
+                random.randint(47, 48),
+                random.randint(55, 61)
+            ])]
     
     def __str__(self):
         return self.text
@@ -36,7 +46,12 @@ class Button():
     def select(self):
         SOUNDS.play('select')
         CAMERA.screenshake(30, 1)
-        self.callback()
+
+        if self.callback:
+            if inspect.iscoroutinefunction(self.callback):
+                asyncio.create_task(self.callback())  # Run async function in background
+            else:
+                self.callback()
     
     def update(self, hovered: bool):
         self.hovered = hovered
