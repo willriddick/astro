@@ -3,7 +3,7 @@ import pygame
 from src.util import State, Vec2
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton, TextButton
 from src.entities import StarSpawner
-from src.clock import CLOCK
+from src.constants import DISPLAY_HEIGHT
 from src.camera import CAMERA
 from src.settings import SETTINGS
 from src.inputs import INPUTS
@@ -39,13 +39,13 @@ class MainMenu(State):
 
         # create pages
         self.menu = Menu(
-            position=Vec2(16, 180 - 16),
+            position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
                     Button('Play', self._switch_to_play),
                     Button('Settings', self._switch_to_settings), 
                     Button('Quit', self._quit)
-                ]),
+                ], default_index=0, reset_index=True),
                 Page([
                     Button('Display', self._switch_to_display),
                     Button('Audio', self._switch_to_audio),
@@ -61,13 +61,13 @@ class MainMenu(State):
                     SliderButton('UI Alpha', key='ui_alpha'),
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Back', self._switch_to_settings)
-                ]),
+                ], default_index=6),
                 Page([
                     SliderButton('Master Volume', key='master_volume', callback=self._update_volume),
                     SliderButton('Sfx Volume', key='sfx_volume', callback=self._update_volume),
                     SliderButton('Music Volume', key='music_volume', callback=self._update_volume),
                     Button('Back', self._switch_to_settings)
-                ]),
+                ], default_index=3),
                 Page([
                     InputButton('Up', key='up', callback=lambda x: self._set_movement(x)),
                     InputButton('Down', key='down', callback=lambda x: self._set_movement(x)), 
@@ -75,7 +75,7 @@ class MainMenu(State):
                     InputButton('Right', key='right', callback=lambda x: self._set_movement(x)),
                     InputButton('Jump', key='jump', callback=lambda x: self._set_movement(x)),
                     Button('Back', self._switch_to_settings)
-                ]),
+                ], default_index=5),
                 Page([
                     Button('Singleplayer', self._start_singleplayer),
                     Button('Host', self._switch_to_host),
@@ -86,13 +86,13 @@ class MainMenu(State):
                     TextButton('Username', callback=lambda x, y: self._set_host_username(x, y)),
                     self.start_button,
                     Button('Canel', self._switch_to_play)
-                ]),
+                ], default_index=2),
                 Page([
                     TextButton('Username', callback=lambda x, y: self._set_join_username(x, y)),
                     TextButton('Join Code', callback=lambda x, y: self._set_join_code(x, y)),
                     self.join_button,
                     Button('Cancel', self._switch_to_play)
-                ]),
+                ], default_index=3)
             ],
         )
     

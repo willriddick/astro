@@ -98,8 +98,8 @@ SOUNDS.load_sounds([
     Sound("rocket", default_volume=0.1),
     Sound("fuel_cell", default_volume=0.5),
     Sound("spawn", default_volume=0.35),
-    Sound("blip_pitch", path='blip', default_volume=0.8, pitch=[0.7, 1.2, 0.03]),
-    Sound("blip", default_volume=0.8, pitch=[0.9, 1.1, 0.025]),
-    Sound("select", default_volume=0.7, path="select2"),
+    Sound("blip_pitch", path='blip', default_volume=0.6, pitch=[0.7, 1.2, 0.03]),
+    Sound("blip", default_volume=0.6, pitch=[0.9, 1.1, 0.025]),
+    Sound("select", default_volume=0.5, path="select2"),
     Sound("music/track1", default_volume=0.3, category=1),
 ])

@@ -3,12 +3,20 @@ from .button import Button
 
 
 class Page:
-
-    def __init__(self, buttons: list[Button], default_index: int = 0):
+    def __init__(self, buttons: list[Button], default_index: int = 0, reset_index: bool = False):
         self.buttons = buttons
         self.button_count = len(self.buttons)
+
+        self.reset_index = reset_index
         self.default_index = default_index
         self.button_index = default_index
+    
+    def enter_page(self):
+        if self.reset_index:
+            self.button_index = self.default_index
+
+    def exit_page(self):
+        pass
     
     def change_index(self, input_dir: int):
         button_index = int((self.button_index + input_dir) % self.button_count)

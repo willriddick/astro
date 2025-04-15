@@ -30,6 +30,11 @@ class Singleplayer(State):
             config_index=self.config_index
         )
 
+        self.level_index = 1
+        self.duration = 0.0
+        self.fuel_cells_collected = 0
+        self.ui.reset()
+
     def update(self):
         LEVEL_MANAGER.current.update()
         CAMERA.set_render_callback(self.render) 

@@ -18,6 +18,11 @@ class UI:
 
         self.fuel_icon = graphics.FUEL_CELL
         self.fuel_icon_width = self.fuel_icon.get_width()
+    
+    def reset(self):
+        self.duration = 0.0
+        self.collected = 0
+        self.level = 1
 
     def update(self, collected: int, fuel_cells: int, level):
         self.duration += CLOCK.dt
