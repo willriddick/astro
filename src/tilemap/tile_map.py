@@ -9,6 +9,7 @@ from .tile_type import TileType
 HEADER_FORMAT = 'hhh' # tile_size, border_width, border_height
 TILE_FORMAT = '16s hhh' # type, variant, x, y
 
+
 class TileMap:
     def __init__(self, tileset: TileSet, size: Vec2=Vec2(0,0)):
         self.tileset = tileset
@@ -88,6 +89,15 @@ class TileMap:
             new_map[Vec2(new_x, pos.y)] = tile
             tile.tile_pos = Vec2(new_x, pos.y)
         self.map = new_map
+    
+    def get_empty_positions(self) -> list[Vec2]:
+        empty_positions = []
+        for y in range(self.size.y):
+            for x in range(self.size.x):
+                pos = Vec2(x, y)
+                if pos not in self.map:
+                    empty_positions.append(pos)
+        return empty_positions
     
     def get_valid_floor(self) -> list[Tile]:
         output = []

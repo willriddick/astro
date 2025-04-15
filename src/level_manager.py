@@ -119,8 +119,8 @@ class LevelManager:
                     level.exit_tile = new_map.create_tile(exit_tile, 0, Vec2(pos.x, pos.y - 1))
                 
                 if room.has_attribute(Attribute.COLLECTABLE):
-                    pos = random.choice(new_map.get_valid_floor()).tile_pos
-                    level.fuel_cell_tiles.append(new_map.create_tile(collectable_tile, 0, Vec2(pos.x, pos.y - 1)))
+                    pos = random.choice(new_map.get_empty_positions())
+                    level.fuel_cell_tiles.append(new_map.create_tile(collectable_tile, 0, Vec2(pos.x, pos.y)))
 
                 level.tilemap.place_tilemap(new_map, room.position, flip)
                
