@@ -63,12 +63,6 @@ class LevelManager:
         level.star_spawner = StarSpawner(invert_depth=True)
         level.star_spawner.spawn(STAR_COUNT)
         level.shooting_star = ShootingStar()
-
-        # spawn asteroids
-        # from src.entities import AsteroidSpawner
-        # level.asteroid_spawner = AsteroidSpawner()
-        # level.asteroid_spawner.set_boundary(level.tilemap.rect)
-        # level.asteroid_spawner.spawn(20)
         
         # spawn player
         from src.player import Player

@@ -193,11 +193,11 @@ class Camera:
         buffer = 2
         draw_rect(
             self.display,
-            rect=pygame.Rect(0, 0, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
+            rect=pygame.Rect(0, 16, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
             fill_color=(0, 0, 0, 40),
             outline_color=(0, 0, 0, 0)
         )
-        self.display.blit(text_surf, (buffer, buffer))
+        self.display.blit(text_surf, (buffer, 16 + buffer))
     
 
 CAMERA = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))

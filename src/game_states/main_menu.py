@@ -58,6 +58,7 @@ class MainMenu(State):
                     ToggleButton('Show Gamertag', key='show_gamertag', callback=lambda _: SETTINGS.save()),
                     ToggleButton('Fullscreen', key='fullscreen', callback=lambda x: self._set_fullscreen(x)),
                     self.resolution_slider,
+                    SliderButton('UI Alpha', key='ui_alpha'),
                     SliderButton('Fuel UI Alpha', key='fuel_ui_alpha'),
                     Button('Back', self._switch_to_settings)
                 ]),

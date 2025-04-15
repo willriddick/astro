@@ -35,20 +35,21 @@ class SettingsManager:
                     if content:
                         self._settings.update(json.loads(content))
         except (json.JSONDecodeError, ValueError) as e:
-            print(f"Error loading settings: {e}, resetting to defaults.")
+            print(f'Error loading settings: {e}, resetting to defaults.')
             self.save(filename)
 
     def reset_defaults(self) -> None:
         """Reset settings to default values."""
         self._settings = {
-            "show_fps": False,
-            "show_gamertag": True,
-            "fullscreen": True,
-            "window_scale": 2,
-            "master_volume": 5,
-            "sfx_volume": 5,
-            "music_volume": 5,
-            "fuel_ui_alpha": 5
+            'show_fps': False,
+            'show_gamertag': True,
+            'fullscreen': True,
+            'window_scale': 2,
+            'master_volume': 5,
+            'sfx_volume': 5,
+            'music_volume': 5,
+            'fuel_ui_alpha': 5,
+            'ui_alpha': 5,
         }
 
 
