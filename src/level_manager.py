@@ -42,13 +42,13 @@ class LevelManager:
 
         if level.exit_tile:
             level.exit_pos = level.exit_tile.pos
-            level.rocket = Rocket(level.exit_tile.pos, Vec2(16, 16)) 
+            level.rocket = Rocket(level.exit_tile.pos) 
             level.rocket.spawn()
             level.entities.append(level.rocket)
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
         
         for fuel_cell in level.fuel_cell_tiles:
-            new_cell = FuelCell(fuel_cell.pos, Vec2(16, 16))
+            new_cell = FuelCell(fuel_cell.pos)
             level.fuel_cells.append(new_cell)
             level.entities.append(new_cell)
             new_cell.spawn()

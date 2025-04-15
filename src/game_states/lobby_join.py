@@ -3,6 +3,7 @@ from src.util import State, Vec2
 from src.menu import Menu, Page, Button 
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
+from src.constants import DISPLAY_HEIGHT
 from src.networking import MsgType
 import src.graphics as graphics
 from .game_states import GameStates
@@ -15,7 +16,7 @@ class LobbyJoin(State):
         self.background_color = graphics.PALETTE[15]
     
         self.menu = Menu(
-            position=Vec2(16, 180 - 16),
+            position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
                     Button('Leave', self._leave)

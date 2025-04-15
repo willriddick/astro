@@ -12,8 +12,8 @@ class Rocket(Entity):
 
     PARTICLE_OFFSET = pygame.Vector2(8, 16)
 
-    def __init__(self, position, size, palette_index=1):
-        super().__init__(position, size)
+    def __init__(self, position, palette_index=1):
+        super().__init__(position, Vec2(8, 16))
 
         self.sprite = Sprite(position, image_offset=Vec2(0, 15))
         palette = graphics.PLAYER_PALETTES[palette_index]
@@ -30,7 +30,7 @@ class Rocket(Entity):
         self.speed = 50
         self.acceleration = 100
 
-        self.collider = Collider(size)
+        self.collider = Collider(self.size, offset=Vec2(4, -2))
         self.collider.add_owner(self)
         self.collider.update(position)
         self.collider.enabled = False

@@ -4,6 +4,7 @@ from src.menu import Menu, Page, Button
 from src.level_manager import LEVEL_MANAGER
 from src.camera import CAMERA
 from src.networking import MsgType
+from src.constants import DISPLAY_HEIGHT
 import src.graphics as graphics
 from .game_states import GameStates
 from .lobby_helpers import render_clients
@@ -17,7 +18,7 @@ class LobbyHost(State):
         self.JOIN_CODE_POS = Vec2(16, 16)
 
         self.menu = Menu(
-            position=Vec2(16, 180 - 16),
+            position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
                     Button('Play', self._play),

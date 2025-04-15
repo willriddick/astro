@@ -1,7 +1,7 @@
 import random
 import math
 import pygame
-from src.util import swap_palette, Timer
+from src.util import swap_palette, Timer, Vec2
 from src.components import Entity, Collider, Sprite 
 from src.particles import ParticleEmitter, FuelCellParticle
 from src.camera import CAMERA
@@ -14,8 +14,8 @@ class FuelCell(Entity):
 
     PARTICLE_OFFSET = pygame.Vector2(8, 8)
 
-    def __init__(self, position, size, palette_index=1):
-        super().__init__(position, size)
+    def __init__(self, position, palette_index=1):
+        super().__init__(position, Vec2(8, 8))
         self.spawn_position = position.copy()
         self.sprite = Sprite(position)
         palette = graphics.PLAYER_PALETTES[palette_index]
@@ -29,14 +29,14 @@ class FuelCell(Entity):
         self.particle_emitter = None
         self.particle_timer = Timer(100)
 
-        self.collider = Collider(size)
+        self.collider = Collider(self.size, offset=Vec2(4, 4))
         self.collider.add_owner(self)
         self.collider.update(position)
 
         self.x_bob_speed = random.randint(600, 1300)
         self.y_bob_speed = random.randint(600, 1300)
-        self.x_bob_offset = random.randint(10, 25)
-        self.y_bob_offset = random.randint(10, 25)
+        self.x_bob_offset = random.randint(10, 35)
+        self.y_bob_offset = random.randint(10, 35)
 
         self.collected = False
     
