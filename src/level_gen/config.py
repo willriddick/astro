@@ -33,6 +33,27 @@ CONFIGS = [
         cols=3,
         main_length=4,
         room_count=7,
+        bridge_count=1,
+        item_count=2,
+        branch_length_range=(1, 3),
+        weights={
+            Direction.UP: 10,
+            Direction.DOWN: 0,
+            Direction.LEFT: 5,
+            Direction.RIGHT: 5,
+        },
+        branch_weights={
+            Direction.UP: 5,
+            Direction.DOWN: 5,
+            Direction.LEFT: 5,
+            Direction.RIGHT: 5,
+        },
+    ),
+    Config(
+        rows=5,
+        cols=3,
+        main_length=5,
+        room_count=12,
         bridge_count=2,
         item_count=3,
         branch_length_range=(1, 3),
@@ -51,11 +72,11 @@ CONFIGS = [
     ),
     Config(
         rows=5,
-        cols=3,
-        main_length=7,
-        room_count=10,
-        bridge_count=2,
-        item_count=3,
+        cols=4,
+        main_length=6,
+        room_count=14,
+        bridge_count=3,
+        item_count=4,
         branch_length_range=(1, 3),
         weights={
             Direction.UP: 10,
@@ -70,5 +91,4 @@ CONFIGS = [
             Direction.RIGHT: 5,
         },
     ),
-
 ]

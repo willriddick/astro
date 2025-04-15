@@ -16,7 +16,7 @@ class FuelCell(Entity):
 
     def __init__(self, position, size, palette_index=1):
         super().__init__(position, size)
-        self.spawn_position = position.copy()
+        self.spawn_position = position.copy() - pygame.Vector2(0, 2)
         self.sprite = Sprite(position)
         palette = graphics.PLAYER_PALETTES[palette_index]
         sheet = swap_palette(

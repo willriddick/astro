@@ -16,6 +16,7 @@ class LevelMap:
         self.config = config
         self.paths: list[Path] = []
         self.map: dict[Vec2, Room] = {}
+        self.item_count = 0
         self.index = 0
     
     def __str__(self) -> str:

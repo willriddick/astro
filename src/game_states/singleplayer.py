@@ -16,7 +16,6 @@ class Singleplayer(State):
         self.level_index = 1
         self.next_timer = Timer(TRANSITION_DURATION)
         self.next = False
-        self.config_index = 0
 
         self.duration = 0.0
         self.fuel_cells_collected = 0
@@ -27,7 +26,7 @@ class Singleplayer(State):
         #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
         LEVEL_MANAGER.new_level(
             seed=random.random(),
-            config_index=self.config_index
+            config_index=self.level_index - 1
         )
 
         self.level_index = 1
@@ -48,12 +47,12 @@ class Singleplayer(State):
         )
 
         if self.next_timer.is_done and self.next:
+            self.level_index += 1
             LEVEL_MANAGER.new_level(
                 seed=random.random(),
-                config_index=self.config_index
+                config_index=self.level_index - 1
             )
             self.next = False
-            self.level_index += 1
 
         if LEVEL_MANAGER.current.rocket.collected and not self.next:
             self.next = True

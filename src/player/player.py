@@ -27,16 +27,16 @@ class Player(PhysicsEntity):
 
     FUEL_UI_COLOR_INDEX = 13
     FUEL_UI_OFFSET = pygame.Vector2(-2, -8)
-    MAX_FUEL = 120
-    REFUEL_TIME = 800  # duration in milliseconds after boosting to start refueling
-    REFUEL_RATE = 40  # rate of refueling (fuel per second)
+    MAX_FUEL = 100
+    REFUEL_TIME = 500  # duration in milliseconds after boosting to start refueling
+    REFUEL_RATE = 50  # rate of refueling (fuel per second)
 
     BOOST_ACC = 100
 
     BOOST_UP_COST = 5  # minimum fuel required to boost up and display UI
     INITIAL_BOOST_UP = 5
     BOOST_UP_SPEED = 50
-    BOOST_UP_MOVE_SPEED = 50
+    BOOST_UP_MOVE_SPEED = 60
     BOOST_UP_MOVE_ACC = Vec2(100, 20)
 
     BOOST_DOWN_COST = 25
@@ -53,9 +53,9 @@ class Player(PhysicsEntity):
     VARIABLE_JUMP_BUFFER = 300  # time after jumping to allow variable jump
 
     SLIDE_DURATION = 200  # after this time, the player will decelerate to 0
-    INITIAL_SLIDE_SPEED = 80  # minimum speed when entering slide state
-    INITIAL_SLIDE_MULTIPLIER = 1.4  # multiplies velocity when entering slide state
-    SLIDE_SPEED = 115
+    INITIAL_SLIDE_SPEED = 85  # minimum speed when entering slide state
+    INITIAL_SLIDE_MULTIPLIER = 1.5  # multiplies velocity when entering slide state
+    SLIDE_SPEED = 120
     SLIDE_ACC = (180, 180)
 
     WALL_JUMP_DURATION = 10  # time after wall jumping before switching to AIR

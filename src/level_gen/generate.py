@@ -27,11 +27,11 @@ def generate_level(config: Config) -> LevelMap:
     # generate branches
     _generate_branches(level, config)
 
-    # add links
+    # generate links
     _generate_bridges(level, config)
 
-    # add collectables
-    _generate_items(level, config)
+    # generate collectables
+    _generate_collectables(level, config)
 
     # update keys
     for room in level.get_rooms():
@@ -61,7 +61,10 @@ def _generate_branches(level: LevelMap, config: Config) -> bool:
         room.add_attribute(Attribute.BRANCH)
 
         # generate a branch starting at room
-        _create_path(level, room, length, config.weights)
+        path = _create_path(level, room, length, config.weights)
+        if level.item_count < config.item_count:
+            path.end.add_attribute(Attribute.COLLECTABLE)
+            level.item_count += 1
 
         count = config.room_count - level.index
     
@@ -82,14 +85,18 @@ def _generate_bridges(level: LevelMap, config: Config) -> bool:
     
     return True
 
-def _generate_items(level: LevelMap, config: Config) -> bool:
-    for _ in range(config.item_count):
+def _generate_collectables(level: LevelMap, config: Config) -> bool:
+    if level.item_count >= config.item_count:
+        return True
+
+    for _ in range(config.item_count - level.item_count):
         rooms = list(filter(Room.is_itemable, level.get_rooms()))
         if not rooms:
             return False
         
         room: Room = choice(rooms)
         room.add_attribute(Attribute.COLLECTABLE)
+        level.item_count += 1
     
     return True
 
