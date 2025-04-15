@@ -110,7 +110,7 @@ class Camera:
         self.transition_fade = fade
     
     def is_visible(self, point: Vec2) -> bool:
-        return self.rect.collidepoint(point)
+        return self.rect.inflate(128, 128).collidepoint(point)
 
     def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
         """Set a new render function for the camera."""

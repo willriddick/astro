@@ -58,8 +58,10 @@ class Singleplayer(State):
             self.next = True
             self.next_timer.start()
 
-            LEVEL_MANAGER.player.visible = False
-            LEVEL_MANAGER.player.pause(TRANSITION_DURATION)
+            player = LEVEL_MANAGER.player
+            player.visible = False
+            player.velocity = pygame.Vector2(0, 0)
+            player.pause(TRANSITION_DURATION)
             CAMERA.transition(TRANSITION_DURATION * 2, 0)
         
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
