@@ -1,6 +1,5 @@
 import pygame
 from src.util import Vec2
-from src.clock import CLOCK
 from src.constants import DISPLAY_WIDTH
 from src.settings import SETTINGS
 import src.graphics as graphics
@@ -24,8 +23,8 @@ class UI:
         self.collected = 0
         self.level = 1
 
-    def update(self, collected: int, fuel_cells: int, level):
-        self.duration += CLOCK.dt
+    def update(self, duration, collected: int, fuel_cells: int, level):
+        self.duration = duration
         self.collected = collected
         self.fuel_cells = fuel_cells
         self.level = level
@@ -33,7 +32,12 @@ class UI:
     def render(self, display, offset):
         ui_surface = pygame.Surface((DISPLAY_WIDTH, 16), pygame.SRCALPHA)
 
-        timer_text = f'{self.duration:0.2f}'
+        total_ms = int(self.duration * 1000)
+        minutes = total_ms // 60000
+        seconds = (total_ms % 60000) // 1000
+        milliseconds = (total_ms % 1000) // 10
+
+        timer_text = f'{minutes:02}:{seconds:02}.{milliseconds:02}'
         timer_surf = graphics.FONT.render(timer_text, antialias=False, color=(255, 255, 255))
         timer_pos = Vec2(DISPLAY_WIDTH // 2 - timer_surf.get_width() // 2, TOP_BUFFER)
         ui_surface.blit(timer_surf, timer_pos)

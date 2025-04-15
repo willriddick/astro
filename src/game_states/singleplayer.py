@@ -2,6 +2,7 @@ import pygame
 import random
 from src.util import State, Timer
 from src.camera import CAMERA
+from src.clock import CLOCK
 from src.level_manager import LEVEL_MANAGER
 from src.ui import UI
 from .game_states import GameStates
@@ -35,12 +36,15 @@ class Singleplayer(State):
         self.ui.reset()
 
     def update(self):
+        self.duration += CLOCK.dt
+
         LEVEL_MANAGER.current.update()
         CAMERA.set_render_callback(self.render) 
         CAMERA.move_to(LEVEL_MANAGER.player.center)
 
         self.manage_rocket()
         self.ui.update(
+            self.duration,
             self.fuel_cells_collected, 
             len(LEVEL_MANAGER.current.fuel_cells),
             self.level_index
