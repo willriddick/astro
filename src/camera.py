@@ -36,6 +36,7 @@ class Camera:
         self.transition_focus = 0.5 
 
         self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
+        self.post_render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
     
     @property
     def debug(self) -> str:
@@ -90,6 +91,10 @@ class Camera:
         # render transition
         if self.transition_timer.is_active:
             self._render_transition(self.display)
+        
+        # post callback to render above transition (for rocket)
+        if self.post_render_callback:
+            self.post_render_callback(self.display, -self.offset)
 
         # render debug
         self._render_debug()

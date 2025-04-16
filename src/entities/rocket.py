@@ -15,6 +15,7 @@ class Rocket(Entity):
     def __init__(self, position, palette_index=1):
         super().__init__(position, Vec2(8, 16))
 
+        self.spawn_pos = position
         self.sprite = Sprite(position, image_offset=Vec2(0, 15))
         palette = graphics.PLAYER_PALETTES[palette_index]
         sheet = swap_palette(
@@ -24,11 +25,11 @@ class Rocket(Entity):
         )
         self.sprite.add_animation(0, [sheet], 0, (0, 1))
         
-        self.particle_timer = Timer()
+        self.particle_timer = Timer(100)
         self.particle_emitter = None
 
-        self.speed = 50
-        self.acceleration = 100
+        self.speed = 40
+        self.acceleration = 150
 
         self.collider = Collider(self.size, offset=Vec2(4, -2))
         self.collider.add_owner(self)
@@ -52,9 +53,11 @@ class Rocket(Entity):
                 self.particle_emitter.emit(
                     type=BoostUpParticle, 
                     position=self.position + self.PARTICLE_OFFSET,
-                    count=5
+                    count=3
                 )
-                self.particle_timer.start(100)
+
+                self.sprite.alpha = max(0, self.sprite.alpha - 10)
+                self.particle_timer.start(50)
     
     def render(self, display, offset):
         super().render(display, offset)
@@ -70,9 +73,8 @@ class Rocket(Entity):
         self.enabled = False
         self.sprite.alpha = 100
     
-    
     def spawn(self):
-        self.particle_emitter = ParticleEmitter(30)
+        self.particle_emitter = ParticleEmitter(50)
     
     def collect(self, _: Entity):
         self.collected = True

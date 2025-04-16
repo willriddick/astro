@@ -9,7 +9,7 @@ TOP_BUFFER = 4
 SCREEN_BUFFER = 8
 
 
-class UI:
+class UserInterface:
     def __init__(self):
         self.duration = 0.0
         self.collected = 0

@@ -44,8 +44,8 @@ class LevelManager:
             level.exit_pos = level.exit_tile.pos
             level.rocket = Rocket(level.exit_tile.pos) 
             level.rocket.spawn()
-            level.entities.append(level.rocket)
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
+            CAMERA.post_render_callback = level.rocket.render
         
         for fuel_cell in level.fuel_cell_tiles:
             new_cell = FuelCell(fuel_cell.pos)

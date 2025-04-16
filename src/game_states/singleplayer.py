@@ -4,7 +4,7 @@ from src.util import State, Timer
 from src.camera import CAMERA
 from src.clock import CLOCK
 from src.level_manager import LEVEL_MANAGER
-from src.ui import UI
+from src.ui import UserInterface
 from .game_states import GameStates
 
 
@@ -21,7 +21,7 @@ class Singleplayer(State):
         self.duration = 0.0
         self.fuel_cells_collected = 0
 
-        self.ui = UI()
+        self.ui = UserInterface()
 
     def on_enter(self):
         #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
@@ -42,7 +42,8 @@ class Singleplayer(State):
         CAMERA.set_render_callback(self.render) 
         CAMERA.move_to(LEVEL_MANAGER.player.center)
 
-        self.manage_rocket()
+        self.fuel_cells_collected = manage_rocket()
+
         self.ui.update(
             self.duration,
             self.fuel_cells_collected, 
@@ -50,6 +51,18 @@ class Singleplayer(State):
             self.level_index
         )
 
+        # check if rocket has been collected (make sure next is false so this only triggers once)
+        if LEVEL_MANAGER.current.rocket.collected and not self.next:
+            self.next = True
+            self.next_timer.start()  # start the timer until next level is created
+            CAMERA.transition(TRANSITION_DURATION * 2, 0)  # fade the screen
+
+            player = LEVEL_MANAGER.player  # pause the player for rocket animation
+            player.visible = False
+            player.velocity = pygame.Vector2(0, 0)
+            player.pause(TRANSITION_DURATION)
+        
+        # if next timer is done, create a new level, reset next 
         if self.next_timer.is_done and self.next:
             self.level_index += 1
             LEVEL_MANAGER.new_level(
@@ -58,32 +71,25 @@ class Singleplayer(State):
             )
             self.next = False
 
-        if LEVEL_MANAGER.current.rocket.collected and not self.next:
-            self.next = True
-            self.next_timer.start()
 
-            player = LEVEL_MANAGER.player
-            player.visible = False
-            player.velocity = pygame.Vector2(0, 0)
-            player.pause(TRANSITION_DURATION)
-            CAMERA.transition(TRANSITION_DURATION * 2, 0)
         
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
         self.ui.render(display, offset)
    
-    def manage_rocket(self):
-        enable = True
-        collected = 0
 
-        for cell in LEVEL_MANAGER.current.fuel_cells:
-            if not cell.collected:
-                enable = False
-            else: 
-                collected += 1
-                
-        rocket = LEVEL_MANAGER.current.rocket
-        if enable and not rocket.enabled:
-            rocket.enable()
-        
-        self.fuel_cells_collected = collected 
+def manage_rocket() -> int:
+    enable = True
+    collected = 0
+
+    for cell in LEVEL_MANAGER.current.fuel_cells:
+        if not cell.collected:
+            enable = False
+        else: 
+            collected += 1
+            
+    rocket = LEVEL_MANAGER.current.rocket
+    if enable and not rocket.enabled:
+        rocket.enable()
+    
+    return collected 
