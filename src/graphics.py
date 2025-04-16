@@ -1,3 +1,4 @@
+import random
 from os.path import join
 import pygame
 from src.util import (
@@ -31,8 +32,8 @@ def load():
     PLAYER_SHEET = load_image(join('player', 'player.png'), False)
     PLAYER_PALETTES = load_palettes(join('player', 'palettes'))
 
-    ICON = load_image('icon.png', False)
     ICON_VARIANTS = load_icon_variants()
+    ICON = random.choice(ICON_VARIANTS)
 
     STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
     ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
@@ -83,10 +84,11 @@ def _load_tileset():
 def load_icon_variants() -> list[pygame.Surface]:
     """Load ICON variants with palette swaps for each player palette."""
     icon_variants = []
+    icon = load_image('icon.png')
 
     for palette in PLAYER_PALETTES:
         swapped_icon = swap_palette(
-            ICON,
+            icon,
             PLAYER_PALETTES[0],
             palette
         )

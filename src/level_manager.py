@@ -20,11 +20,14 @@ class LevelManager:
         self.player = None
         self.palette_index = 1
         self.current = None
+        self.seed = None
     
     def new_level(self, seed: int = None, config_index=0, map_path: str = None):
         """Create a new level with the given seed and map path."""
         if seed:
             random.seed(seed)
+        else:
+            random.seed(self.seed)
 
         self.current = level = Level()
         
@@ -44,9 +47,9 @@ class LevelManager:
         if level.exit_tile:
             level.exit_pos = level.exit_tile.pos
             level.rocket = Rocket(level.exit_tile.pos, self.palette_index) 
+            level.entities.append(level.rocket)
             level.rocket.spawn()
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
-            CAMERA.post_render_callback = level.rocket.render
         
         for fuel_cell in level.fuel_cell_tiles:
             new_cell = FuelCell(fuel_cell.pos, self.palette_index)

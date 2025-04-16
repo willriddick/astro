@@ -1,3 +1,4 @@
+import random
 import math
 import pygame
 from src.util import Vec2
@@ -10,7 +11,6 @@ import src.graphics as graphics
 
 BUFFER = 32
 SLOT = (DISPLAY_WIDTH - (BUFFER * 2)) / Host.MAX_CLIENTS
-
 
 def render_clients(display, node):
     if not node:
@@ -26,6 +26,12 @@ def render_clients(display, node):
             Vec2(BUFFER + (i * SLOT), DISPLAY_HEIGHT/2)
         )
 
+        draw_player_icon(display, 1, Vec2(BUFFER + (i * SLOT), DISPLAY_HEIGHT/2 - 64))
+
+
+Y_BUFFER = random.randint(10, 20)
+BASE_AMPLITUDE = random.randint(6, 10)
+
 def draw_wave_lines(surface):
     wave_colors = [
         graphics.PALETTE[15],
@@ -34,12 +40,14 @@ def draw_wave_lines(surface):
         graphics.PALETTE[12],
     ]
 
-    for i in range(30):
+    lines = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+    for i in range(40):
         points = []
         offset = CLOCK.ticks * (0.0002 + i * 0.00003)
-        amplitude = 6 + i * 0.3
+        amplitude = BASE_AMPLITUDE + i * 0.3
         frequency = 0.01 + i * 0.001
-        y_base = i * 10 
+        y_base = i * Y_BUFFER 
 
         for x in range(0, DISPLAY_WIDTH, 4):
             y = y_base + math.sin(x * frequency + offset) * amplitude
@@ -47,8 +55,14 @@ def draw_wave_lines(surface):
 
         color = wave_colors[i % len(wave_colors)]
         width = 1 + (i % 2) 
-        pygame.draw.lines(surface, color, False, points, width)
+        pygame.draw.lines(lines, color, False, points, width)
+    
+    lines.set_alpha(100)
+    surface.blit(lines, (0, 0))
 
 
-def draw_player_icon(display, palette_index: int, position=Vec2(0, 0)):
-    display.blit(graphics.ICON_VARIANTS[palette_index], position)
+def draw_player_icon(display, palette_index: int, position=Vec2(0, 0), scale=2) -> None:
+    display.blit(
+        pygame.transform.scale_by(graphics.ICON_VARIANTS[palette_index], scale),
+        position
+    )

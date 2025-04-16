@@ -4,6 +4,7 @@ from src.util import State, Vec2
 from src.menu import Menu, Page, Button, TextButton 
 from src.level_manager import LEVEL_MANAGER
 from src.camera import CAMERA
+from src.sounds import SOUNDS
 from src.constants import DISPLAY_HEIGHT
 from src.inputs import INPUTS
 import src.graphics as graphics
@@ -20,7 +21,7 @@ class LobbySingleplayer(State):
         self.background_color = graphics.PALETTE[15]
 
         self.seed = ''
-        self.palette_index = 0
+        self.palette_index = random.randint(0, len(graphics.PLAYER_PALETTES) - 1)
 
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
@@ -35,6 +36,7 @@ class LobbySingleplayer(State):
     
     def on_enter(self):
         CAMERA.offset = pygame.Vector2(0, 0)
+        self.seed = ''
     
     def update(self):
         CAMERA.set_render_callback(self.render)
@@ -56,15 +58,18 @@ class LobbySingleplayer(State):
     
     def _set_palette(self, value: int):
         self.palette_index = (self.palette_index + value) % len(graphics.PLAYER_PALETTES)
+        SOUNDS.play('blip')
     
     def _play(self):
         if self.seed == '':
-            self.seed = round(random.random())
+            self.seed = random.random()
         CAMERA.transition(TRANSITION_DURATION, focus=0, fade=-1)  # fade the screen
         LEVEL_MANAGER.palette_index = self.palette_index
         LEVEL_MANAGER.new_level(self.seed, 0)
+        LEVEL_MANAGER.seed = self.seed
         self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
     
     def _cancel(self):
+        CAMERA.transition(500, focus=0, fade=-1)
         self.owner.state_machine.switch(GameStates.MAIN_MENU)
  

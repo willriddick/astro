@@ -28,8 +28,8 @@ class Rocket(Entity):
         self.particle_timer = Timer(100)
         self.particle_emitter = None
 
-        self.speed = 40
-        self.acceleration = 150
+        self.speed = 10
+        self.acceleration = 100
 
         self.collider = Collider(self.size, offset=Vec2(4, -2))
         self.collider.add_owner(self)
@@ -56,7 +56,7 @@ class Rocket(Entity):
                     count=3
                 )
 
-                rate = 10
+                rate = 15
                 self.sprite.alpha = max(0, self.sprite.alpha - rate)
                 self.particle_emitter.alpha = max(0, self.particle_emitter.alpha - rate)
                 self.particle_timer.start(50)
@@ -77,10 +77,12 @@ class Rocket(Entity):
     
     def spawn(self):
         self.particle_emitter = ParticleEmitter(50)
+        CAMERA.post_render_callback = None
     
     def collect(self, _: Entity):
         self.collected = True
         self.collider.enabled = False
         SOUNDS.play('rocket')
         self.particle_timer.start(1)
+        CAMERA.post_render_callback = self.render
     

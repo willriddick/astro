@@ -4,6 +4,7 @@ from src.util import State, Timer
 from src.camera import CAMERA
 from src.clock import CLOCK
 from src.level_manager import LEVEL_MANAGER
+from src.level_gen import CONFIGS
 from src.ui import UserInterface
 from .game_states import GameStates
 
@@ -24,11 +25,6 @@ class Singleplayer(State):
         self.ui = UserInterface()
 
     def on_enter(self):
-        LEVEL_MANAGER.new_level(
-            seed=random.random(),
-            config_index=self.level_index - 1
-        )
-
         self.level_index = 1
         self.duration = 0.0
         self.fuel_cells_collected = 0
@@ -61,14 +57,18 @@ class Singleplayer(State):
             player.velocity = pygame.Vector2(0, 0)
             player.pause(TRANSITION_DURATION)
         
-        # if next timer is done, create a new level, reset next 
+        # if next timer is done
         if self.next_timer.is_done and self.next:
-            self.level_index += 1
-            LEVEL_MANAGER.new_level(
-                seed=random.random(),
-                config_index=self.level_index - 1
-            )
-            self.next = False
+            # if there are more levels to play
+            if self.level_index < len(CONFIGS):
+                # create a new level
+                self.level_index += 1
+                LEVEL_MANAGER.new_level(config_index=self.level_index - 1)
+                self.next = False
+            else:
+                # return to main menu
+                self.owner.state_machine.switch(GameStates.MAIN_MENU)
+                self.next = False
         
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
