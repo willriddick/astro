@@ -6,6 +6,7 @@ from .particle_type import ParticleType
 class ParticleEmitter():
     def __init__(self,  pool_size: int):
         self.pool: list[Particle] = [Particle() for _ in range(pool_size)]
+        self.alpha = 255
     
     def update(self):
         for p in self.pool:
@@ -15,7 +16,7 @@ class ParticleEmitter():
     def render(self, display, offset):
         for p in self.pool:
             if p.active:
-                p.render(display, offset)
+                p.render(display, offset, self.alpha)
     
     def emit(self, type: ParticleType, position: pygame.Vector2, count: int=1):
         """Attempt to spawn the given number of particles at the given position."""

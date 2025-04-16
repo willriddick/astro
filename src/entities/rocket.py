@@ -56,7 +56,9 @@ class Rocket(Entity):
                     count=3
                 )
 
-                self.sprite.alpha = max(0, self.sprite.alpha - 10)
+                rate = 10
+                self.sprite.alpha = max(0, self.sprite.alpha - rate)
+                self.particle_emitter.alpha = max(0, self.particle_emitter.alpha - rate)
                 self.particle_timer.start(50)
     
     def render(self, display, offset):

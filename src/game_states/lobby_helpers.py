@@ -26,7 +26,6 @@ def render_clients(display, node):
             Vec2(BUFFER + (i * SLOT), DISPLAY_HEIGHT/2)
         )
 
-
 def draw_wave_lines(surface):
     wave_colors = [
         graphics.PALETTE[15],
@@ -40,12 +39,12 @@ def draw_wave_lines(surface):
         offset = CLOCK.ticks * (0.0002 + i * 0.00003)
         amplitude = 6 + i * 0.3
         frequency = 0.01 + i * 0.001
-        y_base = 40 + i * 10 
+        y_base = i * 10 
 
         for x in range(0, DISPLAY_WIDTH, 4):
             y = y_base + math.sin(x * frequency + offset) * amplitude
             points.append((x, int(y)))
 
         color = wave_colors[i % len(wave_colors)]
-        width = 1 + (i % 3) 
+        width = 1 + (i % 2) 
         pygame.draw.lines(surface, color, False, points, width)
