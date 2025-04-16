@@ -24,7 +24,6 @@ class Singleplayer(State):
         self.ui = UserInterface()
 
     def on_enter(self):
-        #LEVEL_MANAGER.new_level(map_path='assets/maps/test/0.json')
         LEVEL_MANAGER.new_level(
             seed=random.random(),
             config_index=self.level_index - 1
@@ -70,13 +69,11 @@ class Singleplayer(State):
                 config_index=self.level_index - 1
             )
             self.next = False
-
-
         
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
         self.ui.render(display, offset)
-   
+    
 
 def manage_rocket() -> int:
     enable = True

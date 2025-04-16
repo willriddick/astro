@@ -23,7 +23,7 @@ class UserInterface:
         self.collected = 0
         self.level = 1
 
-    def update(self, duration, collected: int, fuel_cells: int, level):
+    def update(self, duration: float, collected: int, fuel_cells: int, level: int):
         self.duration = duration
         self.collected = collected
         self.fuel_cells = fuel_cells

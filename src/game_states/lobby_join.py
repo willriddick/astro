@@ -7,7 +7,7 @@ from src.constants import DISPLAY_HEIGHT
 from src.networking import MsgType
 import src.graphics as graphics
 from .game_states import GameStates
-from .lobby_helpers import render_clients
+from .lobby_helpers import render_clients, draw_wave_lines
 
 
 class LobbyJoin(State):
@@ -19,7 +19,8 @@ class LobbyJoin(State):
             position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
-                    Button('Leave', self._leave)
+                    Button('Ping', self._ping),
+                    Button('Cancel', self._cancel)
                 ])
             ]
         ) 
@@ -38,6 +39,7 @@ class LobbyJoin(State):
             if event.type == MsgType.NEW_LEVEL:
                 seed, config_index = event.data
                 print(f'recieved NEW_LEVEL message: {seed} {config_index}')
+                CAMERA.transition(500, focus=0, fade=-1)
                 LEVEL_MANAGER.new_level(seed, config_index)
                 self.owner.state_machine.switch(GameStates.MULTIPLAYER)
 
@@ -48,13 +50,18 @@ class LobbyJoin(State):
     
     def render(self, display, offset):
         display.fill(self.background_color)
+        draw_wave_lines(display)
         self.menu.render(display, offset)
 
         node = self.owner.network_node
         render_clients(display, node)
 
-    def _leave(self):
+    def _cancel(self):
+        CAMERA.transition(500, focus=0, fade=-1)
         self.owner.network_node.disconnect()
         self.owner.network_node.close()
         self.owner.network_node = None
         self.owner.state_machine.switch(GameStates.MAIN_MENU)
+    
+    def _ping(self):
+        pass

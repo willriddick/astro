@@ -10,7 +10,7 @@ from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
-from src.game_states import GameStates, MainMenu, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
+from src.game_states import GameStates, MainMenu, LobbySingleplayer, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
 from src.networking import Host, Client, NetworkNode, MsgType
 import src.graphics as graphics
 
@@ -36,9 +36,11 @@ class Game:
         self.events: list[pygame.event.Event] = []  
         self.command_prompt = CommandPrompt()
 
-        self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), LobbyHost(), LobbyJoin(), Multiplayer()])
+        self.state_machine = StateMachine(self, [
+            MainMenu(), LobbySingleplayer(), Singleplayer(),
+            LobbyHost(), LobbyJoin(), Multiplayer()
+        ])
         self.network_node: NetworkNode = None
-
 
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
