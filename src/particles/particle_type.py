@@ -1,6 +1,3 @@
-from src.util import Vec2
-
-
 class ParticleType:
     """Defines the properties of a particle, allowing flexible behavior changes."""
     def __init__(self, 

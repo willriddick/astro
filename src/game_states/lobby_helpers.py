@@ -48,3 +48,7 @@ def draw_wave_lines(surface):
         color = wave_colors[i % len(wave_colors)]
         width = 1 + (i % 2) 
         pygame.draw.lines(surface, color, False, points, width)
+
+
+def draw_player_icon(display, palette_index: int, position=Vec2(0, 0)):
+    display.blit(graphics.ICON_VARIANTS[palette_index], position)

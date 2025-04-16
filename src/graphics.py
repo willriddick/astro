@@ -1,8 +1,13 @@
 from os.path import join
-from src.util import load_image, load_sprite_sheet, load_font, load_palette, load_palettes, Vec2
+import pygame
+from src.util import (
+    load_image, load_sprite_sheet, load_font, 
+    load_palette, load_palettes, Vec2, swap_palette
+)
 
 
 ICON = None
+ICON_VARIANTS = None
 PALETTE = None
 FONT = None
 PLAYER_SHEET = None
@@ -17,17 +22,17 @@ TILESET = None
 
 def load():
     """Load all assets into module-level variables."""
-    global ICON, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
+    global ICON, ICON_VARIANTS, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
     global STARS, ASTEROIDS, SPIKE, TILESET, ROCKET, FUEL_CELL
-
-    ICON = load_image('icon.png', False)
-    
+   
     PALETTE = load_palette('endesga-64.png')
-    
     FONT = load_font('DePixelKlein.ttf', 9)
 
     PLAYER_SHEET = load_image(join('player', 'player.png'), False)
     PLAYER_PALETTES = load_palettes(join('player', 'palettes'))
+
+    ICON = load_image('icon.png', False)
+    ICON_VARIANTS = load_icon_variants()
 
     STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
     ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
@@ -74,3 +79,17 @@ def _load_tileset():
     ))
 
     TILESET = tileset
+
+def load_icon_variants() -> list[pygame.Surface]:
+    """Load ICON variants with palette swaps for each player palette."""
+    icon_variants = []
+
+    for palette in PLAYER_PALETTES:
+        swapped_icon = swap_palette(
+            ICON,
+            PLAYER_PALETTES[0],
+            palette
+        )
+        icon_variants.append(swapped_icon)
+
+    return icon_variants

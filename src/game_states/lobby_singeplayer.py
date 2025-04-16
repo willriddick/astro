@@ -1,13 +1,14 @@
 import random
 import pygame
 from src.util import State, Vec2 
-from src.menu import Menu, Page, Button, TextButton
+from src.menu import Menu, Page, Button, TextButton 
 from src.level_manager import LEVEL_MANAGER
 from src.camera import CAMERA
 from src.constants import DISPLAY_HEIGHT
+from src.inputs import INPUTS
 import src.graphics as graphics
 from .game_states import GameStates
-from .lobby_helpers import draw_wave_lines
+from .lobby_helpers import draw_wave_lines, draw_player_icon
 
 
 TRANSITION_DURATION = 500
@@ -19,6 +20,7 @@ class LobbySingleplayer(State):
         self.background_color = graphics.PALETTE[15]
 
         self.seed = ''
+        self.palette_index = 0
 
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
@@ -37,25 +39,32 @@ class LobbySingleplayer(State):
     def update(self):
         CAMERA.set_render_callback(self.render)
         self.menu.update()
+
+        pal_dir = INPUTS.get_dir(just_pressed=True).x
+        if pal_dir:
+            self._set_palette(pal_dir)
     
     def render(self, display, offset):
         display.fill(self.background_color)
         draw_wave_lines(display)
+        draw_player_icon(display, self.palette_index, Vec2(0, 0))
         self.menu.render(display, offset)
 
     def _set_seed(self, selected: bool, value: str):
         self.menu.movement_enabled = not selected 
         self.seed = value
     
+    def _set_palette(self, value: int):
+        self.palette_index = (self.palette_index + value) % len(graphics.PLAYER_PALETTES)
+    
     def _play(self):
         if self.seed == '':
             self.seed = round(random.random())
         CAMERA.transition(TRANSITION_DURATION, focus=0, fade=-1)  # fade the screen
+        LEVEL_MANAGER.palette_index = self.palette_index
         LEVEL_MANAGER.new_level(self.seed, 0)
         self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
     
     def _cancel(self):
         self.owner.state_machine.switch(GameStates.MAIN_MENU)
-
- 
  

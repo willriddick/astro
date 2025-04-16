@@ -104,7 +104,7 @@ class Player(PhysicsEntity):
         # setup sprite
         self.rotated = False
         self.last_facing_dir = 1
-        self.palette_index = None
+        self.palette_index = palette_index
         self.sprite = None
         self.load_sprite(palette_index)
     
@@ -314,6 +314,7 @@ class Player(PhysicsEntity):
     
     def load_sprite(self, palette_index: int):
         from .sprite import load_sprite
+        print(palette_index)
         self.palette_index = palette_index
         self.sprite, self.fuel_ui_color = load_sprite(palette_index)
 
