@@ -1,5 +1,4 @@
 import pygame
-import random
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.clock import CLOCK
@@ -22,13 +21,15 @@ class Singleplayer(State):
         self.duration = 0.0
         self.fuel_cells_collected = 0
 
-        self.ui = UserInterface()
+        self.ui = UserInterface(LEVEL_MANAGER.palette_index)
+        self.ui.reset()
 
     def on_enter(self):
         CAMERA.transition(1000, focus=1, fade=-1)
         self.level_index = 1
         self.duration = 0.0
         self.fuel_cells_collected = 0
+        self.ui.palette_index = LEVEL_MANAGER.palette_index
         self.ui.reset()
 
     def update(self):

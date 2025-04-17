@@ -1,7 +1,8 @@
 import pygame
-from src.util import Vec2
+from src.util import Vec2, swap_palette
 from src.constants import DISPLAY_WIDTH
 from src.settings import SETTINGS
+from src.level_manager import LEVEL_MANAGER
 import src.graphics as graphics
 
 
@@ -10,11 +11,11 @@ SCREEN_BUFFER = 8
 
 
 class UserInterface:
-    def __init__(self):
+    def __init__(self, palette_index=1):
         self.duration = 0.0
         self.collected = 0
         self.level = 1
-
+        self.palette_index = palette_index
         self.fuel_icon = graphics.FUEL_CELL
         self.fuel_icon_width = self.fuel_icon.get_width()
     
@@ -22,6 +23,13 @@ class UserInterface:
         self.duration = 0.0
         self.collected = 0
         self.level = 1
+
+        palette = graphics.PLAYER_PALETTES[self.palette_index]
+        self.fuel_icon = swap_palette(
+            graphics.FUEL_CELL,
+            graphics.PLAYER_PALETTES[0],
+            palette,
+        )
 
     def update(self, duration: float, collected: int, fuel_cells: int, level: int):
         self.duration = duration
