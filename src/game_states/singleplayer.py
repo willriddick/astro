@@ -25,6 +25,7 @@ class Singleplayer(State):
         self.ui = UserInterface()
 
     def on_enter(self):
+        CAMERA.transition(1000, focus=1, fade=-1)
         self.level_index = 1
         self.duration = 0.0
         self.fuel_cells_collected = 0

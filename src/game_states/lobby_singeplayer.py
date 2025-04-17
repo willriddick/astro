@@ -9,7 +9,7 @@ from src.constants import DISPLAY_HEIGHT
 from src.inputs import INPUTS
 import src.graphics as graphics
 from .game_states import GameStates
-from .lobby_helpers import draw_wave_lines, draw_player_icon
+from .lobby_helpers import draw_wave_lines, draw_player_card
 
 
 TRANSITION_DURATION = 500
@@ -49,7 +49,7 @@ class LobbySingleplayer(State):
     def render(self, display, offset):
         display.fill(self.background_color)
         draw_wave_lines(display)
-        draw_player_icon(display, self.palette_index, Vec2(0, 0))
+        draw_player_card(display, '', self.palette_index, TextButton.DEFAULT_COLOR, Vec2(32, 64))
         self.menu.render(display, offset)
 
     def _set_seed(self, selected: bool, value: str):

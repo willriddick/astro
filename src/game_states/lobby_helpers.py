@@ -1,7 +1,7 @@
-import random
 import math
+import random
 import pygame
-from src.util import Vec2
+from src.util import draw_rect
 from src.menu import Button
 from src.clock import CLOCK
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
@@ -18,15 +18,52 @@ def render_clients(display, node):
     
     for i, client in enumerate(node.clients.items()):
         id_ = client[0]
-        username = client[1][0].upper()
         color = Button.HOVERED_COLOR if id_ == node.id else Button.DEFAULT_COLOR
-    
-        display.blit(
-            graphics.FONT.render(username, antialias=False, color=color),
-            Vec2(BUFFER + (i * SLOT), DISPLAY_HEIGHT/2)
-        )
+        username = client[1][0].upper()
+        palette = 0
+        draw_player_card(display, username, palette, color, (BUFFER + i * SLOT, 64), id_ == node.id)
 
-        draw_player_icon(display, 1, Vec2(BUFFER + (i * SLOT), DISPLAY_HEIGHT/2 - 64))
+
+def draw_player_card(display, username, palette_index, color, position, show_controls=True):
+    card_surf = pygame.Surface((SLOT, SLOT), pygame.SRCALPHA)
+    center = SLOT // 2
+
+    background_color = graphics.PALETTE[15]
+    outline_color = graphics.PALETTE[14]
+    text_color = graphics.PALETTE[13]
+    background_color.a = 150
+    outline_color.a = 150
+    text_color.a = 150
+
+    # draw background
+    draw_rect(
+        card_surf, (0, 0), card_surf.get_rect(), 
+        fill_color=background_color, line_width=3, outline_color=outline_color
+    )
+
+    # draw username
+    username_surf = graphics.FONT.render(username, antialias=False, color=color)
+    card_surf.blit(
+        username_surf, 
+        (center - (username_surf.width // 2), 16)
+    )
+
+    # draw instructions
+    if show_controls:
+        controls_surf = graphics.FONT.render('Cycle with A / D', antialias=False, color=text_color)
+        card_surf.blit(
+            controls_surf, 
+            (center - (controls_surf.width // 2), SLOT - 16)
+        )
+    
+    # draw player icon
+    icon = pygame.transform.scale_by(graphics.ICON_VARIANTS[palette_index], 3)
+    card_surf.blit(
+        icon,
+        (center - (icon.width // 2), 32)
+    )
+
+    display.blit(card_surf, position)
 
 
 Y_BUFFER = random.randint(10, 20)
@@ -59,10 +96,3 @@ def draw_wave_lines(surface):
     
     lines.set_alpha(100)
     surface.blit(lines, (0, 0))
-
-
-def draw_player_icon(display, palette_index: int, position=Vec2(0, 0), scale=2) -> None:
-    display.blit(
-        pygame.transform.scale_by(graphics.ICON_VARIANTS[palette_index], scale),
-        position
-    )

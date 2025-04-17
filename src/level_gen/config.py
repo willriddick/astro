@@ -1,4 +1,3 @@
-from random import randint
 from src.util import Direction
 
 
@@ -48,9 +47,7 @@ CONFIGS = [
             Direction.LEFT: 5,
             Direction.RIGHT: 5,
         },
-    )
-]
-TWO = [
+    ),
     Config(
         rows=5,
         cols=3,

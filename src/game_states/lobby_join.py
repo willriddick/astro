@@ -46,7 +46,7 @@ class LobbyJoin(State):
             # if host disconnects, leave game
             if event.type == MsgType.DISCONNECT:
                 if event.data[0] == 0:
-                    self._leave() 
+                    self._cancel() 
     
     def render(self, display, offset):
         display.fill(self.background_color)

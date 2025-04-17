@@ -41,7 +41,7 @@ class LobbyHost(State):
         # render join code
         node = self.owner.network_node
         if node:
-            text = node.join_code
+            text = f'JOIN CODE: {node.join_code}'
             display.blit(
                 graphics.FONT.render(text, antialias=False, color=Button.DEFAULT_COLOR), 
                 self.JOIN_CODE_POS
@@ -53,7 +53,7 @@ class LobbyHost(State):
         CAMERA.transition(500, focus=0, fade=-1)
 
         if self.seed == '':
-            self.seed = round(random.random())
+            self.seed = random.random()
 
         self.owner.network_node.broadcast_message(
             MsgType.NEW_LEVEL,
