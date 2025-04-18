@@ -14,7 +14,6 @@ FONT = None
 PLAYER_SHEET = None
 PLAYER_PALETTES = None
 STARS = None
-ASTEROIDS = None
 SPIKE = None
 ROCKET = None
 FUEL_CELL = None
@@ -24,7 +23,7 @@ TILESET = None
 def load():
     """Load all assets into module-level variables."""
     global ICON, ICON_VARIANTS, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
-    global STARS, ASTEROIDS, SPIKE, TILESET, ROCKET, FUEL_CELL
+    global STARS, SPIKE, TILESET, ROCKET, FUEL_CELL
    
     PALETTE = load_palette('endesga-64.png')
     FONT = load_font('DePixelKlein.ttf', 9)
@@ -36,7 +35,6 @@ def load():
     ICON = random.choice(ICON_VARIANTS)
 
     STARS = load_sprite_sheet(load_image('stars.png', True), (8, 8))
-    ASTEROIDS = load_sprite_sheet(load_image('asteroids.png', True), (16, 16))
     SPIKE = load_sprite_sheet(load_image('spikes.png', True), (16, 16))
     ROCKET = load_image('rocket.png', True)
     FUEL_CELL = load_image('fuel_cell.png', True)
@@ -49,9 +47,10 @@ def _load_tileset():
     from src.tilemap.tile_set import TileSet, TileType
     tileset = TileSet(Vec2(16, 16))
 
-    test_tiles = load_sprite_sheet(load_image(join('tiles', 'test_tiles.png')), (16, 16))
-    tileset.add(TileType('entrance', [test_tiles[0]]))
-    tileset.add(TileType('exit', [test_tiles[1]]))
+    extra = load_sprite_sheet(load_image(join('tiles', 'extra.png')), (16, 16))
+    tileset.add(TileType('entrance', [extra[0]]))
+    tileset.add(TileType('exit', [extra[1]]))
+    tileset.add(TileType('collectable', [extra[2]]))
 
     tileset.add(TileType(
         name='stone',
@@ -62,7 +61,7 @@ def _load_tileset():
 
     tileset.add(TileType(
         name='platform',
-        images=[test_tiles[2]],
+        images=[extra[3]],
         collision=True,
         size=Vec2(16, 2),
     ))
@@ -71,12 +70,6 @@ def _load_tileset():
         name='spike',
         images=[SPIKE[0]],
         size=Vec2(16, 2),
-    ))
-
-    tileset.add(TileType(
-        name='collectable',
-        images=[ASTEROIDS[0]],
-        size=Vec2(16, 16),
     ))
 
     TILESET = tileset

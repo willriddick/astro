@@ -26,7 +26,8 @@ class Multiplayer(State):
         self.duration = 0.0
         self.fuel_cells_collected = 0
 
-        self.ui = UserInterface()
+        self.ui = UserInterface(palette_index=LEVEL_MANAGER.palette_index)
+        self.ui.reset()
 
         from src.player.ghost import Ghost
         self.ghosts: dict[int, Ghost] = {} 
@@ -35,6 +36,7 @@ class Multiplayer(State):
         from src.player.ghost import Ghost
         self.node = self.owner.network_node
         self.update_timer.start()
+        self.ui.reset()
         CAMERA.transition(1000, focus=1, fade=-1)
 
         for client, (username, _) in self.node.clients.items():

@@ -56,7 +56,7 @@ class Rocket(Entity):
                     count=3
                 )
 
-                rate = 15
+                rate = 10
                 self.sprite.alpha = max(0, self.sprite.alpha - rate)
                 self.particle_emitter.alpha = max(0, self.particle_emitter.alpha - rate)
                 self.particle_timer.start(50)

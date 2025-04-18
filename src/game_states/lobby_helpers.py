@@ -12,7 +12,7 @@ import src.graphics as graphics
 BUFFER = 32
 SLOT = (DISPLAY_WIDTH - (BUFFER * 2)) / Host.MAX_CLIENTS
 
-def render_clients(display, node):
+def render_clients(display, node, palettes: list[int]=None):
     if not node:
         return
     
@@ -20,7 +20,7 @@ def render_clients(display, node):
         id_ = client[0]
         color = Button.HOVERED_COLOR if id_ == node.id else Button.DEFAULT_COLOR
         username = client[1][0].upper()
-        palette = 0
+        palette = palettes[i] if palettes else 0
         draw_player_card(display, username, palette, color, (BUFFER + i * SLOT, 64), id_ == node.id)
 
 

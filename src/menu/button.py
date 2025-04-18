@@ -12,8 +12,8 @@ import src.graphics as graphics
 class Button():
 
     SURFACE_SIZE = Vec2(224, 16)
-    X_OFFSET = 7
-    OFFSET_SPEED = 15 
+    X_OFFSET = 10
+    OFFSET_SPEED = 8
 
     # placeholders
     DEFAULT_COLOR = None  

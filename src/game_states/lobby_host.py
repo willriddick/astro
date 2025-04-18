@@ -3,6 +3,8 @@ from src.util import State, Vec2
 from src.menu import Menu, Page, Button, TextButton
 from src.level_manager import LEVEL_MANAGER
 from src.camera import CAMERA
+from src.inputs import INPUTS
+from src.sounds import SOUNDS
 from src.networking import MsgType
 from src.constants import DISPLAY_HEIGHT
 import src.graphics as graphics
@@ -17,6 +19,7 @@ class LobbyHost(State):
 
         self.JOIN_CODE_POS = Vec2(16, 16)
         self.seed = ''
+        self.palette_index = 0
 
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
@@ -38,6 +41,11 @@ class LobbyHost(State):
         draw_wave_lines(display)
         self.menu.render(display, offset)
 
+        # swap palette
+        pal_dir = INPUTS.get_dir(just_pressed=True).x
+        if pal_dir:
+            self._set_palette(pal_dir)
+
         # render join code
         node = self.owner.network_node
         if node:
@@ -47,7 +55,7 @@ class LobbyHost(State):
                 self.JOIN_CODE_POS
             ) 
 
-        render_clients(display, node)
+        render_clients(display, node, [self.palette_index, 0, 0, 0])
     
     def _play(self):
         CAMERA.transition(500, focus=0, fade=-1)
@@ -60,6 +68,7 @@ class LobbyHost(State):
             (self.seed, 0)
         )
 
+        LEVEL_MANAGER.palette_index = self.palette_index
         LEVEL_MANAGER.new_level(self.seed, 0)
 
         self.owner.state_machine.switch(GameStates.MULTIPLAYER)
@@ -67,6 +76,10 @@ class LobbyHost(State):
     def _set_seed(self, selected: bool, value: str):
         self.menu.movement_enabled = not selected 
         self.seed = value
+    
+    def _set_palette(self, value: int):
+        self.palette_index = (self.palette_index + value) % len(graphics.PLAYER_PALETTES)
+        SOUNDS.play('blip')
     
     def _cancel(self):
         CAMERA.transition(500, focus=0, fade=-1)
