@@ -39,7 +39,7 @@ class Singleplayer(State):
         CAMERA.set_render_callback(self.render) 
         CAMERA.move_to(LEVEL_MANAGER.player.center)
 
-        self.fuel_cells_collected = manage_rocket()
+        self.fuel_cells_collected = manage_fuel_cells()
 
         self.ui.update(
             self.duration,
@@ -64,8 +64,6 @@ class Singleplayer(State):
             # if there are more levels to play
             if self.level_index < len(CONFIGS):
                 # create a new level
-                self.level_index += 1
-                LEVEL_MANAGER.new_level(config_index=self.level_index - 1)
                 self.next = False
             else:
                 # return to main menu
@@ -76,8 +74,34 @@ class Singleplayer(State):
         LEVEL_MANAGER.current.render(display, offset)
         self.ui.render(display, offset)
     
+    def new_level(self) -> None:
+        self.level_index += 1
+        LEVEL_MANAGER.new_level(config_index=self.level_index - 1)
+    
+    def handle_rocket(self) -> None:
+        # check if rocket has been collected (make sure next is false so this only triggers once)
+        if LEVEL_MANAGER.current.rocket.collected and not self.next:
+            self.next = True
+            self.next_timer.start()  # start the timer until next level is created
+            CAMERA.transition(TRANSITION_DURATION * 2, 0)  # fade the screen
 
-def manage_rocket() -> int:
+            player = LEVEL_MANAGER.player  # pause the player for rocket animation
+            player.visible = False
+            player.velocity = pygame.Vector2(0, 0)
+            player.pause(TRANSITION_DURATION)
+        
+        # if next timer is done
+        if self.next_timer.is_done and self.next:
+            # if there are more levels to play
+            if self.level_index < len(CONFIGS):
+                self.new_level()
+                self.next = False
+            else:
+                self.owner.state_machine.switch(GameStates.MAIN_MENU)
+                self.next = False
+            
+
+def manage_fuel_cells() -> int:
     enable = True
     collected = 0
 

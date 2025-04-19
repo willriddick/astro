@@ -1,3 +1,4 @@
+import random
 from src.util import State
 from src.util import State, Vec2 
 from src.menu import Menu, Page, Button 
@@ -17,7 +18,7 @@ class LobbyJoin(State):
         super().__init__(GameStates.LOBBY_JOIN)
         self.background_color = graphics.PALETTE[15]
 
-        self.palette_index = 0
+        self.palette_index = random.randint(0, len(graphics.PLAYER_PALETTES) - 1)
     
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
@@ -51,6 +52,7 @@ class LobbyJoin(State):
                 CAMERA.transition(500, focus=0, fade=-1)
                 LEVEL_MANAGER.palette_index = self.palette_index
                 LEVEL_MANAGER.new_level(seed, config_index)
+                LEVEL_MANAGER.seed = seed
                 self.owner.state_machine.switch(GameStates.MULTIPLAYER)
 
             # if host disconnects, leave game

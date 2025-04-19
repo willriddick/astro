@@ -19,7 +19,7 @@ class LobbyHost(State):
 
         self.JOIN_CODE_POS = Vec2(16, 16)
         self.seed = ''
-        self.palette_index = 0
+        self.palette_index = random.randint(0, len(graphics.PLAYER_PALETTES) - 1)
 
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
@@ -61,16 +61,14 @@ class LobbyHost(State):
         CAMERA.transition(500, focus=0, fade=-1)
 
         if self.seed == '':
-            self.seed = random.random()
+            self.seed = random.randint(0, 99999999)
 
-        self.owner.network_node.broadcast_message(
-            MsgType.NEW_LEVEL,
-            (self.seed, 0)
-        )
-
+        seed = int(self.seed)
+        index = 0
+        self.owner.network_node.broadcast_message(MsgType.NEW_LEVEL, (seed, index))
         LEVEL_MANAGER.palette_index = self.palette_index
-        LEVEL_MANAGER.new_level(self.seed, 0)
-
+        LEVEL_MANAGER.new_level(seed, index)
+        LEVEL_MANAGER.seed = seed
         self.owner.state_machine.switch(GameStates.MULTIPLAYER)
     
     def _set_seed(self, selected: bool, value: str):
