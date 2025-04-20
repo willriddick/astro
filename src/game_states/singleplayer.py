@@ -48,28 +48,8 @@ class Singleplayer(State):
             self.level_index
         )
 
-        # check if rocket has been collected (make sure next is false so this only triggers once)
-        if LEVEL_MANAGER.current.rocket.collected and not self.next:
-            self.next = True
-            self.next_timer.start()  # start the timer until next level is created
-            CAMERA.transition(TRANSITION_DURATION * 2, 0)  # fade the screen
+        self.handle_rocket()
 
-            player = LEVEL_MANAGER.player  # pause the player for rocket animation
-            player.visible = False
-            player.velocity = pygame.Vector2(0, 0)
-            player.pause(TRANSITION_DURATION)
-        
-        # if next timer is done
-        if self.next_timer.is_done and self.next:
-            # if there are more levels to play
-            if self.level_index < len(CONFIGS):
-                # create a new level
-                self.next = False
-            else:
-                # return to main menu
-                self.owner.state_machine.switch(GameStates.MAIN_MENU)
-                self.next = False
-        
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
         self.ui.render(display, offset)
@@ -99,7 +79,7 @@ class Singleplayer(State):
             else:
                 self.owner.state_machine.switch(GameStates.MAIN_MENU)
                 self.next = False
-            
+              
 
 def manage_fuel_cells() -> int:
     enable = True
