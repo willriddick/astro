@@ -39,6 +39,7 @@ class Multiplayer(State):
         self.ui.reset()
         CAMERA.transition(1000, focus=1, fade=-1)
         self.create_ghosts()
+        LEVEL_MANAGER.player.multiplayer = True
 
     def update(self):
         self.duration += CLOCK.dt

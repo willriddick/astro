@@ -2,10 +2,13 @@ import pygame
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.clock import CLOCK
+from src.sounds import SOUNDS
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
 from src.level_gen import CONFIGS
+from src.constants import DISPLAY_HEIGHT
 from src.ui import UserInterface
+from src.menu import Menu, Page, Button
 from .game_states import GameStates
 
 
@@ -27,6 +30,15 @@ class Singleplayer(State):
         self.ui = UserInterface(LEVEL_MANAGER.palette_index)
         self.ui.reset()
 
+        self.pause_menu = Menu(pages=[
+                Page(buttons=[
+                    Button('Resume', self._resume), 
+                    Button('Quit', self._quit)
+                ], reset_index=True)
+            ], 
+            position=pygame.Vector2(16, DISPLAY_HEIGHT - 16),
+        )
+
     def on_enter(self):
         CAMERA.transition(1000, focus=1, fade=-1)
         self.level_index = 1
@@ -34,8 +46,17 @@ class Singleplayer(State):
         self.fuel_cells_collected = 0
         self.ui.palette_index = LEVEL_MANAGER.palette_index
         self.ui.reset()
+        self.pause_menu.change_page(0)
+        LEVEL_MANAGER.player.multiplayer = False
 
     def update(self):
+        if INPUTS.get('escape', just_pressed=True):
+            self._toggle_pause()
+
+        if self.paused:
+            self.pause_menu.update()
+            return
+    
         self.duration += CLOCK.dt
 
         LEVEL_MANAGER.current.update()
@@ -52,11 +73,16 @@ class Singleplayer(State):
         )
 
         self.handle_rocket()
-        self.handle_pause()
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
         self.ui.render(display, offset)
+
+        if self.paused:
+            overlay = pygame.Surface(display.get_size(), flags=pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+            display.blit(overlay, (0, 0))
+            self.pause_menu.render(display, offset)
     
     def new_level(self) -> None:
         self.level_index += 1
@@ -83,11 +109,28 @@ class Singleplayer(State):
             else:
                 self.owner.state_machine.switch(GameStates.MAIN_MENU)
                 self.next = False
+   
+    def _toggle_pause(self) -> None:
+        SOUNDS.play('select', pitch_index=1)
+        if self.paused:
+            self._resume()
+        else:
+            self._pause()
+   
+    def _pause(self) -> None:
+        self.paused = True
+        LEVEL_MANAGER.player.pause(-1)
+
+    def _resume(self) -> None:
+        self.paused = False
+        LEVEL_MANAGER.player.unpause()
     
-    def handle_pause(self) -> None:
-        if INPUTS.get('escape', just_pressed=True):
-            self.paused = not self.paused
-            print(f'Paused: {self.paused}')
+    def _quit(self) -> None:
+        self._resume()
+        self.next = False
+        self.next_timer.reset()
+        CAMERA.transition(TRANSITION_DURATION, 0, -1)
+        self.owner.state_machine.switch(GameStates.MAIN_MENU)
               
 
 def manage_fuel_cells() -> int:

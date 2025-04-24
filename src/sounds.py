@@ -92,7 +92,7 @@ SOUNDS.load_sounds([
     Sound("boost", default_volume=0.45),
     Sound("cant_boost", default_volume=0.7),
     Sound("slide", default_volume=0.4),
-    Sound("teleport", default_volume=0.2),
+    Sound("teleport", default_volume=0.1),
     Sound("hurt", default_volume=0.2),
     Sound("dead", default_volume=1.8),
     Sound("rocket", default_volume=0.08),
