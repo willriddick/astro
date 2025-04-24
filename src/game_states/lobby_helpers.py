@@ -4,15 +4,26 @@ import pygame
 from src.util import draw_rect
 from src.menu import Button
 from src.clock import CLOCK
+from src.sounds import SOUNDS
 from src.constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
-from src.networking import Host
+from src.networking import Host, MsgType, NetworkNode
 import src.graphics as graphics
 
 
 BUFFER = 32
 SLOT = (DISPLAY_WIDTH - (BUFFER * 2)) / Host.MAX_CLIENTS
 
-def render_clients(display, node, palettes: list[int]=None):
+def set_palette(network_node: NetworkNode, palette_index: int, value: int) -> int:
+    new_index = (palette_index + value) % len(graphics.PLAYER_PALETTES)
+    network_node.clients[network_node.id] = (network_node.username, network_node.get_address(), new_index)
+    network_node.broadcast_message(
+        MsgType.PALETTE,
+        (network_node.id, new_index)
+    )
+    SOUNDS.play('blip')
+    return new_index
+
+def render_clients(display, node):
     if not node:
         return
     
@@ -20,7 +31,7 @@ def render_clients(display, node, palettes: list[int]=None):
         id_ = client[0]
         color = Button.HOVERED_COLOR if id_ == node.id else Button.DEFAULT_COLOR
         username = client[1][0].upper()
-        palette = palettes[i] if palettes else 0
+        palette = client[1][2]
         draw_player_card(display, username, palette, color, (BUFFER + i * SLOT, 64), id_ == node.id)
 
 

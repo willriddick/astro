@@ -34,6 +34,8 @@ class Host(NetworkNode):
                 self.event_queue.put(msg)
             case MsgType.NEW_LEVEL:
                 self.event_queue.put(msg)
+            case MsgType.PALETTE:
+                self.event_queue.put(msg)
             case _:
                 print(f'Unknown message type: {msg.type}')
    

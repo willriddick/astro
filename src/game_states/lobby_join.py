@@ -6,11 +6,10 @@ from src.camera import CAMERA
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
 from src.constants import DISPLAY_HEIGHT
-from src.sounds import SOUNDS
 from src.networking import MsgType
 import src.graphics as graphics
 from .game_states import GameStates
-from .lobby_helpers import render_clients, draw_wave_lines
+from .lobby_helpers import render_clients, draw_wave_lines, set_palette
 
 
 class LobbyJoin(State):
@@ -24,7 +23,6 @@ class LobbyJoin(State):
             position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
-                    Button('Ping', self._ping),
                     Button('Cancel', self._cancel)
                 ])
             ]
@@ -34,17 +32,16 @@ class LobbyJoin(State):
         CAMERA.set_render_callback(self.render)
         self.menu.update()
 
-        # swap palette
-        pal_dir = INPUTS.get_dir(just_pressed=True).x
-        if pal_dir:
-            self._set_palette(pal_dir)
-
         node = self.owner.network_node
         if not node:
             return
-        
-        events = self.owner.network_node.get_events()
-        for event in events:
+
+        # swap palette
+        pal_dir = INPUTS.get_dir(just_pressed=True).x
+        if pal_dir:
+            self.palette_index = set_palette(node, self.palette_index, pal_dir)
+
+        for event in node.get_events():
             # if host starts game, switch to multiplayer state
             if event.type == MsgType.NEW_LEVEL:
                 seed, config_index = event.data
@@ -54,11 +51,16 @@ class LobbyJoin(State):
                 LEVEL_MANAGER.new_level(seed, config_index)
                 LEVEL_MANAGER.seed = seed
                 self.owner.state_machine.switch(GameStates.MULTIPLAYER)
-
             # if host disconnects, leave game
-            if event.type == MsgType.DISCONNECT:
+            elif event.type == MsgType.DISCONNECT:
                 if event.data[0] == 0:
                     self._cancel() 
+            # update clients' palettes
+            elif event.type == MsgType.PALETTE:
+                _id, palette_index = event.data[0], event.data[1]
+                username = node.clients[_id][0]
+                address = node.clients[_id][1]
+                node.clients[_id] = (username, address, palette_index)
     
     def render(self, display, offset):
         display.fill(self.background_color)
@@ -75,9 +77,3 @@ class LobbyJoin(State):
         self.owner.network_node = None
         self.owner.state_machine.switch(GameStates.MAIN_MENU)
     
-    def _ping(self):
-        pass
-
-    def _set_palette(self, value: int):
-        self.palette_index = (self.palette_index + value) % len(graphics.PLAYER_PALETTES)
-        SOUNDS.play('blip')

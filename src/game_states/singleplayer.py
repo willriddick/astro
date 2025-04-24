@@ -2,6 +2,7 @@ import pygame
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.clock import CLOCK
+from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
 from src.level_gen import CONFIGS
 from src.ui import UserInterface
@@ -14,6 +15,8 @@ TRANSITION_DURATION = 1000
 class Singleplayer(State):
     def __init__(self):
         super().__init__(GameStates.SINGLEPLAYER)
+        self.paused = False
+
         self.level_index = 1
         self.next_timer = Timer(TRANSITION_DURATION)
         self.next = False
@@ -49,6 +52,7 @@ class Singleplayer(State):
         )
 
         self.handle_rocket()
+        self.handle_pause()
 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
@@ -79,6 +83,11 @@ class Singleplayer(State):
             else:
                 self.owner.state_machine.switch(GameStates.MAIN_MENU)
                 self.next = False
+    
+    def handle_pause(self) -> None:
+        if INPUTS.get('escape', just_pressed=True):
+            self.paused = not self.paused
+            print(f'Paused: {self.paused}')
               
 
 def manage_fuel_cells() -> int:

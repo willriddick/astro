@@ -4,12 +4,11 @@ from src.menu import Menu, Page, Button, TextButton
 from src.level_manager import LEVEL_MANAGER
 from src.camera import CAMERA
 from src.inputs import INPUTS
-from src.sounds import SOUNDS
 from src.networking import MsgType
 from src.constants import DISPLAY_HEIGHT
 import src.graphics as graphics
 from .game_states import GameStates
-from .lobby_helpers import render_clients, draw_wave_lines
+from .lobby_helpers import render_clients, draw_wave_lines, set_palette
 
 
 class LobbyHost(State):
@@ -35,18 +34,30 @@ class LobbyHost(State):
     def update(self):
         CAMERA.set_render_callback(self.render)
         self.menu.update()
+
+        node = self.owner.network_node
+        if not node:
+            return
+        
+        # swap palette
+        pal_dir = INPUTS.get_dir(just_pressed=True).x
+        if pal_dir:
+            self.palette_index = set_palette(node, self.palette_index, pal_dir)
+        
+        for event in node.get_events():
+            # update clients' palettes
+            if event.type == MsgType.PALETTE:
+                _id, palette_index = event.data[0], event.data[1]
+                username = node.clients[_id][0]
+                address = node.clients[_id][1]
+                node.clients[_id] = (username, address, palette_index)
     
     def render(self, display, offset):
         display.fill(self.background_color)
         draw_wave_lines(display)
         self.menu.render(display, offset)
 
-        # swap palette
-        pal_dir = INPUTS.get_dir(just_pressed=True).x
-        if pal_dir:
-            self._set_palette(pal_dir)
-
-        # render join code
+             # render join code
         node = self.owner.network_node
         if node:
             text = f'JOIN CODE: {node.join_code}'
@@ -55,7 +66,7 @@ class LobbyHost(State):
                 self.JOIN_CODE_POS
             ) 
 
-        render_clients(display, node, [self.palette_index, 0, 0, 0])
+        render_clients(display, node)
     
     def _play(self):
         CAMERA.transition(500, focus=0, fade=-1)
@@ -74,10 +85,6 @@ class LobbyHost(State):
     def _set_seed(self, selected: bool, value: str):
         self.menu.movement_enabled = not selected 
         self.seed = value
-    
-    def _set_palette(self, value: int):
-        self.palette_index = (self.palette_index + value) % len(graphics.PLAYER_PALETTES)
-        SOUNDS.play('blip')
     
     def _cancel(self):
         CAMERA.transition(500, focus=0, fade=-1)

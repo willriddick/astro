@@ -45,6 +45,8 @@ class Client(NetworkNode):
                 self.event_queue.put(msg)
             case MsgType.NEW_LEVEL:
                 self.event_queue.put(msg)
+            case MsgType.PALETTE:
+                self.event_queue.put(msg)
             case MsgType.JOIN:
                 print(f'Received join message from: {msg.addr}')
             case _:

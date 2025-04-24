@@ -106,12 +106,12 @@ class Multiplayer(State):
     
     def create_ghosts(self) -> None:
         from src.player.ghost import Ghost
-        for client, (username, _) in self.node.clients.items():
+        for client, (username, _, palette_index) in self.node.clients.items():
             # dont create a ghost for the current player
             if client == self.node.id:
                 continue
 
-            new_ghost = Ghost(username)
+            new_ghost = Ghost(username, palette_index)
             self.ghosts[client] = new_ghost
     
     def new_level(self) -> None:
