@@ -2,8 +2,12 @@ import pygame
 from src.util import State, Timer
 from src.camera import CAMERA
 from src.level_manager import LEVEL_MANAGER
+from src.inputs import INPUTS
 from src.clock import CLOCK
+from src.sounds import SOUNDS
 from src.level_gen import CONFIGS
+from src.constants import DISPLAY_HEIGHT
+from src.menu import Menu, Page, Button
 from src.ui import UserInterface
 from src.networking import MsgType, NetworkNode
 from .game_states import GameStates
@@ -16,11 +20,15 @@ TRANSITION_DURATION = 2000
 class Multiplayer(State):
     def __init__(self):
         super().__init__(GameStates.MULTIPLAYER)
-        self.node: NetworkNode = None
+        self.paused = False
 
         self.level_index = 1
         self.next_timer = Timer(TRANSITION_DURATION)
         self.next = False
+
+        from src.player.ghost import Ghost
+        self.node: NetworkNode = None
+        self.ghosts: dict[int, Ghost] = {} 
 
         self.update_timer = Timer(40)
 
@@ -30,8 +38,14 @@ class Multiplayer(State):
         self.ui = UserInterface(palette_index=LEVEL_MANAGER.palette_index)
         self.ui.reset()
 
-        from src.player.ghost import Ghost
-        self.ghosts: dict[int, Ghost] = {} 
+        self.pause_menu = Menu(pages=[
+                Page(buttons=[
+                    Button('Resume', self._resume), 
+                    Button('Quit', self._quit)
+                ], reset_index=True)
+            ], 
+            position=pygame.Vector2(16, DISPLAY_HEIGHT - 16),
+        )
 
     def on_enter(self):
         self.node = self.owner.network_node
@@ -42,6 +56,9 @@ class Multiplayer(State):
         LEVEL_MANAGER.player.multiplayer = True
 
     def update(self):
+        if INPUTS.get('escape', just_pressed=True):
+            self._toggle_pause()
+
         self.duration += CLOCK.dt
 
         LEVEL_MANAGER.current.update()
@@ -60,12 +77,21 @@ class Multiplayer(State):
         self.handle_events()
         self.broadcast_update()
         self.handle_rocket()
+
+        if self.paused:
+            self.pause_menu.update()
                 
     def render(self, display: pygame.Surface, offset: pygame.Vector2):
         LEVEL_MANAGER.current.render(display, offset)
         for ghost in self.ghosts.values():
             ghost.render(display, offset)
         self.ui.render(display, offset)
+
+        if self.paused:
+            overlay = pygame.Surface(display.get_size(), flags=pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+            display.blit(overlay, (0, 0))
+            self.pause_menu.render(display, offset)
     
     def broadcast_update(self) -> None:
         if self.update_timer.is_done:
@@ -143,4 +169,33 @@ class Multiplayer(State):
             else:
                 self.owner.state_machine.switch(GameStates.MAIN_MENU)
                 self.next = False
+
+    def _toggle_pause(self) -> None:
+        SOUNDS.play('select', pitch_index=1)
+        if self.paused:
+            self._resume()
+        else:
+            self._pause()
+   
+    def _pause(self) -> None:
+        self.paused = True
+        LEVEL_MANAGER.player.pause(-1)
+
+    def _resume(self) -> None:
+        self.paused = False
+        LEVEL_MANAGER.player.unpause()
+    
+    def _quit(self) -> None:
+        self._resume()
+        self.next = False
+        self.next_timer.reset()
+
+        self.node.broadcast_message(MsgType.DISCONNECT, self.node.id)
+        self.node.network_node.disconnect()
+        self.node.network_node.close()
+        self.node.network_node = None
+        self.node.state_machine.switch(GameStates.MAIN_MENU)
+
+        CAMERA.transition(TRANSITION_DURATION, 0, -1)
+        self.owner.state_machine.switch(GameStates.MAIN_MENU)
     
