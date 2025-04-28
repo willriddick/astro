@@ -77,6 +77,9 @@ class Player(PhysicsEntity):
         self.paused_timer = Timer()
         self.multiplayer = multiplayer
 
+        # tracks jetpack particles for multiplayer 
+        self.current_particle = 0
+
         self.input_dir = Vec2(0, 0)
         self.spawn_position = pygame.Vector2(0, 0)
         self.slide_dir = 0

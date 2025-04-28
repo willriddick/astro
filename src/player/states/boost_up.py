@@ -26,6 +26,7 @@ class BoostUp(State):
     
     def on_exit(self):
         self.owner.refuel_timer.start()
+        self.owner.current_particle = 0
     
     def update(self):
         self.owner.accelerate_x(self.owner.input_dir.x, Player.BOOST_UP_MOVE_SPEED, Player.BOOST_UP_MOVE_ACC)
@@ -44,6 +45,7 @@ class BoostUp(State):
                 count=4
             )
             self.timer.start()
+            self.owner.current_particle = 1
 
         # switch states
         if self.owner.input_dir.y != -1:

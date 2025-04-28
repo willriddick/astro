@@ -77,6 +77,9 @@ class Multiplayer(State):
         self.handle_events()
         self.broadcast_update()
         self.handle_rocket()
+    
+        for ghost in self.ghosts.values():
+            ghost.update()
 
         if self.paused:
             self.pause_menu.update()
@@ -103,6 +106,7 @@ class Multiplayer(State):
                     int(player.position.x), 
                     int(player.position.y),
                     int(player.sprite.current.value),
+                    int(player.current_particle),
                     bool(player.sprite.flip_x),
                     bool(player.sprite.flash_timer.is_active),
                     bool(player.sprite.alpha_timer.is_active)
@@ -116,12 +120,13 @@ class Multiplayer(State):
                 case MsgType.UPDATE:
                     ghost = self.ghosts.get(event.data[0])
                     if ghost:
-                        ghost.update(
+                        ghost.set_state(
                             new_pos=pygame.Vector2(event.data[1], event.data[2]),
                             current_anim=event.data[3],
-                            flip_x=bool(event.data[4]),
-                            flash=bool(event.data[5]),
-                            alpha=bool(event.data[6])
+                            current_particle=event.data[4],
+                            flip_x=bool(event.data[5]),
+                            flash=bool(event.data[6]),
+                            alpha=bool(event.data[7])
                         )
                 case MsgType.NEW_LEVEL:
                     CAMERA.transition(TRANSITION_DURATION, 0, -1)  # fade the screen

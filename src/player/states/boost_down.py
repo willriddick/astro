@@ -28,9 +28,11 @@ class BoostDown(State):
             position=self.owner.position + pygame.Vector2(BOOST_OFFSET * self.owner.sprite.flip_x, 7),
             count=5
         )
+        self.owner.current_particle = -1
 
     def on_exit(self):
         self.owner.refuel_timer.start()
+        self.owner.current_particle = 0
 
     def update(self):
         self.owner.apply_gravity(Player.GRAVITY, Player.BOOST_DOWN_SPEED)

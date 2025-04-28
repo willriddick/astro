@@ -20,7 +20,7 @@ MsgFormat = {
     MsgType.DISCONNECT: 'i',  # id
     MsgType.CHAT: 'i 64s',  # id, 64 character message
     MsgType.PING: 'i',  # id
-    MsgType.UPDATE: 'i iii???',  # id, x, y, current_anim, flip_x, flash, alpha
+    MsgType.UPDATE: 'i iiii???',  # id, x, y, current_anim, current_particle, flip_x, flash, alpha
     MsgType.NEW_LEVEL: 'ii',  # seed, config
     MsgType.PALETTE: 'ii',  # id, palette index
 }
