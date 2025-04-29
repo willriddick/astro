@@ -66,4 +66,5 @@ class Button():
 
         surface = pygame.Surface(self.SURFACE_SIZE, pygame.SRCALPHA)
         surface.blit(graphics.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
+        surface.set_alpha(50)
         return surface

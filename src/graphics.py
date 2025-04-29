@@ -7,6 +7,7 @@ from src.util import (
 )
 
 
+LOGO = None
 ICON = None
 ICON_VARIANTS = None
 PALETTE = None
@@ -22,9 +23,11 @@ TILESET = None
 
 def load():
     """Load all assets into module-level variables."""
-    global ICON, ICON_VARIANTS, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
+    global LOGO, ICON, ICON_VARIANTS, PALETTE, FONT, PLAYER_SHEET, PLAYER_PALETTES
     global STARS, SPIKE, TILESET, ROCKET, FUEL_CELL
-   
+
+    LOGO = load_image('logo.png', True)
+
     PALETTE = load_palette('endesga-64.png')
     FONT = load_font('DePixelKlein.ttf', 9)
 

@@ -20,6 +20,7 @@ class MainMenu(State):
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
 
+
         # settings
         self.resolution_slider = SliderButton(
             'Resolution', 
@@ -95,6 +96,15 @@ class MainMenu(State):
                 ], default_index=3)
             ],
         )
+
+        # Update logo
+        self.logo_position = Vec2(
+            16, 
+            DISPLAY_HEIGHT // 2 - graphics.LOGO.get_height() // 2 + 32
+        )
+        color = Button.HOVERED_COLOR
+        color.a = 150
+        graphics.LOGO.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
     
     def on_enter(self):
         self.star_spawner.spawn(30)
@@ -117,6 +127,9 @@ class MainMenu(State):
         display.fill(self.background_color)
         self.star_spawner.render(display, offset)
         self.menu.render(display, offset)
+
+        if self.menu.page_index == 0:
+            display.blit(graphics.LOGO, self.logo_position)
     
     def _change_page(self, page: int):
         self.menu.change_page(page)
