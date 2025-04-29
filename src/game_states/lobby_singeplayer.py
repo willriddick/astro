@@ -20,23 +20,25 @@ class LobbySingleplayer(State):
         super().__init__(GameStates.LOBBY_SINGLEPLAYER)
         self.background_color = graphics.PALETTE[15]
 
-        self.seed = ''
         self.palette_index = random.randint(0, len(graphics.PLAYER_PALETTES) - 1)
+
+        self.seed_button = TextButton('Seed', self._set_seed)
 
         self.menu = Menu(
             position=Vec2(16, DISPLAY_HEIGHT - 16),
             pages = [
                 Page([
-                    TextButton('Seed', self._set_seed),
                     Button('Play', self._play),
+                    self.seed_button,
                     Button('Cancel', self._cancel)
                 ], default_index=0, reset_index=True)
             ]
         )
+
     
     def on_enter(self):
         CAMERA.offset = pygame.Vector2(0, 0)
-        self.seed = ''
+        self.seed = self.seed_button.value
     
     def update(self):
         CAMERA.set_render_callback(self.render)
