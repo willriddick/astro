@@ -100,10 +100,10 @@ class MainMenu(State):
         # Update logo
         self.logo_position = Vec2(
             16, 
-            DISPLAY_HEIGHT // 2 - graphics.LOGO.get_height() // 2 + 32
+            DISPLAY_HEIGHT // 2 - graphics.LOGO.get_height() // 2 + 44
         )
         color = Button.HOVERED_COLOR
-        color.a = 150
+        color.a = 170
         graphics.LOGO.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
     
     def on_enter(self):
