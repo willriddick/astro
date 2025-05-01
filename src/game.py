@@ -21,7 +21,6 @@ class Game:
     def __init__(self):
         pygame.init()
         self.running = False
-        self.paused = False
         scale = SETTINGS.get('window_scale')
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
@@ -60,8 +59,7 @@ class Game:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
-            if not self.paused:
-                self.state_machine.update()
+            self.state_machine.update()
             CAMERA.update()
 
             # handle commmands and draw command prompt
@@ -102,9 +100,6 @@ class Game:
                 LEVEL_MANAGER.new_level()
             case ['n', seed]:
                 LEVEL_MANAGER.new_level(seed=seed)
-            case ['p', index]:
-                if player:
-                    player.load_sprite(int(index))
             case ['r']:
                 if player:
                     player.spawn(player.spawn_position)
@@ -160,10 +155,6 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                if event.mod & pygame.KMOD_CTRL:
-                    self.paused = not self.paused
     
     def handle_resize(self, width, height):
         new_width = width

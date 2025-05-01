@@ -196,10 +196,10 @@ class Multiplayer(State):
         self.next_timer.reset()
 
         self.node.broadcast_message(MsgType.DISCONNECT, self.node.id)
-        self.node.network_node.disconnect()
-        self.node.network_node.close()
-        self.node.network_node = None
-        self.node.state_machine.switch(GameStates.MAIN_MENU)
+        self.node.disconnect()
+        self.node.close()
+        self.node = None
+        self.state_machine.switch(GameStates.MAIN_MENU)
 
         CAMERA.transition(TRANSITION_DURATION, 0, -1)
         self.owner.state_machine.switch(GameStates.MAIN_MENU)
