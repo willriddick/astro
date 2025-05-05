@@ -1,6 +1,6 @@
 import random
 import pygame
-from src.util import State, Vec2
+from src.util import State, Vec2, Timer
 from src.menu import Menu, Page, Button, ToggleButton, SliderButton, InputButton, TextButton
 from src.entities import StarSpawner
 from src.constants import DISPLAY_HEIGHT
@@ -19,6 +19,7 @@ class MainMenu(State):
         self.background_color = graphics.PALETTE[15]
         self.star_spawner = StarSpawner(invert_depth=True)
         self.camera_movement: pygame.Vector2 = None
+
 
         # settings
         self.resolution_slider = SliderButton(
@@ -95,13 +96,23 @@ class MainMenu(State):
                 ], default_index=3)
             ],
         )
+
+        # Update logo
+        self.logo_position = Vec2(
+            16, 
+            DISPLAY_HEIGHT // 2 - graphics.LOGO.get_height() // 2 + 44
+        )
+        color = Button.HOVERED_COLOR
+        color.a = 170
+        graphics.LOGO.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
     
     def on_enter(self):
         self.star_spawner.spawn(30)
+        self.menu.change_page(0)
         CAMERA.boundary = None
         self.camera_movement = pygame.Vector2(
-            random.choice([-1, 1]) * random.randint(5, 30),
-            random.choice([-1, 1]) * random.randint(5, 30)
+            random.choice([-1, 1]) * random.randint(10, 30),
+            random.choice([-1, 1]) * random.randint(10, 30)
         )
     
     def on_exit(self):
@@ -117,44 +128,57 @@ class MainMenu(State):
         self.star_spawner.render(display, offset)
         self.menu.render(display, offset)
 
+        if self.menu.page_index == 0:
+            display.blit(graphics.LOGO, self.logo_position)
+    
+    def _change_page(self, page: int):
+        self.menu.change_page(page)
+        MainMenu._transition()
+    
+    def _transition():
+        CAMERA.transition(500, focus=1, fade=-1)
+
     def _switch_to_main(self):
-        self.menu.change_page(0)
+        self._change_page(0)
         SETTINGS.save()
 
     def _switch_to_settings(self):
-        self.menu.change_page(1)
+        self._change_page(1)
     
     def _switch_to_display(self):
-        self.menu.change_page(2)
+        self._change_page(2)
     
     def _switch_to_audio(self):
-        self.menu.change_page(3)
+        self._change_page(3)
     
     def _switch_to_controls(self):
-        self.menu.change_page(4)
+        self._change_page(4)
 
     def _switch_to_play(self):
         self.owner.network_node = None
-        self.menu.change_page(5)
+        self._change_page(5)
     
     def _switch_to_host(self):
-        self.menu.change_page(6)
+        self._change_page(6)
     
     def _switch_to_join(self):
-        self.menu.change_page(7)
+        self._change_page(7)
     
     def _start_singleplayer(self):
-        self.owner.state_machine.switch(GameStates.SINGLEPLAYER)
-        CAMERA.transition(1000, focus=1, fade=-1)
+        self.owner.state_machine.switch(GameStates.LOBBY_SINGLEPLAYER)
+        MainMenu._transition()
     
     def _start_multiplayer(self):
         self.owner.state_machine.switch(GameStates.MULTIPLAYER)
+        MainMenu._transition()
     
     def _join_session(self):
         self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
+        MainMenu._transition()
     
     def _host_session(self):
         self.owner.state_machine.switch(GameStates.LOBBY_HOST)
+        MainMenu._transition()
     
     def _set_join_username(self, selected: bool, value: str):
         self.menu.movement_enabled = not selected 
@@ -178,6 +202,7 @@ class MainMenu(State):
 
         if joined:
             self.owner.state_machine.switch(GameStates.LOBBY_JOIN)
+            MainMenu._transition()
         else:
             print('Failed to join session')
 
@@ -186,6 +211,7 @@ class MainMenu(State):
         self.owner.network_node.start()
         self.owner.network_node.start_session()
         self.owner.state_machine.switch(GameStates.LOBBY_HOST)
+        MainMenu._transition()
     
     def _reset_defaults(self):
         if not SETTINGS.get('fullscreen'):
@@ -195,10 +221,12 @@ class MainMenu(State):
         INPUTS.reset_defaults()
         INPUTS.save()
         SOUNDS.update_sounds()
+        MainMenu._transition()
     
     def _set_fullscreen(self, value: bool):
         self.owner.set_fullscreen(value)
         self.resolution_slider.disabled = value
+        MainMenu._transition()
     
     def _update_volume(self, _):
         SETTINGS.save()

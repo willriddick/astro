@@ -10,7 +10,7 @@ from src.settings import SETTINGS
 from src.sounds import SOUNDS
 from src.inputs import INPUTS
 from src.level_manager import LEVEL_MANAGER
-from src.game_states import GameStates, MainMenu, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
+from src.game_states import GameStates, MainMenu, LobbySingleplayer, Singleplayer, LobbyHost, LobbyJoin, Multiplayer
 from src.networking import Host, Client, NetworkNode, MsgType
 import src.graphics as graphics
 
@@ -21,7 +21,6 @@ class Game:
     def __init__(self):
         pygame.init()
         self.running = False
-        self.paused = False
         scale = SETTINGS.get('window_scale')
         self.window = pygame.display.set_mode(
             (DISPLAY_WIDTH * scale, DISPLAY_HEIGHT * scale),
@@ -36,14 +35,16 @@ class Game:
         self.events: list[pygame.event.Event] = []  
         self.command_prompt = CommandPrompt()
 
-        self.state_machine = StateMachine(self, [MainMenu(), Singleplayer(), LobbyHost(), LobbyJoin(), Multiplayer()])
+        self.state_machine = StateMachine(self, [
+            MainMenu(), LobbySingleplayer(), Singleplayer(),
+            LobbyHost(), LobbyJoin(), Multiplayer()
+        ])
         self.network_node: NetworkNode = None
-
 
     async def run(self):
         """Main game loop that handles events, updates, and rendering."""
         self.running = True
-        #SOUNDS.play('music/track1', loops=-1)
+        SOUNDS.play('music/track1', loops=-1)
 
         while self.running:
             DEBUG.update()
@@ -58,8 +59,7 @@ class Game:
                 self.handle_event(event)
                 self.command_prompt.handle_event(event)
 
-            if not self.paused:
-                self.state_machine.update()
+            self.state_machine.update()
             CAMERA.update()
 
             # handle commmands and draw command prompt
@@ -100,9 +100,6 @@ class Game:
                 LEVEL_MANAGER.new_level()
             case ['n', seed]:
                 LEVEL_MANAGER.new_level(seed=seed)
-            case ['p', index]:
-                if player:
-                    player.load_sprite(int(index))
             case ['r']:
                 if player:
                     player.spawn(player.spawn_position)
@@ -158,10 +155,6 @@ class Game:
             self.handle_resize(event.w, event.h)
         if event.type == pygame.FULLSCREEN:
             self.toggle_fullscreen
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                if event.mod & pygame.KMOD_CTRL:
-                    self.paused = not self.paused
     
     def handle_resize(self, width, height):
         new_width = width

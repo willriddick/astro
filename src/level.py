@@ -39,6 +39,8 @@ class Level:
     def update(self) -> None:
         self.shooting_star.update()
 
+        self.rocket.update()
+
         if self.asteroid_spawner:
             self.asteroid_spawner.update()
 

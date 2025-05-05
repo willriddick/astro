@@ -40,12 +40,13 @@ class Particle(Entity):
         if self.timer.is_done:
             self.despawn()
 
-    def render(self, display, offset):
+    def render(self, display, offset, override_alpha=255):
+        color = (*self.type.color, min(self.alpha, override_alpha))
         draw_circle(
             display, offset, 
             center=self.position, 
             radius=self.current_size,
-            fill_color=(*self.type.color, self.alpha),
+            fill_color=color,
         )
 
     def spawn(self, type: ParticleType, position: pygame.Vector2):

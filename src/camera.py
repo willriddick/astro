@@ -36,6 +36,7 @@ class Camera:
         self.transition_focus = 0.5 
 
         self.render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
+        self.post_render_callback: Callable[[pygame.Surface, pygame.Vector2], None] = None
     
     @property
     def debug(self) -> str:
@@ -90,6 +91,10 @@ class Camera:
         # render transition
         if self.transition_timer.is_active:
             self._render_transition(self.display)
+        
+        # post callback to render above transition (for rocket)
+        if self.post_render_callback:
+            self.post_render_callback(self.display, -self.offset)
 
         # render debug
         self._render_debug()
@@ -110,7 +115,7 @@ class Camera:
         self.transition_fade = fade
     
     def is_visible(self, point: Vec2) -> bool:
-        return self.rect.collidepoint(point)
+        return self.rect.inflate(128, 128).collidepoint(point)
 
     def set_render_callback(self, callback: Callable[[pygame.Surface, pygame.Vector2], None]):
         """Set a new render function for the camera."""
@@ -191,13 +196,16 @@ class Camera:
         text_surf.set_alpha(70)
         text_rect = text_surf.get_rect()
         buffer = 2
+        width = text_rect.width + buffer * 2
+        height = text_rect.height + buffer * 2
+        rect = pygame.Rect(-1, DISPLAY_HEIGHT - height, width, height + buffer * 2)
         draw_rect(
             self.display,
-            rect=pygame.Rect(0, 16, text_rect.width + buffer * 2, text_rect.height + buffer * 2),
+            rect=rect,
             fill_color=(0, 0, 0, 40),
             outline_color=(0, 0, 0, 0)
         )
-        self.display.blit(text_surf, (buffer, 16 + buffer))
+        self.display.blit(text_surf, (2, DISPLAY_HEIGHT - text_surf.height - buffer))
     
 
 CAMERA = Camera(Vec2(DISPLAY_WIDTH, DISPLAY_HEIGHT))

@@ -12,8 +12,8 @@ import src.graphics as graphics
 class Button():
 
     SURFACE_SIZE = Vec2(224, 16)
-    X_OFFSET = 7
-    OFFSET_SPEED = 15 
+    X_OFFSET = 10
+    OFFSET_SPEED = 12
 
     # placeholders
     DEFAULT_COLOR = None  
@@ -66,4 +66,5 @@ class Button():
 
         surface = pygame.Surface(self.SURFACE_SIZE, pygame.SRCALPHA)
         surface.blit(graphics.FONT.render(self.text, antialias=False, color=color), (self.x_offset, 0))
+        surface.set_alpha(50)
         return surface

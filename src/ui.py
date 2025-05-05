@@ -1,8 +1,8 @@
 import pygame
-from src.util import Vec2
-from src.clock import CLOCK
+from src.util import Vec2, swap_palette
 from src.constants import DISPLAY_WIDTH
 from src.settings import SETTINGS
+from src.level_manager import LEVEL_MANAGER
 import src.graphics as graphics
 
 
@@ -10,12 +10,12 @@ TOP_BUFFER = 4
 SCREEN_BUFFER = 8
 
 
-class UI:
-    def __init__(self):
+class UserInterface:
+    def __init__(self, palette_index=1):
         self.duration = 0.0
         self.collected = 0
         self.level = 1
-
+        self.palette_index = palette_index
         self.fuel_icon = graphics.FUEL_CELL
         self.fuel_icon_width = self.fuel_icon.get_width()
     
@@ -24,8 +24,15 @@ class UI:
         self.collected = 0
         self.level = 1
 
-    def update(self, collected: int, fuel_cells: int, level):
-        self.duration += CLOCK.dt
+        palette = graphics.PLAYER_PALETTES[self.palette_index]
+        self.fuel_icon = swap_palette(
+            graphics.FUEL_CELL,
+            graphics.PLAYER_PALETTES[0],
+            palette,
+        )
+
+    def update(self, duration: float, collected: int, fuel_cells: int, level: int):
+        self.duration = duration
         self.collected = collected
         self.fuel_cells = fuel_cells
         self.level = level
@@ -33,7 +40,12 @@ class UI:
     def render(self, display, offset):
         ui_surface = pygame.Surface((DISPLAY_WIDTH, 16), pygame.SRCALPHA)
 
-        timer_text = f'{self.duration:0.2f}'
+        total_ms = int(self.duration * 1000)
+        minutes = total_ms // 60000
+        seconds = (total_ms % 60000) // 1000
+        milliseconds = (total_ms % 1000) // 10
+
+        timer_text = f'{minutes:02}:{seconds:02}.{milliseconds:02}'
         timer_surf = graphics.FONT.render(timer_text, antialias=False, color=(255, 255, 255))
         timer_pos = Vec2(DISPLAY_WIDTH // 2 - timer_surf.get_width() // 2, TOP_BUFFER)
         ui_surface.blit(timer_surf, timer_pos)

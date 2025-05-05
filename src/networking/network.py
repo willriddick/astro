@@ -32,7 +32,7 @@ class NetworkNode:
         self.public_ip = self.get_public_ip()
         
         self.id = -1
-        self.clients: dict[int, (str, Address)] = {}
+        self.clients: dict[int, (str, Address, int)] = {}  # id: (username, address, palette index)
 
         self.running = False
         self.receive_thread: threading.Thread = None
@@ -109,7 +109,7 @@ class NetworkNode:
     def add_client(self, client_id: int, username: str, address: Address):
         """Add a client to the list of clients."""
         if client_id not in self.clients:
-            self.clients[client_id] = (username, address)
+            self.clients[client_id] = (username, address, 0)
     
     def remove_client(self, client_id: int):
         """Remove a client from the list of clients."""

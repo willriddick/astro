@@ -32,6 +32,10 @@ class Host(NetworkNode):
                 self.handle_chat(msg.data)
             case MsgType.UPDATE:
                 self.event_queue.put(msg)
+            case MsgType.NEW_LEVEL:
+                self.event_queue.put(msg)
+            case MsgType.PALETTE:
+                self.event_queue.put(msg)
             case _:
                 print(f'Unknown message type: {msg.type}')
    

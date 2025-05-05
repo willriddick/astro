@@ -18,12 +18,16 @@ STAR_COUNT = 100
 class LevelManager:
     def __init__(self):
         self.player = None
+        self.palette_index = 1
         self.current = None
+        self.seed = None
     
     def new_level(self, seed: int = None, config_index=0, map_path: str = None):
         """Create a new level with the given seed and map path."""
         if seed:
             random.seed(seed)
+        else:
+            random.seed(self.seed)
 
         self.current = level = Level()
         
@@ -42,13 +46,13 @@ class LevelManager:
 
         if level.exit_tile:
             level.exit_pos = level.exit_tile.pos
-            level.rocket = Rocket(level.exit_tile.pos) 
-            level.rocket.spawn()
+            level.rocket = Rocket(level.exit_tile.pos, self.palette_index) 
             level.entities.append(level.rocket)
+            level.rocket.spawn()
             level.tilemap.remove_tile(level.exit_tile.tile_pos)    
         
         for fuel_cell in level.fuel_cell_tiles:
-            new_cell = FuelCell(fuel_cell.pos)
+            new_cell = FuelCell(fuel_cell.pos, self.palette_index)
             level.fuel_cells.append(new_cell)
             level.entities.append(new_cell)
             new_cell.spawn()
@@ -67,7 +71,10 @@ class LevelManager:
         # spawn player
         from src.player import Player
         if self.player is None:
-            self.player = Player()
+            self.player = Player(self.palette_index)
+        
+        if self.player.palette_index != self.palette_index:
+            self.player.load_sprite(self.palette_index)
 
         level.entities.append(self.player)
         self.player.spawn(level.spawn_pos)

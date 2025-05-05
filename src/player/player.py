@@ -39,7 +39,7 @@ class Player(PhysicsEntity):
     BOOST_UP_MOVE_SPEED = 60
     BOOST_UP_MOVE_ACC = Vec2(100, 20)
 
-    BOOST_DOWN_COST = 25
+    BOOST_DOWN_COST = 15
     INITIAL_BOOST_DOWN = 40
     BOOST_DOWN_SPEED = 200
     BOOST_DOWN_MOVE_SPEED = 75
@@ -68,13 +68,17 @@ class Player(PhysicsEntity):
     ROTATE_DURATION = 180  # time to play FRONT animation when rotating
     AIR_ROTATE_DURATION = 250
 
-    def __init__(self, palette_index: int=1):
+    def __init__(self, palette_index: int=1, multiplayer: bool=False):
         super().__init__(pygame.Vector2(0, 0), size=Vec2(8, 13))
 
         self.visible = True
 
         self.paused = False
         self.paused_timer = Timer()
+        self.multiplayer = multiplayer
+
+        # tracks jetpack particles for multiplayer 
+        self.current_particle = 0
 
         self.input_dir = Vec2(0, 0)
         self.spawn_position = pygame.Vector2(0, 0)
@@ -104,7 +108,7 @@ class Player(PhysicsEntity):
         # setup sprite
         self.rotated = False
         self.last_facing_dir = 1
-        self.palette_index = None
+        self.palette_index = palette_index
         self.sprite = None
         self.load_sprite(palette_index)
     
@@ -154,13 +158,14 @@ class Player(PhysicsEntity):
         if self.paused_timer.duration != -1:
             self.paused = self.paused_timer.is_active
 
-        self.sprite.update(self.position)
-        self.health_component.update(self.position)
-        self.state_machine.update()
-        self.particle_emitter.update()
-        self.handle_collision()
-        self.handle_collectables()
-        self.handle_fuel()
+        if not self.paused or self.multiplayer:
+            self.sprite.update(self.position)
+            self.health_component.update(self.position)
+            self.state_machine.update()
+            self.particle_emitter.update()
+            self.handle_collision()
+            self.handle_collectables()
+            self.handle_fuel()
     
     def pause(self, duration: int):
         """
